@@ -43,6 +43,8 @@ export const Paywall: React.FC<PaywallProps> = ({ profile, onUpgraded, onContinu
 
   const handlePaystack = () => {
     if (!profile?.email) { alert('No email on your account.'); return; }
+    console.log('Paystack key:', PAYSTACK_PUBLIC_KEY ? PAYSTACK_PUBLIC_KEY.substring(0,10) + '...' : 'MISSING');
+    console.log('Plan code:', MONTHLY_PLAN_CODE || 'MISSING');
     if (!PAYSTACK_PUBLIC_KEY) { alert('Paystack key not configured.'); return; }
 
     setPayLoading(true);
