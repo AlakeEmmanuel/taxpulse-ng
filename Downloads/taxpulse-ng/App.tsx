@@ -10,45 +10,118 @@ import { AIAssistant } from './pages/AIAssistant';
 import { EvidenceVault } from './pages/EvidenceVault';
 import { PenaltyCalculator } from './pages/PenaltyCalculator';
 import { TaxExport } from './pages/TaxExport';
+import { AuthPage } from './pages/AuthPage';
+import { Paywall } from './pages/Paywall';
 import { Company } from './types';
+import { UserProfile, getProfile, isPro, signOut } from './services/auth';
 import * as db from './services/db';
+import { supabase } from './services/supabaseClient';
 
 export type AppView =
   | 'dashboard' | 'onboarding' | 'calculators' | 'pit'
   | 'ledger' | 'settings' | 'ai' | 'vault' | 'penalties' | 'export';
 
+const PRO_VIEWS: AppView[] = ['ai', 'vault', 'export'];
+
+const LockedFeature: React.FC<{ name: string; onUpgrade: () => void }> = ({ name, onUpgrade }) => (
+  <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-6 space-y-5">
+    <div className="w-20 h-20 bg-amber-50 border-2 border-amber-200 rounded-2xl flex items-center justify-center text-4xl">🔒</div>
+    <div>
+      <h2 className="text-xl font-extrabold text-slate-900">{name} is a Pro feature</h2>
+      <p className="text-slate-500 text-sm mt-2 max-w-sm">Upgrade to TaxPulse Pro to unlock AI assistance, PDF exports, Evidence Vault and unlimited companies.</p>
+    </div>
+    <button onClick={onUpgrade} className="bg-cac-green text-white px-8 py-3.5 rounded-xl font-bold text-sm hover:bg-cac-dark transition-colors">
+      Upgrade to Pro — ₦2,500/month
+    </button>
+  </div>
+);
+
 const Spinner = ({ msg = 'Loading...' }: { msg?: string }) => (
   <div className="min-h-screen flex items-center justify-center bg-slate-50">
     <div className="text-center">
-      <div className="w-16 h-16 border-4 border-cac-green border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-      <p className="text-slate-600 font-bold">{msg}</p>
+      <img src="/logo-icon.png" alt="TaxPulse" className="w-16 h-16 mx-auto mb-4 rounded-2xl" />
+      <div className="w-8 h-8 border-3 border-cac-green border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+      <p className="text-slate-500 text-sm">{msg}</p>
     </div>
   </div>
 );
 
+type AppState = 'loading' | 'unauthenticated' | 'ready';
+
 const App: React.FC = () => {
+  const [appState, setAppState] = useState<AppState>('loading');
+  const [userId, setUserId] = useState<string | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [showPaywall, setShowPaywall] = useState(false);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [activeCompany, setActiveCompany] = useState<Company | null>(null);
   const [view, setView] = useState<AppView>('dashboard');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
 
   useEffect(() => {
-    db.getCompanies()
-      .then(list => {
-        setCompanies(list);
-        if (list.length > 0) {
-          setActiveCompany(list[0]);
-          setView('dashboard');
-        } else {
-          setView('onboarding');
-        }
-      })
-      .catch(e => setError(e.message))
-      .finally(() => setLoading(false));
+    // Check session on load
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session?.user) {
+        await initUser(session.user.id);
+      } else {
+        setAppState('unauthenticated');
+      }
+    });
+
+    // Listen for login/logout
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        await initUser(session.user.id);
+      }
+      if (event === 'SIGNED_OUT') {
+        setUserId(null);
+        setProfile(null);
+        setCompanies([]);
+        setActiveCompany(null);
+        setAppState('unauthenticated');
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
+  const initUser = async (uid: string) => {
+    (window as any).__taxpulse_uid = uid;
+    setUserId(uid);
+    try {
+      const [prof, list] = await Promise.all([
+        getProfile(uid),
+        db.getCompanies()
+      ]);
+      setProfile(prof);
+      setCompanies(list);
+      if (list.length > 0) {
+        setActiveCompany(list[0]);
+        setView('dashboard');
+      } else {
+        setView('onboarding');
+      }
+      setAppState('ready');
+    } catch (e: any) {
+      console.error('Init error:', e);
+      // Still show app even if data load fails
+      setView('onboarding');
+      setAppState('ready');
+    }
+  };
+
+  const handleNavigate = (v: AppView) => {
+    if (PRO_VIEWS.includes(v) && !isPro(profile)) {
+      setShowPaywall(true);
+      return;
+    }
+    setView(v);
+  };
+
   const handleCompanyAdded = async (company: Company) => {
+    if (!isPro(profile) && companies.length >= 1) {
+      setShowPaywall(true);
+      return;
+    }
     try {
       const saved = await db.addCompany(company);
       setCompanies(prev => [...prev, saved]);
@@ -65,42 +138,45 @@ const App: React.FC = () => {
     } catch (e: any) { alert('Error: ' + e.message); }
   };
 
-  if (loading) return <Spinner msg="TaxPulse NG" />;
+  const handleUpgraded = async () => {
+    if (userId) setProfile(await getProfile(userId));
+    setShowPaywall(false);
+  };
 
-  if (error) return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50">
-      <div className="bg-white rounded-2xl shadow p-8 max-w-md w-full text-center space-y-4">
-        <p className="text-4xl">⚠️</p>
-        <p className="font-bold text-slate-900">Database connection error</p>
-        <p className="text-sm text-slate-500 font-mono bg-slate-50 p-3 rounded-lg">{error}</p>
-        <p className="text-xs text-slate-400">Check your <strong>.env.local</strong> Supabase keys</p>
-        <button onClick={() => window.location.reload()}
-          className="bg-cac-green text-white px-6 py-2.5 rounded-xl font-bold text-sm">
-          Retry
-        </button>
-      </div>
-    </div>
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
+  if (appState === 'loading')        return <Spinner msg="Starting TaxPulse NG..." />;
+  if (appState === 'unauthenticated') return <AuthPage onAuth={() => {}} />;
+  if (showPaywall) return (
+    <Paywall profile={profile!} onUpgraded={handleUpgraded} onContinueFree={() => setShowPaywall(false)} />
   );
+
+  const proUser = isPro(profile);
 
   return (
     <Layout
       companies={companies}
       activeCompany={activeCompany}
       currentView={view}
-      onNavigate={setView}
+      onNavigate={handleNavigate}
       onSelectCompany={(c) => { setActiveCompany(c); setView('dashboard'); }}
       onAddCompany={() => setView('onboarding')}
+      isPro={proUser}
+      onSignOut={handleSignOut}
+      onUpgrade={() => setShowPaywall(true)}
     >
       {view === 'onboarding'  && <Onboarding onComplete={handleCompanyAdded} />}
-      {view === 'dashboard'   && activeCompany && <Dashboard company={activeCompany} onNavigate={setView} />}
+      {view === 'dashboard'   && activeCompany && <Dashboard company={activeCompany} onNavigate={handleNavigate} />}
       {view === 'calculators' && <CalculatorsPage />}
       {view === 'pit'         && <PITCalculator />}
       {view === 'ledger'      && activeCompany && <LedgerPage company={activeCompany} />}
       {view === 'penalties'   && <PenaltyCalculator />}
       {view === 'settings'    && activeCompany && <SettingsPage company={activeCompany} onCompanyUpdate={handleCompanySaved} />}
-      {view === 'ai'          && activeCompany && <AIAssistant company={activeCompany} />}
-      {view === 'vault'       && activeCompany && <EvidenceVault company={activeCompany} />}
-      {view === 'export'      && activeCompany && <TaxExport company={activeCompany} />}
+      {view === 'ai'     && (proUser ? <AIAssistant company={activeCompany!} /> : <LockedFeature name="AI Tax Assistant" onUpgrade={() => setShowPaywall(true)} />)}
+      {view === 'vault'  && (proUser ? <EvidenceVault company={activeCompany!} /> : <LockedFeature name="Evidence Vault" onUpgrade={() => setShowPaywall(true)} />)}
+      {view === 'export' && (proUser ? <TaxExport company={activeCompany!} /> : <LockedFeature name="PDF Export" onUpgrade={() => setShowPaywall(true)} />)}
     </Layout>
   );
 };
