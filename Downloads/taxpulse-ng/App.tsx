@@ -94,26 +94,28 @@ const App: React.FC = () => {
     (window as any).__taxpulse_uid = uid;
     setUserId(uid);
 
-    // Wrap in a 6-second timeout — if DB hangs, still show the app
-    const withTimeout = <T,>(promise: Promise<T>, fallback: T): Promise<T> =>
-      Promise.race([
-        promise,
-        new Promise<T>(resolve => setTimeout(() => resolve(fallback), 6000))
-      ]);
+    let prof: UserProfile | null = null;
+    let list: Company[] = [];
 
     try {
-      const [prof, list] = await Promise.all([
-        withTimeout(getProfile(uid), null),
-        withTimeout(db.getCompanies(), []),
+      prof = await Promise.race([
+        getProfile(uid),
+        new Promise<null>(r => setTimeout(() => r(null), 5000))
       ]);
-      setProfile(prof);
-      setCompanies(list as Company[]);
-      setActiveCompany((list as Company[])[0] || null);
-      setView((list as Company[]).length > 0 ? 'dashboard' : 'onboarding');
-    } catch (err) {
-      console.error('loadUserData error:', err);
-      setView('onboarding');
-    }
+    } catch (e) { console.error('getProfile error:', e); }
+
+    try {
+      const result = await Promise.race([
+        db.getCompanies(),
+        new Promise<Company[]>(r => setTimeout(() => r([]), 5000))
+      ]);
+      list = result || [];
+    } catch (e) { console.error('getCompanies error:', e); }
+
+    setProfile(prof);
+    setCompanies(list);
+    setActiveCompany(list[0] || null);
+    setView(list.length > 0 ? 'dashboard' : 'onboarding');
     setAppState('ready');
   };
 
