@@ -93,15 +93,23 @@ const App: React.FC = () => {
   const loadUserData = async (uid: string) => {
     (window as any).__taxpulse_uid = uid;
     setUserId(uid);
+
+    // Wrap in a 6-second timeout — if DB hangs, still show the app
+    const withTimeout = <T,>(promise: Promise<T>, fallback: T): Promise<T> =>
+      Promise.race([
+        promise,
+        new Promise<T>(resolve => setTimeout(() => resolve(fallback), 6000))
+      ]);
+
     try {
       const [prof, list] = await Promise.all([
-        getProfile(uid),
-        db.getCompanies(),
+        withTimeout(getProfile(uid), null),
+        withTimeout(db.getCompanies(), []),
       ]);
       setProfile(prof);
-      setCompanies(list);
-      setActiveCompany(list[0] || null);
-      setView(list.length > 0 ? 'dashboard' : 'onboarding');
+      setCompanies(list as Company[]);
+      setActiveCompany((list as Company[])[0] || null);
+      setView((list as Company[]).length > 0 ? 'dashboard' : 'onboarding');
     } catch (err) {
       console.error('loadUserData error:', err);
       setView('onboarding');
