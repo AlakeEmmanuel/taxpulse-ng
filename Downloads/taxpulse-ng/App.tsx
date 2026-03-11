@@ -164,7 +164,11 @@ const App: React.FC = () => {
 
   if (appState === 'env_error')       return <EnvError />;
   if (appState === 'loading')         return <Spinner msg="Starting TaxPulse NG..." />;
-  if (appState === 'unauthenticated') return <AuthPage onAuth={() => {}} />;
+  if (appState === 'unauthenticated') return <AuthPage onAuth={async () => {
+    // Manually check session after login as backup
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) await initUser(session.user.id);
+  }} />;
   if (showPaywall) return (
     <Paywall profile={profile!} onUpgraded={handleUpgraded} onContinueFree={() => setShowPaywall(false)} />
   );
