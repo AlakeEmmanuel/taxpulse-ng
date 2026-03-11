@@ -125,7 +125,8 @@ const App: React.FC = () => {
   };
 
   const handleCompanyAdded = async (company: Company) => {
-    if (!isPro(profile) && companies.length >= 1) { setShowPaywall(true); return; }
+    // Always allow first company. Block 2nd+ for free users.
+    if (companies.length >= 1 && !isPro(profile)) { setShowPaywall(true); return; }
     try {
       const saved = await db.addCompany(company);
       setCompanies(prev => [...prev, saved]);
@@ -154,6 +155,21 @@ const App: React.FC = () => {
   );
 
   const proUser = isPro(profile);
+
+  // If no company set up yet, always show onboarding
+  if (appState === 'ready' && companies.length === 0) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col">
+        <header className="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between">
+          <img src="/logo-full.png" alt="TaxPulse NG" className="h-9 w-auto" />
+          <button onClick={async () => { await signOut(); }} className="text-xs text-slate-400 hover:text-slate-600">Sign out</button>
+        </header>
+        <div className="flex-1 p-4">
+          <Onboarding onComplete={handleCompanyAdded} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Layout
