@@ -39,14 +39,28 @@ const LockedFeature: React.FC<{ name: string; onUpgrade: () => void }> = ({ name
 const Spinner = ({ msg = 'Loading...' }: { msg?: string }) => (
   <div className="min-h-screen flex items-center justify-center bg-slate-50">
     <div className="text-center">
-      <img src="/logo-icon.png" alt="TaxPulse" className="w-16 h-16 mx-auto mb-4 rounded-2xl" />
-      <div className="w-8 h-8 border-3 border-cac-green border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+      <div className="w-16 h-16 border-4 border-cac-green border-t-transparent rounded-full animate-spin mx-auto mb-4" />
       <p className="text-slate-500 text-sm">{msg}</p>
     </div>
   </div>
 );
 
-type AppState = 'loading' | 'unauthenticated' | 'ready';
+const EnvError = () => (
+  <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50">
+    <div className="bg-white rounded-2xl shadow p-8 max-w-md w-full text-center space-y-4">
+      <p className="text-4xl">⚠️</p>
+      <p className="font-bold text-slate-900">Configuration Error</p>
+      <p className="text-sm text-slate-500">Supabase environment variables are missing.</p>
+      <div className="bg-slate-50 rounded-xl p-4 text-left text-xs font-mono space-y-1">
+        <p>VITE_SUPABASE_URL={import.meta.env.VITE_SUPABASE_URL ? '✅' : '❌ missing'}</p>
+        <p>VITE_SUPABASE_ANON_KEY={import.meta.env.VITE_SUPABASE_ANON_KEY ? '✅' : '❌ missing'}</p>
+      </div>
+      <p className="text-xs text-slate-400">Add these in Vercel → Settings → Environment Variables</p>
+    </div>
+  </div>
+);
+
+type AppState = 'loading' | 'unauthenticated' | 'ready' | 'env_error';
 
 const App: React.FC = () => {
   const [appState, setAppState] = useState<AppState>('loading');
@@ -58,16 +72,29 @@ const App: React.FC = () => {
   const [view, setView] = useState<AppView>('dashboard');
 
   useEffect(() => {
-    // Check session on load
+    // Check env vars first
+    if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+      setAppState('env_error');
+      return;
+    }
+
+    // Add 5 second timeout so we never hang forever
+    const timeout = setTimeout(() => {
+      setAppState('unauthenticated');
+    }, 5000);
+
     supabase.auth.getSession().then(async ({ data: { session } }) => {
+      clearTimeout(timeout);
       if (session?.user) {
         await initUser(session.user.id);
       } else {
         setAppState('unauthenticated');
       }
+    }).catch(() => {
+      clearTimeout(timeout);
+      setAppState('unauthenticated');
     });
 
-    // Listen for login/logout
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
         await initUser(session.user.id);
@@ -81,7 +108,7 @@ const App: React.FC = () => {
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => { clearTimeout(timeout); subscription.unsubscribe(); };
   }, []);
 
   const initUser = async (uid: string) => {
@@ -100,28 +127,20 @@ const App: React.FC = () => {
       } else {
         setView('onboarding');
       }
-      setAppState('ready');
     } catch (e: any) {
-      console.error('Init error:', e);
-      // Still show app even if data load fails
+      console.error('initUser error:', e);
       setView('onboarding');
-      setAppState('ready');
     }
+    setAppState('ready');
   };
 
   const handleNavigate = (v: AppView) => {
-    if (PRO_VIEWS.includes(v) && !isPro(profile)) {
-      setShowPaywall(true);
-      return;
-    }
+    if (PRO_VIEWS.includes(v) && !isPro(profile)) { setShowPaywall(true); return; }
     setView(v);
   };
 
   const handleCompanyAdded = async (company: Company) => {
-    if (!isPro(profile) && companies.length >= 1) {
-      setShowPaywall(true);
-      return;
-    }
+    if (!isPro(profile) && companies.length >= 1) { setShowPaywall(true); return; }
     try {
       const saved = await db.addCompany(company);
       setCompanies(prev => [...prev, saved]);
@@ -143,11 +162,8 @@ const App: React.FC = () => {
     setShowPaywall(false);
   };
 
-  const handleSignOut = async () => {
-    await signOut();
-  };
-
-  if (appState === 'loading')        return <Spinner msg="Starting TaxPulse NG..." />;
+  if (appState === 'env_error')       return <EnvError />;
+  if (appState === 'loading')         return <Spinner msg="Starting TaxPulse NG..." />;
   if (appState === 'unauthenticated') return <AuthPage onAuth={() => {}} />;
   if (showPaywall) return (
     <Paywall profile={profile!} onUpgraded={handleUpgraded} onContinueFree={() => setShowPaywall(false)} />
@@ -164,7 +180,7 @@ const App: React.FC = () => {
       onSelectCompany={(c) => { setActiveCompany(c); setView('dashboard'); }}
       onAddCompany={() => setView('onboarding')}
       isPro={proUser}
-      onSignOut={handleSignOut}
+      onSignOut={async () => { await signOut(); }}
       onUpgrade={() => setShowPaywall(true)}
     >
       {view === 'onboarding'  && <Onboarding onComplete={handleCompanyAdded} />}
