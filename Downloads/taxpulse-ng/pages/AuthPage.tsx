@@ -3,9 +3,7 @@ import { signInEmail, signUpEmail } from '../services/auth';
 
 type AuthMode = 'login' | 'signup';
 
-interface AuthPageProps { onAuth: () => void; }
-
-export const AuthPage: React.FC<AuthPageProps> = ({ onAuth }) => {
+export const AuthPage: React.FC = () => {
   const [mode, setMode] = useState<AuthMode>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -28,7 +26,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onAuth }) => {
         setPassword('');
       } else {
         await signInEmail(email, password);
-        onAuth();
+        // onAuthStateChange in App.tsx handles the rest
       }
     } catch (e: any) {
       setError(e.message || 'Authentication failed.');

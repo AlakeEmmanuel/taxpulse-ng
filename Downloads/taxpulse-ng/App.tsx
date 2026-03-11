@@ -45,90 +45,65 @@ const Spinner = ({ msg = 'Loading...' }: { msg?: string }) => (
   </div>
 );
 
-const EnvError = () => (
-  <div className="min-h-screen flex items-center justify-center p-6 bg-slate-50">
-    <div className="bg-white rounded-2xl shadow p-8 max-w-md w-full text-center space-y-4">
-      <p className="text-4xl">⚠️</p>
-      <p className="font-bold text-slate-900">Configuration Error</p>
-      <p className="text-sm text-slate-500">Supabase environment variables are missing.</p>
-      <div className="bg-slate-50 rounded-xl p-4 text-left text-xs font-mono space-y-1">
-        <p>VITE_SUPABASE_URL={import.meta.env.VITE_SUPABASE_URL ? '✅' : '❌ missing'}</p>
-        <p>VITE_SUPABASE_ANON_KEY={import.meta.env.VITE_SUPABASE_ANON_KEY ? '✅' : '❌ missing'}</p>
-      </div>
-      <p className="text-xs text-slate-400">Add these in Vercel → Settings → Environment Variables</p>
-    </div>
-  </div>
-);
-
-type AppState = 'loading' | 'unauthenticated' | 'ready' | 'env_error';
+type AppState = 'loading' | 'unauthenticated' | 'ready';
 
 const App: React.FC = () => {
-  const [appState, setAppState] = useState<AppState>('loading');
-  const [userId, setUserId] = useState<string | null>(null);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [appState, setAppState]       = useState<AppState>('loading');
+  const [userId, setUserId]           = useState<string | null>(null);
+  const [profile, setProfile]         = useState<UserProfile | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
-  const [companies, setCompanies] = useState<Company[]>([]);
+  const [companies, setCompanies]     = useState<Company[]>([]);
   const [activeCompany, setActiveCompany] = useState<Company | null>(null);
-  const [view, setView] = useState<AppView>('dashboard');
+  const [view, setView]               = useState<AppView>('dashboard');
 
   useEffect(() => {
-    // Check env vars first
-    if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
-      setAppState('env_error');
-      return;
-    }
+    // ── Single source of truth: onAuthStateChange ──────────────
+    // INITIAL_SESSION fires immediately on load with current session
+    // SIGNED_IN fires when user logs in
+    // SIGNED_OUT fires when user logs out
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('Auth event:', event);
 
-    // Add 5 second timeout so we never hang forever
-    const timeout = setTimeout(() => {
-      setAppState('unauthenticated');
-    }, 5000);
+        if (event === 'INITIAL_SESSION') {
+          if (session?.user) {
+            await loadUserData(session.user.id);
+          } else {
+            setAppState('unauthenticated');
+          }
+        }
 
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      clearTimeout(timeout);
-      if (session?.user) {
-        await initUser(session.user.id);
-      } else {
-        setAppState('unauthenticated');
+        if (event === 'SIGNED_IN' && session?.user) {
+          await loadUserData(session.user.id);
+        }
+
+        if (event === 'SIGNED_OUT') {
+          setUserId(null);
+          setProfile(null);
+          setCompanies([]);
+          setActiveCompany(null);
+          setAppState('unauthenticated');
+        }
       }
-    }).catch(() => {
-      clearTimeout(timeout);
-      setAppState('unauthenticated');
-    });
+    );
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        await initUser(session.user.id);
-      }
-      if (event === 'SIGNED_OUT') {
-        setUserId(null);
-        setProfile(null);
-        setCompanies([]);
-        setActiveCompany(null);
-        setAppState('unauthenticated');
-      }
-    });
-
-    return () => { clearTimeout(timeout); subscription.unsubscribe(); };
+    return () => subscription.unsubscribe();
   }, []);
 
-  const initUser = async (uid: string) => {
+  const loadUserData = async (uid: string) => {
     (window as any).__taxpulse_uid = uid;
     setUserId(uid);
     try {
       const [prof, list] = await Promise.all([
         getProfile(uid),
-        db.getCompanies()
+        db.getCompanies(),
       ]);
       setProfile(prof);
       setCompanies(list);
-      if (list.length > 0) {
-        setActiveCompany(list[0]);
-        setView('dashboard');
-      } else {
-        setView('onboarding');
-      }
-    } catch (e: any) {
-      console.error('initUser error:', e);
+      setActiveCompany(list[0] || null);
+      setView(list.length > 0 ? 'dashboard' : 'onboarding');
+    } catch (err) {
+      console.error('loadUserData error:', err);
       setView('onboarding');
     }
     setAppState('ready');
@@ -162,13 +137,8 @@ const App: React.FC = () => {
     setShowPaywall(false);
   };
 
-  if (appState === 'env_error')       return <EnvError />;
-  if (appState === 'loading')         return <Spinner msg="Starting TaxPulse NG..." />;
-  if (appState === 'unauthenticated') return <AuthPage onAuth={async () => {
-    // Manually check session after login as backup
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session?.user) await initUser(session.user.id);
-  }} />;
+  if (appState === 'loading')          return <Spinner msg="Starting TaxPulse NG..." />;
+  if (appState === 'unauthenticated')  return <AuthPage />;
   if (showPaywall) return (
     <Paywall profile={profile!} onUpgraded={handleUpgraded} onContinueFree={() => setShowPaywall(false)} />
   );
