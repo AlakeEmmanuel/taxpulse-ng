@@ -30,6 +30,7 @@ export const Paywall: React.FC<PaywallProps> = ({ profile, onUpgraded, onContinu
     if (!promoCode.trim()) return;
     setPromoLoading(true); setPromoError(''); setPromoMsg('');
     try {
+      if (!profile?.id) throw new Error('Please sign in first.');
       const msg = await redeemPromoCode(profile.id, promoCode);
       setPromoMsg(msg);
       setTimeout(onUpgraded, 1500);
@@ -201,7 +202,7 @@ export const Paywall: React.FC<PaywallProps> = ({ profile, onUpgraded, onContinu
             <input
               value={promoCode}
               onChange={e => setPromoCode(e.target.value.toUpperCase())}
-              placeholder="e.g. TAXPULSE2026"
+              placeholder="Enter your promo code"
               className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-mono font-bold tracking-wider focus:outline-none focus:ring-2 focus:ring-cac-green uppercase"
             />
             <button
