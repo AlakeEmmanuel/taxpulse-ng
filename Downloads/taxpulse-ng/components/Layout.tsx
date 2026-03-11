@@ -40,7 +40,8 @@ const MOBILE_NAV: { icon: string; label: string; view: AppView }[] = [
 
 const Layout: React.FC<LayoutProps> = ({
   children, activeCompany, currentView, companies = [],
-  onSelectCompany, onAddCompany, onNavigate
+  onSelectCompany, onAddCompany, onNavigate,
+  isPro = false, onSignOut, onUpgrade
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
