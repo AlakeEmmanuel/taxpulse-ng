@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { UserProfile, redeemPromoCode, activateSubscription } from '../services/auth';
 
 // Your Paystack public key — replace with yours from dashboard.paystack.com
-const PAYSTACK_PUBLIC_KEY  = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY       || 'pk_test_xxxxxx';
-const MONTHLY_PLAN_CODE    = import.meta.env.VITE_PAYSTACK_PLAN_MONTHLY      || 'PLN_xxxxxx';
-const ANNUAL_PLAN_CODE     = import.meta.env.VITE_PAYSTACK_PLAN_ANNUAL       || 'PLN_xxxxxx';
+const PAYSTACK_PUBLIC_KEY  = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY  || '';
+const MONTHLY_PLAN_CODE    = import.meta.env.VITE_PAYSTACK_PLAN_CODE   || '';
+const ANNUAL_PLAN_CODE     = import.meta.env.VITE_PAYSTACK_PLAN_CODE   || '';
 const MONTHLY_PRICE_NGN    = 2500;
 const ANNUAL_PRICE_NGN     = 25000;
 
@@ -42,55 +42,44 @@ export const Paywall: React.FC<PaywallProps> = ({ profile, onUpgraded, onContinu
   };
 
   const handlePaystack = () => {
-    if (!profile.email) {
-      alert('Please update your email in Settings first.');
-      return;
-    }
+    if (!profile?.email) { alert('No email on your account.'); return; }
+    if (!PAYSTACK_PUBLIC_KEY) { alert('Paystack key not configured.'); return; }
 
-    // Load Paystack script if not already loaded
-    if (!window.PaystackPop) {
-      const script = document.createElement('script');
-      script.src = 'https://js.paystack.co/v1/inline.js';
-      script.onload = () => initPaystack();
-      document.head.appendChild(script);
-    } else {
-      initPaystack();
-    }
-  };
-
-  const initPaystack = () => {
     setPayLoading(true);
-    const isAnnual = selectedPlan === 'annual';
-    const handler = window.PaystackPop.setup({
-      key:       PAYSTACK_PUBLIC_KEY,
-      email:     profile.email,
-      amount:    (isAnnual ? ANNUAL_PRICE_NGN : MONTHLY_PRICE_NGN) * 100,
-      currency:  'NGN',
-      plan:      isAnnual ? ANNUAL_PLAN_CODE : MONTHLY_PLAN_CODE,
-      ref:       'TAXPULSE_' + Date.now(),
-      metadata: {
-        custom_fields: [
-          { display_name: 'User ID', variable_name: 'user_id', value: profile.id },
-          { display_name: 'App',     variable_name: 'app',     value: 'TaxPulse NG' },
-        ]
-      },
-      callback: async (response: any) => {
-        setPayLoading(false);
-        // In production, verify on your backend. Here we optimistically activate.
-        try {
-          await activateSubscription(
+
+    const runPaystack = () => {
+      const planCode = selectedPlan === 'annual' ? ANNUAL_PLAN_CODE : MONTHLY_PLAN_CODE;
+      const amount   = (selectedPlan === 'annual' ? ANNUAL_PRICE_NGN : MONTHLY_PRICE_NGN) * 100;
+      const handler = window.PaystackPop.setup({
+        key:      PAYSTACK_PUBLIC_KEY,
+        email:    profile.email,
+        amount:   amount,
+        currency: 'NGN',
+        plan:     planCode,
+        ref:      'TAXPULSE_' + Date.now(),
+        metadata: { custom_fields: [{ display_name: 'User ID', variable_name: 'user_id', value: profile.id }] },
+        callback: function(response: any) {
+          setPayLoading(false);
+          activateSubscription(
             profile.id,
             response.customer?.customer_code || '',
             response.subscription?.subscription_code || response.reference
-          );
-          onUpgraded();
-        } catch (e) {
-          alert('Payment received but activation failed. Contact support with ref: ' + response.reference);
-        }
-      },
-      onClose: () => setPayLoading(false),
-    });
-    handler.openIframe();
+          ).then(onUpgraded).catch(() => {
+            alert('Payment received! Ref: ' + response.reference + '. Contact support if not activated.');
+          });
+        },
+        onClose: function() { setPayLoading(false); },
+      });
+      handler.openIframe();
+    };
+
+    if (window.PaystackPop) { runPaystack(); return; }
+
+    const script = document.createElement('script');
+    script.src = 'https://js.paystack.co/v1/inline.js';
+    script.onload = runPaystack;
+    script.onerror = () => { setPayLoading(false); alert('Could not load Paystack.'); };
+    document.head.appendChild(script);
   };
 
   return (
