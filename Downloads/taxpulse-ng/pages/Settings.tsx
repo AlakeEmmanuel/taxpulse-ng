@@ -10,52 +10,52 @@ interface SettingsProps { company: Company; onCompanyUpdate: (c: Company) => voi
 const NotificationToggle: React.FC = () => {
   const [subscribed, setSubscribed] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [userId, setUserId] = useState<string | null>(null);
+  const [error, setError] = useState('');
+
+  // Get userId from window — set by App.tsx on login, avoids auth lock
+  const userId = (window as any).__taxpulse_uid as string | undefined;
 
   useEffect(() => {
-    const init = async () => {
-      const { supabase } = await import('../services/supabaseClient');
-      const { data: { session } } = await supabase.auth.getSession();
-      setUserId(session?.user?.id || null);
-      setSubscribed(await isPushSubscribed());
+    isPushSubscribed().then(val => {
+      setSubscribed(val);
       setLoading(false);
-    };
-    init();
+    });
   }, []);
 
-  const [toggleError, setToggleError] = useState('');
-
   const toggle = async () => {
-    if (!userId) return;
-    setLoading(true);
-    setToggleError('');
-    try {
-      if (subscribed) {
-        await unsubscribeFromPush(userId);
+    if (!userId || loading) return;
+    setError('');
+
+    // Optimistic UI — update immediately so toggle feels instant
+    const newState = !subscribed;
+    setSubscribed(newState);
+
+    if (!newState) {
+      // Turning OFF
+      await unsubscribeFromPush(userId);
+    } else {
+      // Turning ON
+      setLoading(true);
+      const ok = await subscribeToPush(userId);
+      setLoading(false);
+      if (!ok) {
+        // Revert if failed
         setSubscribed(false);
-      } else {
-        const ok = await subscribeToPush(userId);
-        if (ok) {
-          setSubscribed(true);
-        } else {
-          setToggleError('Could not enable notifications. Please allow them in browser settings.');
-        }
+        setError('Could not enable notifications. Open browser Settings → Notifications and allow this site.');
       }
-    } catch (e: any) {
-      setToggleError(e.message || 'Failed to update notification settings.');
     }
-    setLoading(false);
   };
 
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-3">
-        <span className="text-2xl">{subscribed ? '🔔' : '🔕'}</span>
-        <div>
-          <p className="text-sm font-bold text-slate-900">{subscribed ? 'Notifications enabled' : 'Notifications disabled'}</p>
-          <p className="text-xs text-slate-500">{subscribed ? 'You will receive deadline alerts' : 'Enable to get deadline alerts'}</p>
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">{subscribed ? '🔔' : '🔕'}</span>
+          <div>
+            <p className="text-sm font-bold text-slate-900">{subscribed ? 'Notifications enabled' : 'Notifications disabled'}</p>
+            <p className="text-xs text-slate-500">{subscribed ? 'You'll get alerts 7 days and 1 day before deadlines' : 'Enable to get tax deadline alerts'}</p>
+          </div>
         </div>
-      </div>
       <button
         onClick={toggle}
         disabled={loading}
@@ -63,6 +63,9 @@ const NotificationToggle: React.FC = () => {
       >
         <span className={"inline-block h-4 w-4 transform rounded-full bg-white transition-transform " + (subscribed ? "translate-x-6" : "translate-x-1")} />
       </button>
+      </div>
+      {error && <p className="text-xs text-red-500 bg-red-50 rounded-lg px-3 py-2">{error}</p>}
+      {!subscribed && !error && <p className="text-xs text-slate-400">Note: your browser will only ask for permission once. If you previously denied it, go to browser Settings → Notifications to re-enable.</p>}
     </div>
   );
 };
