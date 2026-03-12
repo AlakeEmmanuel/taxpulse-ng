@@ -42,7 +42,7 @@ const AddSaleModal: React.FC<{ company: Company; onClose: () => void }> = ({ com
       amount: net,
       taxAmount: vat,
     };
-    db.addLedgerEntry(entry);
+    db.addLedgerEntry(entry).catch(e => console.error('Ledger error:', e));
     setSaved(true);
     setTimeout(onClose, 1200);
   };
@@ -112,7 +112,7 @@ const AddExpenseModal: React.FC<{ company: Company; onClose: () => void }> = ({ 
       amount: raw,
       taxAmount: wht,
     };
-    db.addLedgerEntry(entry);
+    db.addLedgerEntry(entry).catch(e => console.error('Ledger error:', e));
     setSaved(true);
     setTimeout(onClose, 1200);
   };
@@ -320,10 +320,13 @@ const PayrollModal: React.FC<{ company: Company; onClose: () => void }> = ({ com
 
 // ─── Mark Filed Modal ─────────────────────────────────────────────────────────
 const MarkFiledModal: React.FC<{ company: Company; onClose: () => void }> = ({ company, onClose }) => {
-  const unfiled = db.getObligations(company.id).filter(o =>
-    o.status === TaxStatus.DUE || o.status === TaxStatus.OVERDUE || o.status === TaxStatus.UPCOMING
-  );
-  const [selectedId, setSelectedId] = useState(unfiled[0]?.id || '');
+  const [unfiled, setUnfiled] = React.useState<any[]>([]);
+  React.useEffect(() => {
+    db.getObligations(company.id).then(obs => setUnfiled(obs.filter(o =>
+      o.status === TaxStatus.DUE || o.status === TaxStatus.OVERDUE || o.status === TaxStatus.UPCOMING
+    ))).catch(() => {});
+  }, [company.id]);
+  const [selectedId, setSelectedId] = useState('');
   const [actualAmount, setActualAmount] = useState('');
   const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split('T')[0]);
   const [receiptRef, setReceiptRef] = useState('');
@@ -335,7 +338,7 @@ const MarkFiledModal: React.FC<{ company: Company; onClose: () => void }> = ({ c
       status: TaxStatus.FILED,
       actualAmount: parseFloat(actualAmount) || undefined,
       paymentDate,
-    });
+    }).catch(e => console.error('Update error:', e));
     setSaved(true);
     setTimeout(onClose, 1200);
   };
@@ -520,13 +523,21 @@ const ScoreRing: React.FC<{ score: number }> = ({ score }) => {
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
 type ModalType = 'sale' | 'expense' | 'payroll' | 'filed' | 'import' | null;
 
+import { AppView } from '../App';
+
 interface DashboardProps {
   company: Company;
+  onNavigate: (view: AppView) => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ company }) => {
+const Dashboard: React.FC<DashboardProps> = ({ company, onNavigate }) => {
   const [modal, setModal] = useState<ModalType>(null);
-  const obligations = db.getObligations(company.id);
+  const [obligations, setObligations] = useState<any[]>([]);
+
+  React.useEffect(() => {
+    db.getObligations(company.id).then(setObligations).catch(() => setObligations([]));
+  }, [company.id]);
+
   const overdue  = obligations.filter(o => o.status === TaxStatus.OVERDUE);
   const due      = obligations.filter(o => o.status === TaxStatus.DUE);
   const upcoming = obligations.filter(o => o.status === TaxStatus.UPCOMING);
