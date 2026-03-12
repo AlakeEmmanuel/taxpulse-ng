@@ -15,12 +15,9 @@ interface ParsedTransaction {
   whtApplicable: boolean;
   category: string;
   selected: boolean;
-  confidence: 'high' | 'medium' | 'low';
 }
 
 type Step = 'upload' | 'processing' | 'review' | 'done';
-
-const GROQ_API_KEY = () => import.meta.env.VITE_GROQ_API_KEY as string;
 
 const categoryColors: Record<string, string> = {
   'Sales Revenue':     'bg-green-100 text-green-800',
@@ -36,7 +33,7 @@ const categoryColors: Record<string, string> = {
   'Other Expense':     'bg-gray-100 text-gray-700',
 };
 
-async function extractTextFromFile(file: File): Promise<string> {
+async function extractTextFromFile(file: File, password?: string): Promise<string> {
   const ext = file.name.split('.').pop()?.toLowerCase();
 
   if (ext === 'csv' || ext === 'txt') {
@@ -52,46 +49,38 @@ async function extractTextFromFile(file: File): Promise<string> {
   }
 
   if (ext === 'pdf') {
-    // Try to extract text using pdf.js with optional password
     try {
-      const pdfjsLib = await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js' as any);
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-      
+      const pdfjsLib = await import('pdfjs-dist');
+      pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+        'pdfjs-dist/build/pdf.worker.min.mjs',
+        import.meta.url
+      ).toString();
+
       const arrayBuffer = await file.arrayBuffer();
-      const loadingTask = pdfjsLib.getDocument({ 
+      const loadingTask = pdfjsLib.getDocument({
         data: arrayBuffer,
-        password: (window as any).__pdfPassword || ''
+        ...(password ? { password } : {}),
       });
-      
+
       const pdf = await loadingTask.promise;
-      let fullText = '';
-      
+      const lines: string[] = [];
+
       for (let i = 1; i <= Math.min(pdf.numPages, 20); i++) {
         const page = await pdf.getPage(i);
         const textContent = await page.getTextContent();
         const pageText = textContent.items.map((item: any) => item.str).join(' ');
-        fullText += pageText + '
-';
+        lines.push(pageText);
       }
-      
+
+      const fullText = lines.join('\n');
       if (fullText.trim().length > 50) return fullText;
-    } catch (pdfErr: any) {
-      if (pdfErr?.name === 'PasswordException') {
+      throw new Error('No readable text found in PDF. Please export as CSV from your bank app.');
+    } catch (err: any) {
+      if (err?.name === 'PasswordException' || err?.message?.includes('password')) {
         throw new Error('PDF_PASSWORD_REQUIRED');
       }
-      console.warn('pdf.js failed, falling back to base64:', pdfErr);
+      throw new Error('Could not read this PDF. Please export your statement as CSV or Excel from your bank app instead.');
     }
-    
-    // Fallback: send as base64 to AI vision
-    return await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const base64 = (reader.result as string).split(',')[1];
-        resolve(`[PDF_BASE64]:${base64.substring(0, 50000)}`);
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
   }
 
   if (file.type.startsWith('image/')) {
@@ -99,25 +88,24 @@ async function extractTextFromFile(file: File): Promise<string> {
       const reader = new FileReader();
       reader.onload = () => {
         const base64 = (reader.result as string).split(',')[1];
-        resolve(`[IMAGE_BASE64:${file.type}]:${base64}`);
+        resolve('[IMAGE_BASE64:' + file.type + ']:' + base64);
       };
       reader.onerror = reject;
       reader.readAsDataURL(file);
     });
   }
 
-  throw new Error(`Unsupported file type: .${ext}`);
+  throw new Error('Unsupported file type: .' + ext);
 }
 
 async function parseWithAI(rawText: string, company: Company): Promise<ParsedTransaction[]> {
-  const apiKey = GROQ_API_KEY();
+  const apiKey = import.meta.env.VITE_GROQ_API_KEY as string;
   if (!apiKey) throw new Error('Groq API key not configured.');
 
-  const isPDF   = rawText.startsWith('[PDF_BASE64]');
   const isImage = rawText.startsWith('[IMAGE_BASE64');
 
   const systemPrompt = `You are a Nigerian bank statement parser and tax categoriser.
-You will be given raw bank statement data and must extract all transactions.
+Extract all transactions from the bank statement data provided.
 
 COMPANY CONTEXT:
 - Name: ${company.name}
@@ -127,30 +115,25 @@ COMPANY CONTEXT:
 - Pays Vendors (WHT): ${company.paysVendors ? 'Yes' : 'No'}
 - Has Employees: ${company.hasEmployees ? 'Yes' : 'No'}
 
-NIGERIAN TAX RULES TO APPLY:
+NIGERIAN TAX RULES:
 - VAT is 7.5% on taxable sales/services (NTA 2025)
 - WHT applies to vendor/contractor payments: 5% (individuals), 10% (companies)
-- PAYE applies to salary payments
-- Bank charges, transfers between own accounts and tax payments are NOT taxable
+- Bank charges, transfers and tax payments are NOT taxable
 
-For each transaction return a JSON array. Each item must have:
+Return a JSON array only. Each item must have:
 {
   "date": "YYYY-MM-DD",
   "description": "cleaned description",
   "amount": number (always positive),
   "type": "sale" or "expense",
   "category": one of [Sales Revenue, Service Income, Staff Salary, Rent, Utilities, Supplies, Professional Fees, Bank Charges, Tax Payment, Other Income, Other Expense],
-  "vatApplicable": true/false,
-  "whtApplicable": true/false,
-  "confidence": "high", "medium", or "low"
+  "vatApplicable": true or false,
+  "whtApplicable": true or false
 }
 
 Rules:
 - Credits to account = "sale", Debits = "expense"
-- vatApplicable = true only for sales/service income if company collectsVat
-- whtApplicable = true only for vendor/professional payments if company paysVendors
-- Mark confidence as "low" if you are unsure about the date or amount
-- Return ONLY valid JSON array, no explanation, no markdown.`;
+- Return ONLY the JSON array with no explanation or markdown.`;
 
   let userContent: any;
 
@@ -159,20 +142,17 @@ Rules:
     const base64 = rawText.split(']:')[1];
     userContent = [
       { type: 'text', text: 'Extract all bank transactions from this statement image.' },
-      { type: 'image_url', image_url: { url: `data:${mediaType};base64,${base64}` } },
+      { type: 'image_url', image_url: { url: 'data:' + mediaType + ';base64,' + base64 } },
     ];
-  } else if (isPDF) {
-    // For PDF, send as text prompt describing it
-    userContent = `Extract all transactions from this bank statement data:\n\n${rawText.replace('[PDF_BASE64]:', '').substring(0, 8000)}`;
   } else {
-    userContent = `Extract all transactions from this bank statement:\n\n${rawText.substring(0, 8000)}`;
+    userContent = 'Extract all transactions from this bank statement:\n\n' + rawText.substring(0, 8000);
   }
 
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
+      'Authorization': 'Bearer ' + apiKey,
     },
     body: JSON.stringify({
       model: isImage ? 'llama-3.2-90b-vision-preview' : 'llama-3.3-70b-versatile',
@@ -187,18 +167,16 @@ Rules:
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err?.error?.message || `AI request failed: HTTP ${res.status}`);
+    throw new Error((err as any)?.error?.message || 'AI request failed: HTTP ' + res.status);
   }
 
   const data = await res.json();
   const raw = data.choices?.[0]?.message?.content || '[]';
-
-  // Strip markdown fences if present
   const clean = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
   const parsed = JSON.parse(clean);
 
   return parsed.map((t: any, i: number) => ({
-    id: `import_${Date.now()}_${i}`,
+    id: 'import_' + Date.now() + '_' + i,
     date: t.date || new Date().toISOString().split('T')[0],
     description: t.description || 'Unknown transaction',
     amount: Math.abs(Number(t.amount) || 0),
@@ -212,54 +190,44 @@ Rules:
     whtApplicable: !!t.whtApplicable,
     category: t.category || 'Other Expense',
     selected: t.category !== 'Bank Charges' && t.category !== 'Tax Payment',
-    confidence: t.confidence || 'medium',
   }));
 }
 
+const fmt = (n: number) => '₦' + n.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
 export const BankImport: React.FC<BankImportProps> = ({ company }) => {
-  const [step, setStep] = useState<Step>('upload');
-  const [file, setFile] = useState<File | null>(null);
-  const [pdfPassword, setPdfPassword] = useState('');
+  const [step, setStep]               = useState<Step>('upload');
+  const [file, setFile]               = useState<File | null>(null);
+  const [password, setPassword]       = useState('');
   const [needsPassword, setNeedsPassword] = useState(false);
   const [transactions, setTransactions] = useState<ParsedTransaction[]>([]);
-  const [error, setError] = useState('');
-  const [saving, setSaving] = useState(false);
-  const [savedCount, setSavedCount] = useState(0);
+  const [error, setError]             = useState('');
+  const [saving, setSaving]           = useState(false);
+  const [savedCount, setSavedCount]   = useState(0);
+  const [dragOver, setDragOver]       = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
-  const [dragOver, setDragOver] = useState(false);
 
   const handleFile = (f: File) => {
     setFile(f);
     setError('');
-    setNeedsPassword(false);
-    setPdfPassword('');
-    // Check if it's a PDF — Nigerian bank PDFs are usually password protected
     const ext = f.name.split('.').pop()?.toLowerCase();
-    if (ext === 'pdf') setNeedsPassword(true);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragOver(false);
-    const f = e.dataTransfer.files[0];
-    if (f) handleFile(f);
+    setNeedsPassword(ext === 'pdf');
+    setPassword('');
   };
 
   const processFile = async () => {
     if (!file) return;
-    // Store password in window for pdf extractor
-    (window as any).__pdfPassword = pdfPassword;
     setStep('processing');
     setError('');
     try {
-      const text = await extractTextFromFile(file);
+      const text = await extractTextFromFile(file, password || undefined);
       const parsed = await parseWithAI(text, company);
-      if (parsed.length === 0) throw new Error('No transactions found. The AI could not identify transactions. Try exporting as CSV from your bank app instead.');
+      if (parsed.length === 0) throw new Error('No transactions found. Try exporting as CSV from your bank app.');
       setTransactions(parsed);
       setStep('review');
     } catch (e: any) {
       if (e.message === 'PDF_PASSWORD_REQUIRED') {
-        setError('This PDF is password protected. Please enter the password below.');
+        setError('This PDF is password protected. Enter the password below and try again.');
         setNeedsPassword(true);
       } else {
         setError(e.message || 'Failed to process file.');
@@ -268,35 +236,25 @@ export const BankImport: React.FC<BankImportProps> = ({ company }) => {
     }
   };
 
-  const toggleAll = (val: boolean) => {
-    setTransactions(prev => prev.map(t => ({ ...t, selected: val })));
-  };
-
-  const toggleRow = (id: string) => {
-    setTransactions(prev => prev.map(t => t.id === id ? { ...t, selected: !t.selected } : t));
-  };
-
-  const updateRow = (id: string, field: keyof ParsedTransaction, value: any) => {
-    setTransactions(prev => prev.map(t => {
-      if (t.id !== id) return t;
-      const updated = { ...t, [field]: value };
-      // Recalculate tax when amount or type changes
-      if (field === 'amount' || field === 'vatApplicable' || field === 'whtApplicable') {
-        updated.taxAmount = updated.vatApplicable
-          ? Math.round(updated.amount * 0.075 * 100) / 100
-          : updated.whtApplicable
-            ? Math.round(updated.amount * 0.05 * 100) / 100
-            : 0;
-      }
-      return updated;
-    }));
-  };
+  const toggleAll = (val: boolean) => setTransactions(prev => prev.map(t => ({ ...t, selected: val })));
+  const toggleRow = (id: string) => setTransactions(prev => prev.map(t => t.id === id ? { ...t, selected: !t.selected } : t));
+  const updateRow = (id: string, field: string, value: any) => setTransactions(prev => prev.map(t => {
+    if (t.id !== id) return t;
+    const updated = { ...t, [field]: value };
+    if (field === 'amount' || field === 'vatApplicable' || field === 'whtApplicable') {
+      updated.taxAmount = updated.vatApplicable
+        ? Math.round(updated.amount * 0.075 * 100) / 100
+        : updated.whtApplicable
+          ? Math.round(updated.amount * 0.05 * 100) / 100
+          : 0;
+    }
+    return updated;
+  }));
 
   const importToLedger = async () => {
     const selected = transactions.filter(t => t.selected);
     if (selected.length === 0) { setError('Please select at least one transaction.'); return; }
     setSaving(true);
-    setError('');
     let count = 0;
     for (const t of selected) {
       try {
@@ -305,32 +263,27 @@ export const BankImport: React.FC<BankImportProps> = ({ company }) => {
           companyId: company.id,
           date: t.date,
           type: t.type,
-          description: `[Bank Import] ${t.description}`,
+          description: '[Bank Import] ' + t.description,
           amount: t.amount,
           taxAmount: t.taxAmount,
         };
         await db.addLedgerEntry(entry);
         count++;
-      } catch (e) {
-        console.error('Failed to save entry:', e);
-      }
+      } catch (e) { console.error('Failed to save entry:', e); }
     }
     setSaving(false);
     setSavedCount(count);
     setStep('done');
   };
 
-  // ── Summary calculations ───────────────────────────────────
-  const selected = transactions.filter(t => t.selected);
+  const selected      = transactions.filter(t => t.selected);
   const totalIncome   = selected.filter(t => t.type === 'sale').reduce((s, t) => s + t.amount, 0);
   const totalExpenses = selected.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
   const totalVAT      = selected.filter(t => t.vatApplicable).reduce((s, t) => s + t.taxAmount, 0);
   const totalWHT      = selected.filter(t => t.whtApplicable).reduce((s, t) => s + t.taxAmount, 0);
   const netProfit     = totalIncome - totalExpenses;
 
-  const fmt = (n: number) => '₦' + n.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-  // ── UPLOAD STEP ────────────────────────────────────────────
+  // ── UPLOAD ────────────────────────────────────────────────
   if (step === 'upload') return (
     <div className="space-y-6 max-w-2xl">
       <header>
@@ -340,18 +293,17 @@ export const BankImport: React.FC<BankImportProps> = ({ company }) => {
 
       {error && <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">{error}</div>}
 
-      {/* Drop zone */}
       <div
-        onDrop={handleDrop}
+        onDrop={e => { e.preventDefault(); setDragOver(false); const f = e.dataTransfer.files[0]; if (f) handleFile(f); }}
         onDragOver={e => { e.preventDefault(); setDragOver(true); }}
         onDragLeave={() => setDragOver(false)}
         onClick={() => fileRef.current?.click()}
-        className={`border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all ${dragOver ? 'border-cac-green bg-green-50' : 'border-slate-200 hover:border-cac-green hover:bg-green-50/50'}`}
+        className={'border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all ' + (dragOver ? 'border-cac-green bg-green-50' : 'border-slate-200 hover:border-cac-green hover:bg-green-50/50')}
       >
         <div className="text-5xl mb-4">📄</div>
         <p className="font-bold text-slate-900">Drop your bank statement here</p>
         <p className="text-sm text-slate-500 mt-1">or click to browse</p>
-        <div className="flex items-center justify-center gap-2 mt-4 flex-wrap">
+        <div className="flex items-center justify-center gap-2 mt-4">
           {['PDF', 'Excel', 'CSV', 'Image'].map(f => (
             <span key={f} className="bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-full">{f}</span>
           ))}
@@ -360,41 +312,40 @@ export const BankImport: React.FC<BankImportProps> = ({ company }) => {
       </div>
 
       {file && (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">📎</span>
-              <div>
-                <p className="font-bold text-sm text-slate-900">{file.name}</p>
-                <p className="text-xs text-slate-400">{(file.size / 1024).toFixed(1)} KB</p>
-              </div>
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 space-y-4">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">📎</span>
+            <div>
+              <p className="font-bold text-sm text-slate-900">{file.name}</p>
+              <p className="text-xs text-slate-400">{(file.size / 1024).toFixed(1)} KB</p>
             </div>
           </div>
+
           {needsPassword && (
             <div className="space-y-1.5">
               <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
-                PDF Password <span className="text-slate-400 font-normal normal-case">(Nigerian bank statements are usually password protected)</span>
+                PDF Password <span className="text-slate-400 font-normal normal-case">(if password protected)</span>
               </label>
               <input
                 type="password"
-                value={pdfPassword}
-                onChange={e => setPdfPassword(e.target.value)}
-                placeholder="Usually your date of birth e.g. 01011990 or account number"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                placeholder="e.g. your date of birth or account number"
                 className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-cac-green"
               />
-              <p className="text-xs text-slate-400">💡 GTBank: date of birth (DDMMYYYY) · Access: last 4 digits of phone · Zenith: date of birth</p>
+              <p className="text-xs text-slate-400">💡 GTBank: date of birth (DDMMYYYY) · Access Bank: last 4 digits of phone · Zenith: date of birth</p>
             </div>
           )}
-          <button onClick={processFile} className="w-full bg-cac-green text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-cac-dark transition-colors">
+
+          <button onClick={processFile} className="w-full bg-cac-green text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-cac-dark transition-colors">
             Process with AI →
           </button>
         </div>
       )}
 
-      {/* How it works */}
       <div className="bg-blue-50 rounded-2xl p-5 space-y-3">
         <p className="font-bold text-blue-900 text-sm">How it works</p>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="grid grid-cols-4 gap-3">
           {[
             { icon: '📤', label: 'Upload statement' },
             { icon: '🤖', label: 'AI extracts transactions' },
@@ -411,7 +362,7 @@ export const BankImport: React.FC<BankImportProps> = ({ company }) => {
     </div>
   );
 
-  // ── PROCESSING STEP ────────────────────────────────────────
+  // ── PROCESSING ────────────────────────────────────────────
   if (step === 'processing') return (
     <div className="min-h-[60vh] flex flex-col items-center justify-center text-center space-y-5">
       <div className="w-20 h-20 bg-green-50 rounded-2xl flex items-center justify-center text-4xl animate-pulse">🤖</div>
@@ -426,25 +377,24 @@ export const BankImport: React.FC<BankImportProps> = ({ company }) => {
     </div>
   );
 
-  // ── REVIEW STEP ────────────────────────────────────────────
+  // ── REVIEW ────────────────────────────────────────────────
   if (step === 'review') return (
     <div className="space-y-5">
       <header className="flex items-start justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Review Transactions</h1>
-          <p className="text-slate-500 text-sm mt-1">{transactions.length} transactions found in {file?.name}. Review, edit and select which to import.</p>
+          <p className="text-slate-500 text-sm mt-1">{transactions.length} transactions found. Review, edit and select which to import.</p>
         </div>
         <div className="flex gap-2">
           <button onClick={() => setStep('upload')} className="text-sm text-slate-500 border border-slate-200 px-4 py-2 rounded-xl hover:bg-slate-50">← Re-upload</button>
           <button onClick={importToLedger} disabled={saving || selected.length === 0} className="bg-cac-green text-white px-5 py-2 rounded-xl font-bold text-sm hover:bg-cac-dark disabled:opacity-50 transition-colors">
-            {saving ? 'Importing...' : `Import ${selected.length} to Ledger`}
+            {saving ? 'Importing...' : 'Import ' + selected.length + ' to Ledger'}
           </button>
         </div>
       </header>
 
       {error && <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">{error}</div>}
 
-      {/* Tax Summary */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
           { label: 'Total Income',   value: fmt(totalIncome),   color: 'text-green-700',  bg: 'bg-green-50'  },
@@ -452,20 +402,18 @@ export const BankImport: React.FC<BankImportProps> = ({ company }) => {
           { label: 'VAT to Remit',   value: fmt(totalVAT),      color: 'text-amber-700',  bg: 'bg-amber-50'  },
           { label: 'WHT to Deduct',  value: fmt(totalWHT),      color: 'text-purple-700', bg: 'bg-purple-50' },
         ].map(s => (
-          <div key={s.label} className={`${s.bg} rounded-2xl p-4`}>
+          <div key={s.label} className={s.bg + ' rounded-2xl p-4'}>
             <p className="text-xs text-slate-500 font-semibold">{s.label}</p>
-            <p className={`text-lg font-extrabold ${s.color} mt-1`}>{s.value}</p>
+            <p className={'text-lg font-extrabold mt-1 ' + s.color}>{s.value}</p>
           </div>
         ))}
       </div>
 
-      {/* Net profit line */}
-      <div className={`rounded-xl px-4 py-3 flex items-center justify-between ${netProfit >= 0 ? 'bg-green-50 border border-green-100' : 'bg-red-50 border border-red-100'}`}>
+      <div className={'rounded-xl px-4 py-3 flex items-center justify-between ' + (netProfit >= 0 ? 'bg-green-50 border border-green-100' : 'bg-red-50 border border-red-100')}>
         <p className="font-bold text-slate-700 text-sm">Net Profit (Income − Expenses)</p>
-        <p className={`font-extrabold text-lg ${netProfit >= 0 ? 'text-green-700' : 'text-red-700'}`}>{fmt(netProfit)}</p>
+        <p className={'font-extrabold text-lg ' + (netProfit >= 0 ? 'text-green-700' : 'text-red-700')}>{fmt(netProfit)}</p>
       </div>
 
-      {/* Transactions table */}
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
         <div className="px-4 py-3 border-b border-slate-50 flex items-center justify-between">
           <p className="font-bold text-sm text-slate-900">Transactions</p>
@@ -490,37 +438,29 @@ export const BankImport: React.FC<BankImportProps> = ({ company }) => {
             </thead>
             <tbody className="divide-y divide-slate-50">
               {transactions.map(t => (
-                <tr key={t.id} className={`transition-colors ${t.selected ? 'bg-white' : 'bg-slate-50 opacity-50'}`}>
+                <tr key={t.id} className={'transition-colors ' + (t.selected ? 'bg-white' : 'bg-slate-50 opacity-50')}>
                   <td className="px-4 py-3">
-                    <input type="checkbox" checked={t.selected} onChange={() => toggleRow(t.id)}
-                      className="w-4 h-4 accent-cac-green cursor-pointer" />
-                  </td>
-                  <td className="px-4 py-3 text-slate-600 whitespace-nowrap">
-                    <input type="date" value={t.date} onChange={e => updateRow(t.id, 'date', e.target.value)}
-                      className="border-0 bg-transparent text-xs focus:outline-none focus:ring-1 focus:ring-cac-green rounded" />
-                  </td>
-                  <td className="px-4 py-3 text-slate-800 max-w-[200px]">
-                    <input value={t.description} onChange={e => updateRow(t.id, 'description', e.target.value)}
-                      className="w-full border-0 bg-transparent text-xs focus:outline-none focus:ring-1 focus:ring-cac-green rounded px-1 truncate" />
+                    <input type="checkbox" checked={t.selected} onChange={() => toggleRow(t.id)} className="w-4 h-4 accent-cac-green cursor-pointer" />
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${categoryColors[t.category] || 'bg-gray-100 text-gray-700'}`}>
+                    <input type="date" value={t.date} onChange={e => updateRow(t.id, 'date', e.target.value)} className="border-0 bg-transparent text-xs focus:outline-none focus:ring-1 focus:ring-cac-green rounded" />
+                  </td>
+                  <td className="px-4 py-3 max-w-[200px]">
+                    <input value={t.description} onChange={e => updateRow(t.id, 'description', e.target.value)} className="w-full border-0 bg-transparent text-xs focus:outline-none focus:ring-1 focus:ring-cac-green rounded px-1 truncate" />
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className={'text-[10px] font-bold px-2 py-0.5 rounded-full ' + (categoryColors[t.category] || 'bg-gray-100 text-gray-700')}>
                       {t.category}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-right font-bold text-slate-900 whitespace-nowrap">
-                    {fmt(t.amount)}
-                  </td>
+                  <td className="px-4 py-3 text-right font-bold text-slate-900 whitespace-nowrap">{fmt(t.amount)}</td>
                   <td className="px-4 py-3 text-center">
-                    <select value={t.type} onChange={e => updateRow(t.id, 'type', e.target.value)}
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full border-0 cursor-pointer ${t.type === 'sale' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                    <select value={t.type} onChange={e => updateRow(t.id, 'type', e.target.value)} className={'text-[10px] font-bold px-2 py-0.5 rounded-full border-0 cursor-pointer ' + (t.type === 'sale' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')}>
                       <option value="sale">Income</option>
                       <option value="expense">Expense</option>
                     </select>
                   </td>
-                  <td className="px-4 py-3 text-right text-xs text-slate-500 whitespace-nowrap">
-                    {t.taxAmount > 0 ? fmt(t.taxAmount) : '—'}
-                  </td>
+                  <td className="px-4 py-3 text-right text-xs text-slate-500 whitespace-nowrap">{t.taxAmount > 0 ? fmt(t.taxAmount) : '—'}</td>
                 </tr>
               ))}
             </tbody>
@@ -530,21 +470,19 @@ export const BankImport: React.FC<BankImportProps> = ({ company }) => {
     </div>
   );
 
-  // ── DONE STEP ──────────────────────────────────────────────
+  // ── DONE ──────────────────────────────────────────────────
   return (
     <div className="min-h-[60vh] flex flex-col items-center justify-center text-center space-y-5 max-w-md mx-auto">
       <div className="w-20 h-20 bg-green-50 border-2 border-green-200 rounded-2xl flex items-center justify-center text-4xl">✅</div>
       <div>
         <h2 className="text-xl font-extrabold text-slate-900">Import Complete!</h2>
-        <p className="text-slate-500 text-sm mt-2">{savedCount} transactions have been added to your ledger. Your tax obligations on the Dashboard have been updated automatically.</p>
+        <p className="text-slate-500 text-sm mt-2">{savedCount} transactions added to your ledger. Your tax obligations have been updated automatically.</p>
       </div>
       <div className="grid grid-cols-2 gap-3 w-full">
-        <button onClick={() => { setStep('upload'); setFile(null); setTransactions([]); }}
-          className="border border-slate-200 text-slate-700 px-4 py-3 rounded-xl font-bold text-sm hover:bg-slate-50">
+        <button onClick={() => { setStep('upload'); setFile(null); setTransactions([]); }} className="border border-slate-200 text-slate-700 px-4 py-3 rounded-xl font-bold text-sm hover:bg-slate-50">
           Import Another
         </button>
-        <button onClick={() => window.location.hash = '#ledger'}
-          className="bg-cac-green text-white px-4 py-3 rounded-xl font-bold text-sm hover:bg-cac-dark">
+        <button onClick={() => window.location.reload()} className="bg-cac-green text-white px-4 py-3 rounded-xl font-bold text-sm hover:bg-cac-dark">
           View Ledger →
         </button>
       </div>
