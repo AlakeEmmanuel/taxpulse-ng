@@ -1,8 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { Company, LedgerEntry } from '../types';
 import * as db from '../services/db';
+import { AppView } from '../App';
 
-interface BankImportProps { company: Company; }
+interface BankImportProps { company: Company; onNavigate: (view: AppView) => void; }
 
 interface ParsedTransaction {
   id: string;
@@ -195,7 +196,7 @@ Rules:
 
 const fmt = (n: number) => '₦' + n.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-export const BankImport: React.FC<BankImportProps> = ({ company }) => {
+export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) => {
   const [step, setStep]               = useState<Step>('upload');
   const [file, setFile]               = useState<File | null>(null);
   const [password, setPassword]       = useState('');
@@ -482,7 +483,7 @@ export const BankImport: React.FC<BankImportProps> = ({ company }) => {
         <button onClick={() => { setStep('upload'); setFile(null); setTransactions([]); }} className="border border-slate-200 text-slate-700 px-4 py-3 rounded-xl font-bold text-sm hover:bg-slate-50">
           Import Another
         </button>
-        <button onClick={() => window.location.reload()} className="bg-cac-green text-white px-4 py-3 rounded-xl font-bold text-sm hover:bg-cac-dark">
+        <button onClick={() => onNavigate('ledger')} className="bg-cac-green text-white px-4 py-3 rounded-xl font-bold text-sm hover:bg-cac-dark">
           View Ledger →
         </button>
       </div>

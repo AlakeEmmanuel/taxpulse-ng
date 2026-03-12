@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Company, LedgerEntry } from '../types';
-import { db } from '../services/mockDb';
+import * as db from '../services/db';
 import { Card } from '../components/Shared';
 
 interface LedgerPageProps { company: Company; }
@@ -12,8 +12,16 @@ const fmt = (n: number) => '₦' + n.toLocaleString(undefined, { maximumFraction
 export const LedgerPage: React.FC<LedgerPageProps> = ({ company }) => {
   const [filter, setFilter] = useState<Filter>('all');
   const [search, setSearch] = useState('');
+  const [all, setAll] = useState<LedgerEntry[]>([]);
+  const [loadingEntries, setLoadingEntries] = useState(true);
 
-  const all = db.getLedgers(company.id);
+  useEffect(() => {
+    setLoadingEntries(true);
+    db.getLedgers(company.id)
+      .then(setAll)
+      .catch(() => setAll([]))
+      .finally(() => setLoadingEntries(false));
+  }, [company.id]);
   const filtered = all
     .filter(e => filter === 'all' || e.type === filter)
     .filter(e => !search || e.description.toLowerCase().includes(search.toLowerCase()))
@@ -24,6 +32,15 @@ export const LedgerPage: React.FC<LedgerPageProps> = ({ company }) => {
   const totalVAT     = all.filter(e => e.type === 'sale').reduce((s, e) => s + e.taxAmount, 0);
   const totalWHT     = all.filter(e => e.type === 'expense').reduce((s, e) => s + e.taxAmount, 0);
   const netPosition  = totalIncome - totalExpense;
+
+  if (loadingEntries) return (
+    <div className="min-h-[40vh] flex items-center justify-center">
+      <div className="text-center space-y-3">
+        <div className="text-4xl animate-pulse">📒</div>
+        <p className="text-slate-500 text-sm">Loading transactions...</p>
+      </div>
+    </div>
+  );
 
   return (
     <div className="space-y-6 max-w-4xl">

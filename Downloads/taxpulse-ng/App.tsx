@@ -197,7 +197,7 @@ const App: React.FC = () => {
       {view === 'ai'     && (proUser ? <AIAssistant company={activeCompany!} /> : <LockedFeature name="AI Tax Assistant" onUpgrade={() => setShowPaywall(true)} />)}
       {view === 'vault'  && (proUser ? <EvidenceVault company={activeCompany!} /> : <LockedFeature name="Evidence Vault" onUpgrade={() => setShowPaywall(true)} />)}
       {view === 'export' && (proUser ? <TaxExport company={activeCompany!} /> : <LockedFeature name="PDF Export" onUpgrade={() => setShowPaywall(true)} />)}
-      {view === 'import' && (proUser ? <BankImport company={activeCompany!} /> : <LockedFeature name="Bank Import" onUpgrade={() => setShowPaywall(true)} />)}
+      {view === 'import' && (proUser ? <BankImport company={activeCompany!} onNavigate={setView} /> : <LockedFeature name="Bank Import" onUpgrade={() => setShowPaywall(true)} />)}
     </Layout>
   );
 };
