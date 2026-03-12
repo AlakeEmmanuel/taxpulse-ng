@@ -45,27 +45,22 @@ const Spinner = ({ msg = 'Loading...' }: { msg?: string }) => (
   </div>
 );
 
+// Three possible states — loading hides everything until we know what to show
 type AppState = 'loading' | 'unauthenticated' | 'ready';
 
 const App: React.FC = () => {
-  const [appState, setAppState]       = useState<AppState>('loading');
-  const [dataLoading, setDataLoading] = useState(true);
-  const [userId, setUserId]           = useState<string | null>(null);
-  const [profile, setProfile]         = useState<UserProfile | null>(null);
-  const [showPaywall, setShowPaywall] = useState(false);
-  const [companies, setCompanies]     = useState<Company[]>([]);
+  const [appState, setAppState]           = useState<AppState>('loading');
+  const [userId, setUserId]               = useState<string | null>(null);
+  const [profile, setProfile]             = useState<UserProfile | null>(null);
+  const [showPaywall, setShowPaywall]     = useState(false);
+  const [companies, setCompanies]         = useState<Company[]>([]);
   const [activeCompany, setActiveCompany] = useState<Company | null>(null);
-  const [view, setView]               = useState<AppView>('dashboard');
+  const [view, setView]                   = useState<AppView>('dashboard');
 
   useEffect(() => {
-    // ── Single source of truth: onAuthStateChange ──────────────
-    // INITIAL_SESSION fires immediately on load with current session
-    // SIGNED_IN fires when user logs in
-    // SIGNED_OUT fires when user logs out
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth event:', event);
-
         if (event === 'INITIAL_SESSION') {
           if (session?.user) {
             await loadUserData(session.user.id);
@@ -73,11 +68,9 @@ const App: React.FC = () => {
             setAppState('unauthenticated');
           }
         }
-
         if (event === 'SIGNED_IN' && session?.user) {
           await loadUserData(session.user.id);
         }
-
         if (event === 'SIGNED_OUT') {
           setUserId(null);
           setProfile(null);
@@ -87,37 +80,29 @@ const App: React.FC = () => {
         }
       }
     );
-
     return () => subscription.unsubscribe();
   }, []);
 
   const loadUserData = async (uid: string) => {
     (window as any).__taxpulse_uid = uid;
     setUserId(uid);
-
-    let prof: UserProfile | null = null;
-    let list: Company[] = [];
-
     try {
-      prof = await Promise.race([
+      const [prof, list] = await Promise.all([
         getProfile(uid),
-        new Promise<null>(r => setTimeout(() => r(null), 5000))
-      ]);
-    } catch (e) { console.error('getProfile error:', e); }
-
-    try {
-      const result = await Promise.race([
         db.getCompanies(),
-        new Promise<Company[]>(r => setTimeout(() => r([]), 5000))
       ]);
-      list = result || [];
-    } catch (e) { console.error('getCompanies error:', e); }
-
-    setProfile(prof);
-    setCompanies(list);
-    setActiveCompany(list[0] || null);
-    setView(list.length > 0 ? 'dashboard' : 'onboarding');
-    setDataLoading(false);
+      setProfile(prof);
+      setCompanies(list);
+      if (list.length > 0) {
+        setActiveCompany(list[0]);
+        setView('dashboard');
+      } else {
+        setView('onboarding');
+      }
+    } catch (err) {
+      console.error('loadUserData error:', err);
+      setView('onboarding');
+    }
     setAppState('ready');
   };
 
@@ -127,7 +112,6 @@ const App: React.FC = () => {
   };
 
   const handleCompanyAdded = async (company: Company) => {
-    // Always allow first company. Block 2nd+ for free users.
     if (companies.length >= 1 && !isPro(profile)) { setShowPaywall(true); return; }
     try {
       const saved = await db.addCompany(company);
@@ -150,28 +134,27 @@ const App: React.FC = () => {
     setShowPaywall(false);
   };
 
-  if (appState === 'loading' || dataLoading) return <Spinner msg="Starting TaxPulse NG..." />;
-  if (appState === 'unauthenticated')  return <AuthPage />;
+  // Always show spinner until we know the auth state AND data is loaded
+  if (appState === 'loading')         return <Spinner msg="Starting TaxPulse NG..." />;
+  if (appState === 'unauthenticated') return <AuthPage />;
   if (showPaywall) return (
     <Paywall profile={profile!} onUpgraded={handleUpgraded} onContinueFree={() => setShowPaywall(false)} />
   );
 
-  const proUser = isPro(profile);
-
-  // If no company set up yet, always show onboarding
-  if (appState === 'ready' && companies.length === 0) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex flex-col">
-        <header className="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between">
-          <img src="/logo-full.png" alt="TaxPulse NG" className="h-9 w-auto" />
-          <button onClick={async () => { await signOut(); }} className="text-xs text-slate-400 hover:text-slate-600">Sign out</button>
-        </header>
-        <div className="flex-1 p-4">
-          <Onboarding onComplete={handleCompanyAdded} />
-        </div>
+  // No company yet — show onboarding with header
+  if (companies.length === 0) return (
+    <div className="min-h-screen bg-slate-50 flex flex-col">
+      <header className="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between">
+        <img src="/logo-full.png" alt="TaxPulse NG" className="h-9 w-auto" />
+        <button onClick={async () => { await signOut(); }} className="text-xs text-slate-400 hover:text-slate-600">Sign out</button>
+      </header>
+      <div className="flex-1 p-4">
+        <Onboarding onComplete={handleCompanyAdded} />
       </div>
-    );
-  }
+    </div>
+  );
+
+  const proUser = isPro(profile);
 
   return (
     <Layout
