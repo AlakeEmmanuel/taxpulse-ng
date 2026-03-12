@@ -4,17 +4,17 @@ import { Card, Button } from '../components/Shared';
 import * as db from '../services/db';
 
 const CATEGORY_LABELS: Record<EvidenceCategory, { label: string; icon: string; color: string }> = {
-  receipt:       { label: 'Receipt',        icon: '🧾', color: 'bg-green-50 text-green-700 border-green-200' },
-  invoice:       { label: 'Invoice',         icon: '📄', color: 'bg-blue-50 text-blue-700 border-blue-200' },
-  payment_proof: { label: 'Payment Proof',   icon: '✅', color: 'bg-purple-50 text-purple-700 border-purple-200' },
-  bank_statement:{ label: 'Bank Statement',  icon: '🏦', color: 'bg-amber-50 text-amber-700 border-amber-200' },
-  other:         { label: 'Other',           icon: '📎', color: 'bg-slate-50 text-slate-700 border-slate-200' },
+  receipt:        { label: 'Receipt',        icon: '🧾', color: 'bg-green-50 text-green-700 border-green-200' },
+  invoice:        { label: 'Invoice',         icon: '📄', color: 'bg-blue-50 text-blue-700 border-blue-200' },
+  payment_proof:  { label: 'Payment Proof',   icon: '✅', color: 'bg-purple-50 text-purple-700 border-purple-200' },
+  bank_statement: { label: 'Bank Statement',  icon: '🏦', color: 'bg-amber-50 text-amber-700 border-amber-200' },
+  other:          { label: 'Other',           icon: '📎', color: 'bg-slate-50 text-slate-700 border-slate-200' },
 };
 
 const fmtSize = (bytes: number) => {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
 };
 
 // ─── Upload Modal ─────────────────────────────────────────────────────────────
@@ -24,49 +24,38 @@ const UploadModal: React.FC<{
   onClose: () => void;
   onUploaded: () => void;
 }> = ({ company, obligations, onClose, onUploaded }) => {
-  const [file, setFile] = useState<File | null>(null);
-  const [category, setCategory] = useState<EvidenceCategory>('receipt');
+  const [file, setFile]               = useState<File | null>(null);
+  const [category, setCategory]       = useState<EvidenceCategory>('receipt');
   const [obligationId, setObligationId] = useState('');
-  const [notes, setNotes] = useState('');
-  const [uploading, setUploading] = useState(false);
-  const [done, setDone] = useState(false);
+  const [notes, setNotes]             = useState('');
+  const [uploading, setUploading]     = useState(false);
+  const [done, setDone]               = useState(false);
+  const [error, setError]             = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (f) setFile(f);
-  };
+  const handleFile = (f: File) => setFile(f);
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    const f = e.dataTransfer.files?.[0];
-    if (f) setFile(f);
-  };
-
-  const handleUpload = () => {
+  // FIXED: async function — previously used await inside non-async reader.onload callback
+  const handleUpload = async () => {
     if (!file) return;
     setUploading(true);
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const base64 = (ev.target?.result as string).split(',')[1];
-      const evidence: EvidenceFile = {
+    setError('');
+    try {
+      await db.addEvidenceFile(file, {
         id: Date.now().toString(),
         companyId: company.id,
         obligationId: obligationId || undefined,
-        name: file.name,
-        mimeType: file.type,
-        sizeBytes: file.size,
-        data: base64,
         uploadDate: new Date().toISOString().split('T')[0],
         category,
         notes: notes || undefined,
-      };
-      await db.addEvidence(evidence);
-      setUploading(false);
+      });
       setDone(true);
-      setTimeout(() => { onUploaded(); onClose(); }, 1000);
-    };
-    reader.readAsDataURL(file);
+      setTimeout(() => { onUploaded(); onClose(); }, 1200);
+    } catch (e: any) {
+      setError(e?.message || 'Upload failed. Check your connection and try again.');
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -78,21 +67,26 @@ const UploadModal: React.FC<{
         </div>
         <div className="p-5 space-y-4">
           {done ? (
-            <div className="text-center py-8">
-              <p className="text-4xl mb-3">✅</p>
+            <div className="text-center py-8 space-y-3">
+              <p className="text-4xl">✅</p>
               <p className="font-bold text-cac-green">File uploaded to vault!</p>
             </div>
           ) : (
             <>
+              {error && <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">{error}</div>}
+
               {/* Drop zone */}
               <div
-                onDrop={handleDrop}
+                onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files?.[0]; if (f) handleFile(f); }}
                 onDragOver={e => e.preventDefault()}
                 onClick={() => inputRef.current?.click()}
-                className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors ${file ? 'border-cac-green bg-green-50' : 'border-slate-200 hover:border-cac-green hover:bg-slate-50'}`}
+                className={'border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors ' + (file ? 'border-cac-green bg-green-50' : 'border-slate-200 hover:border-cac-green hover:bg-slate-50')}
               >
-                <input ref={inputRef} type="file" className="hidden" onChange={handleFile}
-                  accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,.csv,.xlsx,.xls,.doc,.docx" />
+                <input
+                  ref={inputRef} type="file" className="hidden"
+                  onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
+                  accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,.csv,.xlsx,.xls,.doc,.docx"
+                />
                 {file ? (
                   <div>
                     <p className="text-2xl mb-1">📎</p>
@@ -118,7 +112,7 @@ const UploadModal: React.FC<{
                       <button
                         key={cat}
                         onClick={() => setCategory(cat)}
-                        className={`flex flex-col items-center gap-1 p-2 rounded-xl border text-xs font-semibold transition-all ${category === cat ? color + ' ring-2 ring-cac-green' : 'border-slate-100 hover:bg-slate-50 text-slate-600'}`}
+                        className={'flex flex-col items-center gap-1 p-2 rounded-xl border text-xs font-semibold transition-all ' + (category === cat ? color + ' ring-2 ring-cac-green' : 'border-slate-100 hover:bg-slate-50 text-slate-600')}
                       >
                         <span>{icon}</span>
                         <span>{label}</span>
@@ -129,19 +123,21 @@ const UploadModal: React.FC<{
               </div>
 
               {/* Link to obligation */}
-              <div>
-                <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">Link to Obligation (optional)</label>
-                <select
-                  value={obligationId}
-                  onChange={e => setObligationId(e.target.value)}
-                  className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cac-green bg-white"
-                >
-                  <option value="">— Not linked —</option>
-                  {obligations.map(o => (
-                    <option key={o.id} value={o.id}>{o.type} — {o.period}</option>
-                  ))}
-                </select>
-              </div>
+              {obligations.length > 0 && (
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">Link to Obligation (optional)</label>
+                  <select
+                    value={obligationId}
+                    onChange={e => setObligationId(e.target.value)}
+                    className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cac-green bg-white"
+                  >
+                    <option value="">— Not linked —</option>
+                    {obligations.map(o => (
+                      <option key={o.id} value={o.id}>{o.type} — {o.period}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               {/* Notes */}
               <div>
@@ -158,7 +154,12 @@ const UploadModal: React.FC<{
               <div className="flex gap-3 pt-1">
                 <Button variant="ghost" onClick={onClose} className="flex-1">Cancel</Button>
                 <Button onClick={handleUpload} disabled={!file || uploading} className="flex-1">
-                  {uploading ? 'Uploading...' : 'Upload to Vault'}
+                  {uploading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <span className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Uploading...
+                    </span>
+                  ) : 'Upload to Vault'}
                 </Button>
               </div>
             </>
@@ -170,28 +171,45 @@ const UploadModal: React.FC<{
 };
 
 // ─── File Card ────────────────────────────────────────────────────────────────
-const FileCard: React.FC<{ file: EvidenceFile; obligations: TaxObligation[]; onDelete: () => void }> = ({ file, obligations, onDelete }) => {
-  const { label, icon, color } = CATEGORY_LABELS[file.category];
+const FileCard: React.FC<{
+  file: EvidenceFile & { storagePath?: string };
+  obligations: TaxObligation[];
+  onDelete: (id: string, storagePath: string) => void;
+}> = ({ file, obligations, onDelete }) => {
+  const { label, icon, color } = CATEGORY_LABELS[file.category] || CATEGORY_LABELS.other;
   const linkedOb = obligations.find(o => o.id === file.obligationId);
+  const [downloading, setDownloading] = useState(false);
 
-  const handleView = () => {
-    const url = `data:${file.mimeType};base64,${file.data}`;
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = file.name;
-    a.click();
+  // FIXED: fetch from Supabase Storage — file.data is always '' in DB records
+  const handleDownload = async () => {
+    setDownloading(true);
+    try {
+      const base64 = await db.downloadEvidence(file as any);
+      const byteArray = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+      const blob = new Blob([byteArray], { type: file.mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = file.name;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      alert('Could not download file. Please try again.');
+    } finally {
+      setDownloading(false);
+    }
   };
 
   return (
     <div className="bg-white border border-slate-100 rounded-2xl p-4 hover:shadow-md transition-shadow">
       <div className="flex items-start gap-3">
-        <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 border ${color}`}>
+        <div className={'w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 border ' + color}>
           {icon}
         </div>
         <div className="flex-1 min-w-0">
           <p className="font-bold text-slate-900 text-sm truncate">{file.name}</p>
           <div className="flex items-center gap-2 mt-1 flex-wrap">
-            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${color}`}>{label}</span>
+            <span className={'text-[10px] font-bold px-2 py-0.5 rounded-full border ' + color}>{label}</span>
             <span className="text-[10px] text-slate-400">{fmtSize(file.sizeBytes)}</span>
             <span className="text-[10px] text-slate-400">{file.uploadDate}</span>
           </div>
@@ -205,13 +223,14 @@ const FileCard: React.FC<{ file: EvidenceFile; obligations: TaxObligation[]; onD
       </div>
       <div className="flex gap-2 mt-3">
         <button
-          onClick={handleView}
-          className="flex-1 text-xs font-bold text-cac-green bg-green-50 hover:bg-green-100 py-1.5 rounded-lg transition-colors"
+          onClick={handleDownload}
+          disabled={downloading}
+          className="flex-1 text-xs font-bold text-cac-green bg-green-50 hover:bg-green-100 py-1.5 rounded-lg transition-colors disabled:opacity-50"
         >
-          ⬇️ Download
+          {downloading ? 'Downloading...' : '⬇️ Download'}
         </button>
         <button
-          onClick={onDelete}
+          onClick={() => onDelete(file.id, (file as any).storagePath || '')}
           className="text-xs font-bold text-red-400 hover:text-red-600 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition-colors"
         >
           🗑️
@@ -225,34 +244,37 @@ const FileCard: React.FC<{ file: EvidenceFile; obligations: TaxObligation[]; onD
 interface EvidenceVaultProps { company: Company; }
 
 export const EvidenceVault: React.FC<EvidenceVaultProps> = ({ company }) => {
-  const [files, setFiles] = useState<EvidenceFile[]>([]);
-  const [obligations, setObligations] = useState<any[]>([]);
+  const [files, setFiles]         = useState<EvidenceFile[]>([]);
+  const [obligations, setObligations] = useState<TaxObligation[]>([]);
   const [showUpload, setShowUpload] = useState(false);
   const [filterCat, setFilterCat] = useState<EvidenceCategory | 'all'>('all');
-  const [search, setSearch] = useState('');
-  const [loadingFiles, setLoadingFiles] = useState(true);
+  const [search, setSearch]       = useState('');
+  const [loading, setLoading]     = useState(true);
 
   const refresh = () => {
     db.getEvidence(company.id).then(setFiles).catch(() => setFiles([]));
   };
 
   useEffect(() => {
-    setLoadingFiles(true);
+    setLoading(true);
     Promise.all([
       db.getEvidence(company.id),
       db.getObligations(company.id),
     ]).then(([ev, ob]) => {
       setFiles(ev);
-      setObligations(ob);
-    }).catch(() => {}).finally(() => setLoadingFiles(false));
+      setObligations(ob as TaxObligation[]);
+    }).catch(e => console.error('Vault load error:', e))
+      .finally(() => setLoading(false));
   }, [company.id]);
 
-  const handleDelete = async (id: string, storagePath?: string) => {
+  // FIXED: pass correct storagePath to deleteEvidence
+  const handleDelete = async (id: string, storagePath: string) => {
+    if (!storagePath) { console.error('No storagePath for file', id); return; }
+    if (!window.confirm('Delete this document? This cannot be undone.')) return;
     try {
-      if (storagePath) await db.deleteEvidence(id, storagePath);
-      else await db.deleteEvidence(id, id);
-      refresh();
-    } catch (e) { console.error('Delete failed:', e); }
+      await db.deleteEvidence(id, storagePath);
+      setFiles(prev => prev.filter(f => f.id !== id));
+    } catch (e) { console.error('Delete failed:', e); alert('Could not delete file. Please try again.'); }
   };
 
   const filtered = files.filter(f => {
@@ -263,9 +285,17 @@ export const EvidenceVault: React.FC<EvidenceVaultProps> = ({ company }) => {
 
   const byCategory = (cat: EvidenceCategory) => files.filter(f => f.category === cat).length;
 
+  if (loading) return (
+    <div className="min-h-[40vh] flex items-center justify-center">
+      <div className="text-center space-y-3">
+        <div className="text-4xl animate-pulse">🗄️</div>
+        <p className="text-slate-500 text-sm">Loading vault...</p>
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-6">
-      {/* Header */}
       <header className="flex items-start justify-between gap-4">
         <div>
           <div className="flex items-center gap-3 mb-1">
@@ -277,7 +307,7 @@ export const EvidenceVault: React.FC<EvidenceVaultProps> = ({ company }) => {
         <Button onClick={() => setShowUpload(true)} className="shrink-0">+ Upload</Button>
       </header>
 
-      {/* Stats */}
+      {/* Category stats / filter */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         {(Object.keys(CATEGORY_LABELS) as EvidenceCategory[]).map(cat => {
           const { label, icon, color } = CATEGORY_LABELS[cat];
@@ -286,7 +316,7 @@ export const EvidenceVault: React.FC<EvidenceVaultProps> = ({ company }) => {
             <button
               key={cat}
               onClick={() => setFilterCat(filterCat === cat ? 'all' : cat)}
-              className={`flex items-center gap-2 p-3 rounded-xl border text-sm font-semibold transition-all ${filterCat === cat ? color + ' ring-2 ring-cac-green' : 'bg-white border-slate-100 text-slate-600 hover:border-slate-200'}`}
+              className={'flex items-center gap-2 p-3 rounded-xl border text-sm font-semibold transition-all ' + (filterCat === cat ? color + ' ring-2 ring-cac-green' : 'bg-white border-slate-100 text-slate-600 hover:border-slate-200')}
             >
               <span className="text-lg">{icon}</span>
               <div className="text-left">
@@ -298,7 +328,7 @@ export const EvidenceVault: React.FC<EvidenceVaultProps> = ({ company }) => {
         })}
       </div>
 
-      {/* NTA 2025 audit tip */}
+      {/* NTA 2025 retention notice */}
       <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex gap-3">
         <span className="text-xl shrink-0">💡</span>
         <div className="text-xs text-amber-800 space-y-1">
@@ -319,7 +349,7 @@ export const EvidenceVault: React.FC<EvidenceVaultProps> = ({ company }) => {
         />
       </div>
 
-      {/* File Grid */}
+      {/* File grid */}
       {filtered.length === 0 ? (
         <Card className="text-center py-16">
           <p className="text-5xl mb-4">🗄️</p>
@@ -331,9 +361,7 @@ export const EvidenceVault: React.FC<EvidenceVaultProps> = ({ company }) => {
               ? 'Upload receipts, invoices, and payment proofs to keep audit-ready.'
               : 'Try changing your category filter or search term.'}
           </p>
-          {files.length === 0 && (
-            <Button onClick={() => setShowUpload(true)}>Upload First Document</Button>
-          )}
+          {files.length === 0 && <Button onClick={() => setShowUpload(true)}>Upload First Document</Button>}
         </Card>
       ) : (
         <>
@@ -349,7 +377,7 @@ export const EvidenceVault: React.FC<EvidenceVaultProps> = ({ company }) => {
                 key={f.id}
                 file={f}
                 obligations={obligations}
-                onDelete={() => handleDelete(f.id)}
+                onDelete={handleDelete}
               />
             ))}
           </div>
