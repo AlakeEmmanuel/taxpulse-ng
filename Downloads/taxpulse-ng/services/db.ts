@@ -5,12 +5,11 @@
  */
 
 import { supabase } from './supabaseClient';
-
-async function getCurrentUserId(): Promise<string | null> {
-  const { data: { session } } = await supabase.auth.getSession();
-  return session?.user?.id || null;
-}
 import { Company, TaxObligation, LedgerEntry, EvidenceFile } from '../types';
+
+function getCurrentUserId(): string | null {
+  return (window as any).__taxpulse_uid || null;
+}
 
 // ─── Type helpers ─────────────────────────────────────────────────────────────
 // Supabase uses snake_case columns; these helpers convert to/from our camelCase types.
@@ -34,7 +33,7 @@ const toCompany = (r: any): Company => ({
   complianceScore: r.compliance_score,
 });
 
-const fromCompany = async (c: Company) => ({
+const fromCompany = (c: Company) => ({
   name:             c.name,
   entity_type:      c.entityType,
   industry:         c.industry,
@@ -50,7 +49,7 @@ const fromCompany = async (c: Company) => ({
   pays_vendors:     c.paysVendors,
   collects_vat:     c.collectsVat,
   compliance_score: c.complianceScore,
-  user_id: await getCurrentUserId() || undefined,
+  user_id: getCurrentUserId() || undefined,
 });
 
 const toObligation = (r: any): TaxObligation => ({
@@ -67,7 +66,7 @@ const toObligation = (r: any): TaxObligation => ({
   checklist:        r.checklist || [],
 });
 
-const fromObligation = async (o: TaxObligation) => ({
+const fromObligation = (o: TaxObligation) => ({
   company_id:        o.companyId,
   type:              o.type,
   period:            o.period,
@@ -78,7 +77,7 @@ const fromObligation = async (o: TaxObligation) => ({
   payment_date:      o.paymentDate,
   proof_url:         o.proofUrl,
   checklist:         o.checklist,
-  user_id: await getCurrentUserId() || undefined,
+  user_id: getCurrentUserId() || undefined,
 });
 
 const toLedger = (r: any): LedgerEntry => ({
@@ -92,7 +91,7 @@ const toLedger = (r: any): LedgerEntry => ({
   evidenceUrl:  r.evidence_url,
 });
 
-const fromLedger = async (l: LedgerEntry) => ({
+const fromLedger = (l: LedgerEntry) => ({
   company_id:   l.companyId,
   date:         l.date,
   type:         l.type,
@@ -100,7 +99,7 @@ const fromLedger = async (l: LedgerEntry) => ({
   amount:       l.amount,
   tax_amount:   l.taxAmount,
   evidence_url: l.evidenceUrl,
-  user_id: await getCurrentUserId() || undefined,
+  user_id: getCurrentUserId() || undefined,
 });
 
 const toEvidence = (r: any): EvidenceFile => ({
@@ -141,7 +140,7 @@ export async function getCompany(id: string): Promise<Company | null> {
 export async function addCompany(company: Company): Promise<Company> {
   const { data, error } = await supabase
     .from('companies')
-    .insert(await fromCompany(company))
+    .insert(fromCompany(company))
     .select()
     .single();
   if (error) throw error;
@@ -151,7 +150,7 @@ export async function addCompany(company: Company): Promise<Company> {
 export async function updateCompany(company: Company): Promise<void> {
   const { error } = await supabase
     .from('companies')
-    .update(await fromCompany(company))
+    .update(fromCompany(company))
     .eq('id', company.id);
   if (error) throw error;
 }
@@ -170,7 +169,7 @@ export async function getObligations(companyId: string): Promise<TaxObligation[]
 export async function addObligation(obligation: TaxObligation): Promise<TaxObligation> {
   const { data, error } = await supabase
     .from('tax_obligations')
-    .insert(await fromObligation(obligation))
+    .insert(fromObligation(obligation))
     .select()
     .single();
   if (error) throw error;
@@ -207,7 +206,7 @@ export async function getLedgers(companyId: string): Promise<LedgerEntry[]> {
 export async function addLedgerEntry(entry: LedgerEntry): Promise<LedgerEntry> {
   const { data, error } = await supabase
     .from('ledger_entries')
-    .insert(await fromLedger(entry))
+    .insert(fromLedger(entry))
     .select()
     .single();
   if (error) throw error;
