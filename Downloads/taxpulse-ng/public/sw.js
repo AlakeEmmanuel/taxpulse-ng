@@ -1,6 +1,7 @@
-// TaxPulse NG Service Worker
+// TaxPulse NG Service Worker v3
+// Increment version number on every deploy to bust cache
 
-const CACHE = 'taxpulse-v2';
+const CACHE = 'taxpulse-v3';
 const ASSETS = ['/', '/index.html', '/manifest.json'];
 
 self.addEventListener('install', e => {
@@ -9,16 +10,27 @@ self.addEventListener('install', e => {
 });
 
 self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys =>
-    Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-  ));
+  // Delete ALL old caches
+  e.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+    )
+  );
   self.clients.claim();
 });
 
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
+  // Network first for HTML — always get fresh app shell
+  if (e.request.destination === 'document') {
+    e.respondWith(
+      fetch(e.request).catch(() => caches.match('/index.html'))
+    );
+    return;
+  }
+  // Cache first for assets
   e.respondWith(
-    fetch(e.request).catch(() => caches.match(e.request))
+    caches.match(e.request).then(cached => cached || fetch(e.request))
   );
 });
 
@@ -26,7 +38,6 @@ self.addEventListener('fetch', e => {
 self.addEventListener('push', e => {
   let data = { title: 'TaxPulse NG', body: 'You have an upcoming tax deadline.', url: '/' };
   try { if (e.data) data = { ...data, ...e.data.json() }; } catch {}
-
   e.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
@@ -35,17 +46,12 @@ self.addEventListener('push', e => {
       tag: 'taxpulse-deadline',
       data: { url: data.url },
       requireInteraction: true,
-      actions: [
-        { action: 'open', title: 'Open TaxPulse' },
-        { action: 'dismiss', title: 'Dismiss' },
-      ],
     })
   );
 });
 
 self.addEventListener('notificationclick', e => {
   e.notification.close();
-  if (e.action === 'dismiss') return;
   const url = e.notification.data?.url || '/';
   e.waitUntil(clients.openWindow(url));
 });
