@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Company, EntityType } from '../types';
 import { Card, Input, Button } from '../components/Shared';
 import * as db from '../services/db';
+import { subscribeToPush, unsubscribeFromPush, isPushSubscribed } from '../services/notifications';
 
 interface SettingsProps { company: Company; onCompanyUpdate: (c: Company) => void; }
 
