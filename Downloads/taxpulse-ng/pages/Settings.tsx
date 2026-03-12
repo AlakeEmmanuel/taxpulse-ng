@@ -23,16 +23,26 @@ const NotificationToggle: React.FC = () => {
     init();
   }, []);
 
+  const [toggleError, setToggleError] = useState('');
+
   const toggle = async () => {
     if (!userId) return;
     setLoading(true);
-    if (subscribed) {
-      await unsubscribeFromPush(userId);
-      setSubscribed(false);
-    } else {
-      const ok = await subscribeToPush(userId);
-      setSubscribed(ok);
-      if (!ok) alert('Please allow notifications in your browser settings.');
+    setToggleError('');
+    try {
+      if (subscribed) {
+        await unsubscribeFromPush(userId);
+        setSubscribed(false);
+      } else {
+        const ok = await subscribeToPush(userId);
+        if (ok) {
+          setSubscribed(true);
+        } else {
+          setToggleError('Could not enable notifications. Please allow them in browser settings.');
+        }
+      }
+    } catch (e: any) {
+      setToggleError(e.message || 'Failed to update notification settings.');
     }
     setLoading(false);
   };
