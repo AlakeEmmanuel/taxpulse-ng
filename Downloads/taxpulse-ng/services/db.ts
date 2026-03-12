@@ -89,6 +89,7 @@ const toLedger = (r: any): LedgerEntry => ({
   amount:       r.amount,
   taxAmount:    r.tax_amount,
   evidenceUrl:  r.evidence_url,
+  sourceId:     r.source_id,
 });
 
 const fromLedger = (l: LedgerEntry) => ({
@@ -99,7 +100,8 @@ const fromLedger = (l: LedgerEntry) => ({
   amount:       l.amount,
   tax_amount:   l.taxAmount,
   evidence_url: l.evidenceUrl,
-  user_id: getCurrentUserId() || undefined,
+  source_id:    l.sourceId || null,
+  user_id:      getCurrentUserId() || undefined,
 });
 
 const toEvidence = (r: any): EvidenceFile => ({
@@ -115,6 +117,7 @@ const toEvidence = (r: any): EvidenceFile => ({
   category:       r.category,
   notes:          r.notes,
   storagePath:    r.storage_path,
+  monthYear:      r.month_year,
 });
 
 // ─── Companies ────────────────────────────────────────────────────────────────
@@ -283,12 +286,46 @@ export async function addEvidenceFile(rawFile: File, meta: Omit<EvidenceFile, 'd
       upload_date:      meta.uploadDate,
       category:         meta.category,
       notes:            meta.notes || null,
+      month_year:       (meta as any).monthYear || null,
     })
     .select()
     .single();
 
   if (error) throw error;
   return toEvidence(data);
+}
+
+// Delete all ledger entries that came from a specific bank statement import
+export async function deleteLedgerBySource(sourceId: string): Promise<void> {
+  const { error } = await supabase
+    .from('ledger_entries')
+    .delete()
+    .eq('source_id', sourceId);
+  if (error) throw error;
+}
+
+// Get all bank statements for a company, ordered chronologically by month_year
+export async function getBankStatements(companyId: string): Promise<EvidenceFile[]> {
+  const { data, error } = await supabase
+    .from('evidence_files')
+    .select('*')
+    .eq('company_id', companyId)
+    .eq('category', 'bank_statement')
+    .order('month_year', { ascending: true });
+  if (error) throw error;
+  return (data || []).map(toEvidence);
+}
+
+// Check if a bank statement for a given monthYear already exists
+export async function bankStatementExists(companyId: string, monthYear: string): Promise<boolean> {
+  const { data } = await supabase
+    .from('evidence_files')
+    .select('id')
+    .eq('company_id', companyId)
+    .eq('category', 'bank_statement')
+    .eq('month_year', monthYear)
+    .limit(1);
+  return (data?.length || 0) > 0;
 }
 
 export async function downloadEvidence(file: EvidenceFile & { storagePath?: string }): Promise<string> {
