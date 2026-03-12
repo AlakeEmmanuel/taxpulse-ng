@@ -52,12 +52,42 @@ async function extractTextFromFile(file: File): Promise<string> {
   }
 
   if (ext === 'pdf') {
-    // Convert PDF pages to text via base64 — send to AI with vision
+    // Try to extract text using pdf.js with optional password
+    try {
+      const pdfjsLib = await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js' as any);
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      
+      const arrayBuffer = await file.arrayBuffer();
+      const loadingTask = pdfjsLib.getDocument({ 
+        data: arrayBuffer,
+        password: (window as any).__pdfPassword || ''
+      });
+      
+      const pdf = await loadingTask.promise;
+      let fullText = '';
+      
+      for (let i = 1; i <= Math.min(pdf.numPages, 20); i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items.map((item: any) => item.str).join(' ');
+        fullText += pageText + '
+';
+      }
+      
+      if (fullText.trim().length > 50) return fullText;
+    } catch (pdfErr: any) {
+      if (pdfErr?.name === 'PasswordException') {
+        throw new Error('PDF_PASSWORD_REQUIRED');
+      }
+      console.warn('pdf.js failed, falling back to base64:', pdfErr);
+    }
+    
+    // Fallback: send as base64 to AI vision
     return await new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = () => {
         const base64 = (reader.result as string).split(',')[1];
-        resolve(`[PDF_BASE64]:${base64.substring(0, 50000)}`); // cap at 50k chars
+        resolve(`[PDF_BASE64]:${base64.substring(0, 50000)}`);
       };
       reader.onerror = reject;
       reader.readAsDataURL(file);
@@ -189,6 +219,8 @@ Rules:
 export const BankImport: React.FC<BankImportProps> = ({ company }) => {
   const [step, setStep] = useState<Step>('upload');
   const [file, setFile] = useState<File | null>(null);
+  const [pdfPassword, setPdfPassword] = useState('');
+  const [needsPassword, setNeedsPassword] = useState(false);
   const [transactions, setTransactions] = useState<ParsedTransaction[]>([]);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
@@ -199,6 +231,11 @@ export const BankImport: React.FC<BankImportProps> = ({ company }) => {
   const handleFile = (f: File) => {
     setFile(f);
     setError('');
+    setNeedsPassword(false);
+    setPdfPassword('');
+    // Check if it's a PDF — Nigerian bank PDFs are usually password protected
+    const ext = f.name.split('.').pop()?.toLowerCase();
+    if (ext === 'pdf') setNeedsPassword(true);
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -210,16 +247,23 @@ export const BankImport: React.FC<BankImportProps> = ({ company }) => {
 
   const processFile = async () => {
     if (!file) return;
+    // Store password in window for pdf extractor
+    (window as any).__pdfPassword = pdfPassword;
     setStep('processing');
     setError('');
     try {
       const text = await extractTextFromFile(file);
       const parsed = await parseWithAI(text, company);
-      if (parsed.length === 0) throw new Error('No transactions found. Try a different file format.');
+      if (parsed.length === 0) throw new Error('No transactions found. The AI could not identify transactions. Try exporting as CSV from your bank app instead.');
       setTransactions(parsed);
       setStep('review');
     } catch (e: any) {
-      setError(e.message || 'Failed to process file.');
+      if (e.message === 'PDF_PASSWORD_REQUIRED') {
+        setError('This PDF is password protected. Please enter the password below.');
+        setNeedsPassword(true);
+      } else {
+        setError(e.message || 'Failed to process file.');
+      }
       setStep('upload');
     }
   };
@@ -316,15 +360,32 @@ export const BankImport: React.FC<BankImportProps> = ({ company }) => {
       </div>
 
       {file && (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">📎</span>
-            <div>
-              <p className="font-bold text-sm text-slate-900">{file.name}</p>
-              <p className="text-xs text-slate-400">{(file.size / 1024).toFixed(1)} KB</p>
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">📎</span>
+              <div>
+                <p className="font-bold text-sm text-slate-900">{file.name}</p>
+                <p className="text-xs text-slate-400">{(file.size / 1024).toFixed(1)} KB</p>
+              </div>
             </div>
           </div>
-          <button onClick={processFile} className="bg-cac-green text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-cac-dark transition-colors">
+          {needsPassword && (
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
+                PDF Password <span className="text-slate-400 font-normal normal-case">(Nigerian bank statements are usually password protected)</span>
+              </label>
+              <input
+                type="password"
+                value={pdfPassword}
+                onChange={e => setPdfPassword(e.target.value)}
+                placeholder="Usually your date of birth e.g. 01011990 or account number"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-cac-green"
+              />
+              <p className="text-xs text-slate-400">💡 GTBank: date of birth (DDMMYYYY) · Access: last 4 digits of phone · Zenith: date of birth</p>
+            </div>
+          )}
+          <button onClick={processFile} className="w-full bg-cac-green text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-cac-dark transition-colors">
             Process with AI →
           </button>
         </div>
