@@ -1,9 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect }, { useState } from 'react';
 import { Company, EntityType } from '../types';
 import { Card, Input, Button } from '../components/Shared';
 import { db } from '../services/mockDb';
 
 interface SettingsProps { company: Company; onCompanyUpdate: (c: Company) => void; }
+
+
+const NotificationToggle: React.FC = () => {
+  const [subscribed, setSubscribed] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const init = async () => {
+      const { supabase } = await import('../services/supabaseClient');
+      const { data: { session } } = await supabase.auth.getSession();
+      setUserId(session?.user?.id || null);
+      setSubscribed(await isPushSubscribed());
+      setLoading(false);
+    };
+    init();
+  }, []);
+
+  const toggle = async () => {
+    if (!userId) return;
+    setLoading(true);
+    if (subscribed) {
+      await unsubscribeFromPush(userId);
+      setSubscribed(false);
+    } else {
+      const ok = await subscribeToPush(userId);
+      setSubscribed(ok);
+      if (!ok) alert('Please allow notifications in your browser settings.');
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-3">
+        <span className="text-2xl">{subscribed ? '🔔' : '🔕'}</span>
+        <div>
+          <p className="text-sm font-bold text-slate-900">{subscribed ? 'Notifications enabled' : 'Notifications disabled'}</p>
+          <p className="text-xs text-slate-500">{subscribed ? 'You will receive deadline alerts' : 'Enable to get deadline alerts'}</p>
+        </div>
+      </div>
+      <button
+        onClick={toggle}
+        disabled={loading}
+        className={"relative inline-flex h-6 w-11 items-center rounded-full transition-colors " + (subscribed ? "bg-cac-green" : "bg-slate-200") + " disabled:opacity-50"}
+      >
+        <span className={"inline-block h-4 w-4 transform rounded-full bg-white transition-transform " + (subscribed ? "translate-x-6" : "translate-x-1")} />
+      </button>
+    </div>
+  );
+};
 
 export const SettingsPage: React.FC<SettingsProps> = ({ company, onCompanyUpdate }) => {
   const [form, setForm] = useState<Company>({ ...company });
@@ -108,6 +159,16 @@ export const SettingsPage: React.FC<SettingsProps> = ({ company, onCompanyUpdate
       </div>
 
       <Button onClick={handleSave} className="w-full py-3">Save Settings</Button>
+
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+        <div className="px-6 py-4 border-b border-slate-50">
+          <h2 className="font-extrabold text-slate-900 text-sm">Deadline Reminders</h2>
+          <p className="text-xs text-slate-500 mt-0.5">Get notified 7 days and 1 day before tax deadlines</p>
+        </div>
+        <div className="p-6">
+          <NotificationToggle />
+        </div>
+      </div>
     </div>
   );
 };
