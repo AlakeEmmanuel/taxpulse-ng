@@ -1,7 +1,7 @@
-import React, { useState, useEffect }, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Company, EntityType } from '../types';
 import { Card, Input, Button } from '../components/Shared';
-import { db } from '../services/mockDb';
+import * as db from '../services/db';
 
 interface SettingsProps { company: Company; onCompanyUpdate: (c: Company) => void; }
 
@@ -63,11 +63,15 @@ export const SettingsPage: React.FC<SettingsProps> = ({ company, onCompanyUpdate
   const update = (field: keyof Company, value: any) =>
     setForm(prev => ({ ...prev, [field]: value }));
 
-  const handleSave = () => {
-    db.updateCompany(form);
-    onCompanyUpdate(form);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+  const handleSave = async () => {
+    try {
+      await db.updateCompany(form);
+      onCompanyUpdate(form);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (e: any) {
+      alert('Error saving: ' + e.message);
+    }
   };
 
   const field = (label: string, key: keyof Company, type = 'text', placeholder = '') => (
@@ -95,7 +99,9 @@ export const SettingsPage: React.FC<SettingsProps> = ({ company, onCompanyUpdate
 
       <Card className="space-y-4">
         <h2 className="font-bold text-slate-800">Company Profile</h2>
+        <p className="text-xs text-amber-600 bg-amber-50 rounded-lg px-3 py-2">⚡ Changes here affect your tax calculations, obligations and PDF exports</p>
         {field('Company Name', 'name')}
+        <p className="text-xs text-slate-400 -mt-2">Used in all PDF exports and reports</p>
         {field('RC / BN Number', 'rcNumber')}
         {field('Tax Identification Number (TIN)', 'tin')}
         {field('VAT Registration Number', 'vatNumber')}
