@@ -53,7 +53,7 @@ const NotificationToggle: React.FC = () => {
           <span className="text-2xl">{subscribed ? '🔔' : '🔕'}</span>
           <div>
             <p className="text-sm font-bold text-slate-900">{subscribed ? 'Notifications enabled' : 'Notifications disabled'}</p>
-            <p className="text-xs text-slate-500">{subscribed ? 'You'll get alerts 7 days and 1 day before deadlines' : 'Enable to get tax deadline alerts'}</p>
+            <p className="text-xs text-slate-500">{subscribed ? "You'll get alerts 7 days and 1 day before deadlines" : "Enable to get tax deadline alerts"}</p>
           </div>
         </div>
       <button
