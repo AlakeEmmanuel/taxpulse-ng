@@ -254,6 +254,7 @@ export async function addEvidence(file: EvidenceFile): Promise<EvidenceFile> {
       upload_date:      file.uploadDate,
       category:         file.category,
       notes:            file.notes || null,
+      user_id:          getCurrentUserId() || null,
     })
     .select()
     .single();
@@ -287,6 +288,7 @@ export async function addEvidenceFile(rawFile: File, meta: Omit<EvidenceFile, 'd
       category:         meta.category,
       notes:            meta.notes || null,
       month_year:       (meta as any).monthYear || null,
+      user_id:          getCurrentUserId() || null,
     })
     .select()
     .single();
