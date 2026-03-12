@@ -278,25 +278,34 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
     // 2. Save original bank statement to Evidence Vault
     if (file) {
       try {
-        const reader = new FileReader();
+        // Read file as base64
         const base64 = await new Promise<string>((resolve, reject) => {
-          reader.onload = () => resolve((reader.result as string).split(',')[1]);
+          const reader = new FileReader();
+          reader.onload = () => {
+            const result = reader.result as string;
+            // result is "data:mime;base64,xxxxx" — extract just the base64 part
+            resolve(result.includes(',') ? result.split(',')[1] : result);
+          };
           reader.onerror = reject;
           reader.readAsDataURL(file);
         });
+
         const evidence: EvidenceFile = {
           id: 'stmt_' + Date.now(),
           companyId: company.id,
           name: file.name,
-          mimeType: file.type || 'application/octet-stream',
+          mimeType: file.type || 'application/pdf',
           sizeBytes: file.size,
           data: base64,
           uploadDate: new Date().toISOString().split('T')[0],
           category: 'bank_statement',
-          notes: count + ' transactions imported to ledger',
+          notes: count + ' transactions imported to ledger on ' + new Date().toLocaleDateString('en-NG'),
         };
         await db.addEvidence(evidence);
-      } catch (e) { console.error('Failed to save statement to vault:', e); }
+      } catch (e) {
+        // Don't block the user if vault save fails — ledger entries are already saved
+        console.error('Failed to save statement to vault:', e);
+      }
     }
 
     setSaving(false);

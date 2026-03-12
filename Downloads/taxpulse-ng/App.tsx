@@ -84,7 +84,13 @@ const App: React.FC = () => {
           handled = true;
           if (session?.user) {
             const uid = session.user.id;
-            setTimeout(() => { loadUserData(uid); }, 0);
+            // TOKEN_REFRESHED fires SIGNED_IN again — only load if not already ready
+            setTimeout(() => {
+              setAppState(prev => {
+                if (prev !== 'ready') { loadUserData(uid); }
+                return prev;
+              });
+            }, 0);
           } else {
             setAppState('unauthenticated');
           }
@@ -197,7 +203,7 @@ const App: React.FC = () => {
       {view === 'ai'     && (proUser ? <AIAssistant company={activeCompany!} /> : <LockedFeature name="AI Tax Assistant" onUpgrade={() => setShowPaywall(true)} />)}
       {view === 'vault'  && (proUser ? <EvidenceVault company={activeCompany!} /> : <LockedFeature name="Evidence Vault" onUpgrade={() => setShowPaywall(true)} />)}
       {view === 'export' && (proUser ? <TaxExport company={activeCompany!} /> : <LockedFeature name="PDF Export" onUpgrade={() => setShowPaywall(true)} />)}
-      {view === 'import' && (proUser ? <BankImport company={activeCompany!} onNavigate={setView} /> : <LockedFeature name="Bank Import" onUpgrade={() => setShowPaywall(true)} />)}
+      {view === 'import' && (proUser ? <BankImport company={activeCompany!} onNavigate={handleNavigate} /> : <LockedFeature name="Bank Import" onUpgrade={() => setShowPaywall(true)} />)}
     </Layout>
   );
 };

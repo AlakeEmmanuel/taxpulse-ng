@@ -232,7 +232,7 @@ export async function addEvidence(file: EvidenceFile): Promise<EvidenceFile> {
 
   const { error: storageError } = await supabase.storage
     .from('evidence')
-    .upload(storagePath, blob, { contentType: file.mimeType, upsert: false });
+    .upload(storagePath, blob, { contentType: file.mimeType, upsert: true });
 
   if (storageError) throw storageError;
 
