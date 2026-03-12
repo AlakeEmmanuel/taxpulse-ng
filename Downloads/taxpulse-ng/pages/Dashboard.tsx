@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Company, TaxStatus, TaxType, LedgerEntry } from '../types';
 import { Card, Badge, Button, Input } from '../components/Shared';
-import { db } from '../services/mockDb';
+import * as db from '../services/db';
 import { calcPAYE, calcCIT, calcVAT, WHT_RATES, VAT_RATE } from '../utils/taxEngine';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
@@ -590,7 +590,7 @@ const Dashboard: React.FC<DashboardProps> = ({ company }) => {
           <QuickActionButton icon="💳" label="Add Expense"   onClick={() => setModal('expense')} />
           <QuickActionButton icon="👥" label="Run Payroll"   onClick={() => setModal('payroll')} />
           <QuickActionButton icon="✅" label="Mark Filed"    onClick={() => setModal('filed')} />
-          <QuickActionButton icon="🏦" label="Import Bank"   onClick={() => setModal('import')} />
+          <QuickActionButton icon="🏦" label="Import Bank"   onClick={() => onNavigate('import')} />
         </div>
       </Card>
 
