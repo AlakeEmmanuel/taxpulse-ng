@@ -75,21 +75,18 @@ const App: React.FC = () => {
     }, 3000);
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth event:', event);
-        if (event === 'INITIAL_SESSION') {
+      (event, session) => {
+        // IMPORTANT: Do NOT await inside this callback — it holds Supabase auth lock
+        // Use setTimeout(..., 0) to run async work after lock is released
+        if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') {
           clearTimeout(fallback);
           handled = true;
           if (session?.user) {
-            await loadUserData(session.user.id);
+            const uid = session.user.id;
+            setTimeout(() => { loadUserData(uid); }, 0);
           } else {
             setAppState('unauthenticated');
           }
-        }
-        if (event === 'SIGNED_IN' && session?.user) {
-          clearTimeout(fallback);
-          handled = true;
-          await loadUserData(session.user.id);
         }
         if (event === 'SIGNED_OUT') {
           clearTimeout(fallback);
