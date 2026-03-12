@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Company, TaxStatus, TaxType } from '../types';
 import { Card, Button } from '../components/Shared';
-import { db } from '../services/mockDb';
+import * as db from '../services/db';
 
 // jsPDF is imported dynamically to avoid blocking the app if not installed
 // Run: npm install jspdf jspdf-autotable
@@ -19,13 +19,24 @@ const PERIODS = [
 interface TaxExportProps { company: Company; }
 
 export const TaxExport: React.FC<TaxExportProps> = ({ company }) => {
-  const [period, setPeriod] = useState('February 2026');
+  const [period, setPeriod] = useState('Full Year 2026');
   const [generating, setGenerating] = useState(false);
   const [generated, setGenerated] = useState(false);
   const [error, setError] = useState('');
+  const [obligations, setObligations] = useState<any[]>([]);
+  const [ledgerEntries, setLedgerEntries] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const obligations = db.getObligations(company.id);
-  const ledgerEntries = db.getLedgers(company.id);
+  useEffect(() => {
+    setLoading(true);
+    Promise.all([
+      db.getObligations(company.id),
+      db.getLedgers(company.id),
+    ]).then(([obs, led]) => {
+      setObligations(obs);
+      setLedgerEntries(led);
+    }).catch(() => {}).finally(() => setLoading(false));
+  }, [company.id]);
 
   // Compute summary
   const totalSales = ledgerEntries.filter(l => l.type === 'sale').reduce((s, l) => s + l.amount, 0);
@@ -33,10 +44,10 @@ export const TaxExport: React.FC<TaxExportProps> = ({ company }) => {
   const vatCollected = ledgerEntries.filter(l => l.type === 'sale').reduce((s, l) => s + l.taxAmount, 0);
   const whtDeducted = ledgerEntries.filter(l => l.type === 'expense').reduce((s, l) => s + l.taxAmount, 0);
 
-  const filed = obligations.filter(o => o.status === TaxStatus.FILED);
-  const due = obligations.filter(o => o.status === TaxStatus.DUE || o.status === TaxStatus.OVERDUE);
-  const upcoming = obligations.filter(o => o.status === TaxStatus.UPCOMING);
-  const totalTaxPaid = filed.reduce((s, o) => s + (o.actualAmount || o.estimatedAmount), 0);
+  const filed = obligations.filter((o: any) => o.status === TaxStatus.FILED);
+  const due = obligations.filter((o: any) => o.status === TaxStatus.DUE || o.status === TaxStatus.OVERDUE);
+  const upcoming = obligations.filter((o: any) => o.status === TaxStatus.UPCOMING);
+  const totalTaxPaid = filed.reduce((s: number, o: any) => s + (o.actualAmount || o.estimatedAmount), 0);
 
   const generatePDF = async () => {
     setGenerating(true);
@@ -151,7 +162,7 @@ export const TaxExport: React.FC<TaxExportProps> = ({ company }) => {
       (doc as any).autoTable({
         startY: y,
         head: [['Tax', 'Period', 'Due Date', 'Amount (NGN)', 'Status', 'Paid On']],
-        body: obligations.map(o => [
+        body: obligations.map((o: any) => [
           o.type,
           o.period,
           o.dueDate,
@@ -231,22 +242,86 @@ export const TaxExport: React.FC<TaxExportProps> = ({ company }) => {
 
       y = (doc as any).lastAutoTable.finalY + 10;
 
-      // ── Ledger entries (if any) ───────────────────────────────────
+      // ── Monthly Breakdown (for annual report) ──────────────────
+      const isAnnual = period.includes('Full Year');
       if (ledgerEntries.length > 0) {
         if (y > 200) { doc.addPage(); y = 20; }
         doc.setTextColor(...green);
         doc.setFontSize(11);
         doc.setFont('helvetica', 'bold');
-        doc.text('TRANSACTION LEDGER', 14, y);
+        doc.text(isAnnual ? 'MONTHLY FINANCIAL BREAKDOWN' : 'TRANSACTION LEDGER', 14, y);
         y += 5;
+
+        if (isAnnual) {
+          // Group by month
+          const monthMap = new Map<string, { income: number; expenses: number; vat: number; wht: number; count: number }>();
+          const monthOrder = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+          for (const l of ledgerEntries) {
+            const d = new Date(l.date);
+            const key = d.toLocaleDateString('en-NG', { month: 'long', year: 'numeric' });
+            if (!monthMap.has(key)) monthMap.set(key, { income: 0, expenses: 0, vat: 0, wht: 0, count: 0 });
+            const m = monthMap.get(key)!;
+            if (l.type === 'sale') { m.income += l.amount; m.vat += l.taxAmount; }
+            else { m.expenses += l.amount; m.wht += l.taxAmount; }
+            m.count++;
+          }
+
+          // Sort months
+          const sortedMonths = Array.from(monthMap.entries()).sort((a, b) => {
+            const [aM, aY] = a[0].split(' ');
+            const [bM, bY] = b[0].split(' ');
+            if (aY !== bY) return Number(aY) - Number(bY);
+            return monthOrder.indexOf(aM) - monthOrder.indexOf(bM);
+          });
+
+          (doc as any).autoTable({
+            startY: y,
+            head: [['Month', 'Income (₦)', 'Expenses (₦)', 'Net (₦)', 'VAT (₦)', 'WHT (₦)', 'Txns']],
+            body: [
+              ...sortedMonths.map(([month, m]) => [
+                month,
+                fmt(m.income),
+                fmt(m.expenses),
+                fmt(m.income - m.expenses),
+                fmt(m.vat),
+                fmt(m.wht),
+                m.count,
+              ]),
+              // Totals row
+              ['TOTAL', fmt(totalSales), fmt(totalExpenses), fmt(totalSales - totalExpenses), fmt(vatCollected), fmt(whtDeducted), ledgerEntries.length],
+            ],
+            theme: 'grid',
+            headStyles: { fillColor: green, textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 8 },
+            bodyStyles: { fontSize: 8, textColor: darkGray },
+            alternateRowStyles: { fillColor: lightGray },
+            columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right' }, 3: { halign: 'right', fontStyle: 'bold' }, 4: { halign: 'right' }, 5: { halign: 'right' }, 6: { halign: 'center' } },
+            didDrawRow: (data: any) => {
+              // Bold totals row
+              if (data.row.index === sortedMonths.length) {
+                doc.setFillColor(...green);
+              }
+            },
+            margin: { left: 14, right: 14 },
+          });
+
+          y = (doc as any).lastAutoTable.finalY + 10;
+
+          // Full transaction ledger on next page
+          doc.addPage(); y = 20;
+          doc.setTextColor(...green);
+          doc.setFontSize(11);
+          doc.setFont('helvetica', 'bold');
+          doc.text('FULL TRANSACTION LEDGER', 14, y);
+          y += 5;
+        }
 
         (doc as any).autoTable({
           startY: y,
           head: [['Date', 'Description', 'Type', 'Amount (NGN)', 'Tax (NGN)']],
-          body: ledgerEntries.slice(0, 30).map(l => [
+          body: ledgerEntries.map(l => [
             l.date,
-            l.description.length > 40 ? l.description.slice(0, 40) + '…' : l.description,
-            l.type === 'sale' ? 'Sale' : 'Expense',
+            l.description.length > 45 ? l.description.slice(0, 45) + '…' : l.description,
+            l.type === 'sale' ? 'Income' : 'Expense',
             fmt(l.amount),
             fmt(l.taxAmount),
           ]),
@@ -254,14 +329,7 @@ export const TaxExport: React.FC<TaxExportProps> = ({ company }) => {
           headStyles: { fillColor: green, textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 8 },
           bodyStyles: { fontSize: 7.5, textColor: darkGray },
           alternateRowStyles: { fillColor: lightGray },
-          columnStyles: {
-            2: {
-              fontStyle: 'bold',
-              cellWidth: 20,
-            },
-            3: { halign: 'right' },
-            4: { halign: 'right' },
-          },
+          columnStyles: { 2: { fontStyle: 'bold', cellWidth: 18 }, 3: { halign: 'right' }, 4: { halign: 'right' } },
           margin: { left: 14, right: 14 },
         });
       }
@@ -301,6 +369,15 @@ export const TaxExport: React.FC<TaxExportProps> = ({ company }) => {
     }
   };
 
+  if (loading) return (
+    <div className="min-h-[40vh] flex items-center justify-center">
+      <div className="text-center space-y-3">
+        <div className="text-4xl animate-pulse">📄</div>
+        <p className="text-slate-500 text-sm">Loading your financial data...</p>
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-6 max-w-3xl">
       {/* Header */}
@@ -312,17 +389,7 @@ export const TaxExport: React.FC<TaxExportProps> = ({ company }) => {
         <p className="text-slate-500 text-sm">Generate a professional tax compliance summary PDF for your records, accountant, or NRS submission.</p>
       </header>
 
-      {/* Install notice */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex gap-3">
-        <span className="text-xl shrink-0">📦</span>
-        <div className="text-xs text-blue-800 space-y-1">
-          <p className="font-bold">Requires jsPDF (one-time setup)</p>
-          <p>Run this in your project terminal before using PDF export:</p>
-          <code className="block bg-blue-100 rounded-lg px-3 py-2 font-mono mt-1 text-blue-900 text-xs">
-            npm install jspdf jspdf-autotable
-          </code>
-        </div>
-      </div>
+
 
       <div className="grid md:grid-cols-2 gap-6">
         {/* Config */}
@@ -348,8 +415,8 @@ export const TaxExport: React.FC<TaxExportProps> = ({ company }) => {
               '✅ Tax obligations & filing status',
               '✅ VAT collected & WHT deducted',
               '✅ NTA 2025 tax rates reference',
-              '✅ Transaction ledger (up to 30 entries)',
-              '✅ Compliance score bar',
+              '✅ Full transaction ledger (all entries)',
+              '✅ Monthly breakdown (annual reports)',
             ].map(item => (
               <p key={item} className="text-xs text-slate-600">{item}</p>
             ))}

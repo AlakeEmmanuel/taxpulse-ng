@@ -1,7 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Company, EvidenceFile, EvidenceCategory, TaxObligation } from '../types';
 import { Card, Button } from '../components/Shared';
-import { db } from '../services/mockDb';
+import * as db from '../services/db';
 
 const CATEGORY_LABELS: Record<EvidenceCategory, { label: string; icon: string; color: string }> = {
   receipt:       { label: 'Receipt',        icon: '🧾', color: 'bg-green-50 text-green-700 border-green-200' },
@@ -61,7 +61,7 @@ const UploadModal: React.FC<{
         category,
         notes: notes || undefined,
       };
-      db.addEvidence(evidence);
+      await db.addEvidence(evidence);
       setUploading(false);
       setDone(true);
       setTimeout(() => { onUploaded(); onClose(); }, 1000);
@@ -225,18 +225,34 @@ const FileCard: React.FC<{ file: EvidenceFile; obligations: TaxObligation[]; onD
 interface EvidenceVaultProps { company: Company; }
 
 export const EvidenceVault: React.FC<EvidenceVaultProps> = ({ company }) => {
-  const [files, setFiles] = useState<EvidenceFile[]>(() => db.getEvidence(company.id));
+  const [files, setFiles] = useState<EvidenceFile[]>([]);
+  const [obligations, setObligations] = useState<any[]>([]);
   const [showUpload, setShowUpload] = useState(false);
   const [filterCat, setFilterCat] = useState<EvidenceCategory | 'all'>('all');
   const [search, setSearch] = useState('');
+  const [loadingFiles, setLoadingFiles] = useState(true);
 
-  const obligations = db.getObligations(company.id);
+  const refresh = () => {
+    db.getEvidence(company.id).then(setFiles).catch(() => setFiles([]));
+  };
 
-  const refresh = () => setFiles(db.getEvidence(company.id));
+  useEffect(() => {
+    setLoadingFiles(true);
+    Promise.all([
+      db.getEvidence(company.id),
+      db.getObligations(company.id),
+    ]).then(([ev, ob]) => {
+      setFiles(ev);
+      setObligations(ob);
+    }).catch(() => {}).finally(() => setLoadingFiles(false));
+  }, [company.id]);
 
-  const handleDelete = (id: string) => {
-    db.deleteEvidence(id);
-    refresh();
+  const handleDelete = async (id: string, storagePath?: string) => {
+    try {
+      if (storagePath) await db.deleteEvidence(id, storagePath);
+      else await db.deleteEvidence(id, id);
+      refresh();
+    } catch (e) { console.error('Delete failed:', e); }
   };
 
   const filtered = files.filter(f => {

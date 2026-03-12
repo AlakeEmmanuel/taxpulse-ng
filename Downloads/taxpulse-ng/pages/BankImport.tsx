@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Company, LedgerEntry } from '../types';
+import { Company, LedgerEntry, EvidenceFile } from '../types';
 import * as db from '../services/db';
 import { AppView } from '../App';
 
@@ -257,6 +257,8 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
     if (selected.length === 0) { setError('Please select at least one transaction.'); return; }
     setSaving(true);
     let count = 0;
+
+    // 1. Save transactions to ledger
     for (const t of selected) {
       try {
         const entry: LedgerEntry = {
@@ -272,6 +274,31 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
         count++;
       } catch (e) { console.error('Failed to save entry:', e); }
     }
+
+    // 2. Save original bank statement to Evidence Vault
+    if (file) {
+      try {
+        const reader = new FileReader();
+        const base64 = await new Promise<string>((resolve, reject) => {
+          reader.onload = () => resolve((reader.result as string).split(',')[1]);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+        const evidence: EvidenceFile = {
+          id: 'stmt_' + Date.now(),
+          companyId: company.id,
+          name: file.name,
+          mimeType: file.type || 'application/octet-stream',
+          sizeBytes: file.size,
+          data: base64,
+          uploadDate: new Date().toISOString().split('T')[0],
+          category: 'bank_statement',
+          notes: count + ' transactions imported to ledger',
+        };
+        await db.addEvidence(evidence);
+      } catch (e) { console.error('Failed to save statement to vault:', e); }
+    }
+
     setSaving(false);
     setSavedCount(count);
     setStep('done');
