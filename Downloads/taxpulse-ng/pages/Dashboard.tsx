@@ -42,9 +42,10 @@ const AddSaleModal: React.FC<{ company: Company; onClose: () => void }> = ({ com
       amount: net,
       taxAmount: vat,
     };
-    db.addLedgerEntry(entry).catch(e => console.error('Ledger error:', e));
-    setSaved(true);
-    setTimeout(onClose, 1200);
+    db.addLedgerEntry({ ...entry, id: Date.now().toString() }).then(() => {
+      setSaved(true);
+      setTimeout(onClose, 1200);
+    }).catch(e => { console.error('Ledger error:', e); alert('Failed to save. Please try again.'); });
   };
 
   return (
@@ -112,9 +113,10 @@ const AddExpenseModal: React.FC<{ company: Company; onClose: () => void }> = ({ 
       amount: raw,
       taxAmount: wht,
     };
-    db.addLedgerEntry(entry).catch(e => console.error('Ledger error:', e));
-    setSaved(true);
-    setTimeout(onClose, 1200);
+    db.addLedgerEntry({ ...entry, id: Date.now().toString() }).then(() => {
+      setSaved(true);
+      setTimeout(onClose, 1200);
+    }).catch(e => { console.error('Ledger error:', e); alert('Failed to save. Please try again.'); });
   };
 
   return (
@@ -338,9 +340,10 @@ const MarkFiledModal: React.FC<{ company: Company; onClose: () => void }> = ({ c
       status: TaxStatus.FILED,
       actualAmount: parseFloat(actualAmount) || undefined,
       paymentDate,
-    }).catch(e => console.error('Update error:', e));
-    setSaved(true);
-    setTimeout(onClose, 1200);
+    }).then(() => {
+      setSaved(true);
+      setTimeout(onClose, 1200);
+    }).catch(e => { console.error('Update error:', e); alert('Failed to update. Please try again.'); });
   };
 
   if (unfiled.length === 0) {
@@ -388,102 +391,6 @@ const MarkFiledModal: React.FC<{ company: Company; onClose: () => void }> = ({ c
   );
 };
 
-// ─── Bank Import Modal ────────────────────────────────────────────────────────
-const BankImportModal: React.FC<{ company: Company; onClose: () => void }> = ({ company, onClose }) => {
-  const [tab, setTab] = useState<'csv' | 'manual'>('csv');
-  const [rows, setRows] = useState<{ date: string; desc: string; amount: string }[]>([]);
-  const [saved, setSaved] = useState(false);
-
-  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => {
-      const lines = (ev.target?.result as string).split('\n').filter(Boolean);
-      const parsed = lines.slice(1).map(line => {
-        const cols = line.split(',');
-        return { date: cols[0]?.trim() || '', desc: cols[1]?.trim() || '', amount: cols[2]?.trim() || '' };
-      }).filter(r => r.desc && r.amount);
-      setRows(parsed);
-    };
-    reader.readAsText(file);
-  };
-
-  const saveAll = () => {
-    rows.forEach(r => {
-      const amount = Math.abs(parseFloat(r.amount) || 0);
-      if (!amount) return;
-      db.addLedgerEntry({
-        id: Date.now().toString() + Math.random(),
-        companyId: company.id,
-        date: r.date || new Date().toISOString().split('T')[0],
-        type: parseFloat(r.amount) > 0 ? 'sale' : 'expense',
-        description: r.desc,
-        amount,
-        taxAmount: 0,
-      });
-    });
-    setSaved(true);
-    setTimeout(onClose, 1200);
-  };
-
-  return (
-    <ModalWrapper title="Import Bank Statement" onClose={onClose}>
-      {saved ? (
-        <div className="text-center py-8">
-          <p className="text-4xl mb-3">✅</p>
-          <p className="font-bold text-cac-green">{rows.length} transactions imported!</p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          <div className="flex gap-1 bg-slate-100 rounded-xl p-1">
-            {(['csv', 'manual'] as const).map(t => (
-              <button key={t} onClick={() => setTab(t)} className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${tab === t ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'}`}>
-                {t === 'csv' ? '📄 CSV Upload' : '✏️ Manual Entry'}
-              </button>
-            ))}
-          </div>
-
-          {tab === 'csv' ? (
-            <div className="space-y-3">
-              <div className="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center">
-                <p className="text-2xl mb-2">📂</p>
-                <p className="text-sm font-bold text-slate-700 mb-1">Upload CSV</p>
-                <p className="text-xs text-slate-400 mb-3">Expected columns: Date, Description, Amount</p>
-                <input type="file" accept=".csv" onChange={handleFile} className="text-xs" />
-              </div>
-              {rows.length > 0 && (
-                <div className="space-y-1 max-h-40 overflow-y-auto">
-                  {rows.map((r, i) => (
-                    <div key={i} className="flex justify-between text-xs p-2 bg-slate-50 rounded-lg">
-                      <span className="text-slate-600 truncate flex-1">{r.desc}</span>
-                      <span className={`font-bold ml-2 ${parseFloat(r.amount) >= 0 ? 'text-cac-green' : 'text-red-500'}`}>{fmt(Math.abs(parseFloat(r.amount) || 0))}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {[0].map(i => (
-                <div key={i} className="space-y-2">
-                  <Input label="Date" type="date" value={rows[0]?.date || ''} onChange={e => setRows([{ ...rows[0] || { desc: '', amount: '' }, date: e.target.value }])} />
-                  <Input label="Description" value={rows[0]?.desc || ''} onChange={e => setRows([{ ...rows[0] || { date: '', amount: '' }, desc: e.target.value }])} placeholder="Transaction description" />
-                  <Input label="Amount (₦, negative for expense)" type="number" value={rows[0]?.amount || ''} onChange={e => setRows([{ ...rows[0] || { date: '', desc: '' }, amount: e.target.value }])} placeholder="-50000 or 200000" />
-                </div>
-              ))}
-            </div>
-          )}
-
-          <div className="flex gap-3">
-            <Button variant="ghost" onClick={onClose} className="flex-1">Cancel</Button>
-            <Button onClick={saveAll} className="flex-1" disabled={rows.length === 0}>Import {rows.length > 0 ? `(${rows.length})` : ''}</Button>
-          </div>
-        </div>
-      )}
-    </ModalWrapper>
-  );
-};
 
 // ─── Modal Wrapper ────────────────────────────────────────────────────────────
 const ModalWrapper: React.FC<{ title: string; onClose: () => void; children: React.ReactNode }> = ({ title, onClose, children }) => (
@@ -521,7 +428,7 @@ const ScoreRing: React.FC<{ score: number }> = ({ score }) => {
 };
 
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
-type ModalType = 'sale' | 'expense' | 'payroll' | 'filed' | 'import' | null;
+type ModalType = 'sale' | 'expense' | 'payroll' | 'filed' | null;
 
 import { AppView } from '../App';
 
@@ -654,7 +561,6 @@ const Dashboard: React.FC<DashboardProps> = ({ company, onNavigate }) => {
       {modal === 'expense' && <AddExpenseModal company={company} onClose={() => setModal(null)} />}
       {modal === 'payroll' && <PayrollModal    company={company} onClose={() => setModal(null)} />}
       {modal === 'filed'   && <MarkFiledModal  company={company} onClose={() => setModal(null)} />}
-      {modal === 'import'  && <BankImportModal company={company} onClose={() => setModal(null)} />}
     </div>
   );
 };
