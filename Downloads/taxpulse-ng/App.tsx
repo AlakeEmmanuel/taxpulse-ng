@@ -58,10 +58,28 @@ const App: React.FC = () => {
   const [view, setView]                   = useState<AppView>('dashboard');
 
   useEffect(() => {
+    let handled = false;
+
+    // Fallback: if onAuthStateChange doesn't fire within 3s, check session manually
+    const fallback = setTimeout(async () => {
+      if (handled) return;
+      console.log('Fallback: checking session manually');
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        handled = true;
+        await loadUserData(session.user.id);
+      } else {
+        handled = true;
+        setAppState('unauthenticated');
+      }
+    }, 3000);
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth event:', event);
         if (event === 'INITIAL_SESSION') {
+          clearTimeout(fallback);
+          handled = true;
           if (session?.user) {
             await loadUserData(session.user.id);
           } else {
@@ -69,9 +87,12 @@ const App: React.FC = () => {
           }
         }
         if (event === 'SIGNED_IN' && session?.user) {
+          clearTimeout(fallback);
+          handled = true;
           await loadUserData(session.user.id);
         }
         if (event === 'SIGNED_OUT') {
+          clearTimeout(fallback);
           setUserId(null);
           setProfile(null);
           setCompanies([]);
@@ -80,7 +101,7 @@ const App: React.FC = () => {
         }
       }
     );
-    return () => subscription.unsubscribe();
+    return () => { clearTimeout(fallback); subscription.unsubscribe(); };
   }, []);
 
   const loadUserData = async (uid: string) => {
