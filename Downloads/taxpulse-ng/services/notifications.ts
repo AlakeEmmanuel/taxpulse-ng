@@ -47,13 +47,12 @@ export async function subscribeToPush(userId: string): Promise<boolean> {
       applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
     });
 
-    // Save to Supabase
+    // Delete any existing row for this user, then insert fresh
+    await supabase.from('push_subscriptions').delete().eq('user_id', userId);
+    
     const { error } = await supabase
       .from('push_subscriptions')
-      .upsert(
-        { user_id: userId, subscription: sub.toJSON() },
-        { onConflict: 'user_id' }
-      );
+      .insert({ user_id: userId, subscription: sub.toJSON() });
 
     if (error) {
       console.error('Failed to save push subscription:', error);
