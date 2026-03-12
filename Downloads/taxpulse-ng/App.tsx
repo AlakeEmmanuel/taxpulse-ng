@@ -105,13 +105,18 @@ const App: React.FC = () => {
   }, []);
 
   const loadUserData = async (uid: string) => {
+    console.log('loadUserData started', uid);
     (window as any).__taxpulse_uid = uid;
     setUserId(uid);
     try {
-      const [prof, list] = await Promise.all([
-        getProfile(uid),
-        db.getCompanies(),
-      ]);
+      console.log('fetching profile...');
+      const prof = await getProfile(uid);
+      console.log('profile done', prof);
+
+      console.log('fetching companies...');
+      const list = await db.getCompanies();
+      console.log('companies done', list);
+
       setProfile(prof);
       setCompanies(list);
       if (list.length > 0) {
@@ -124,6 +129,7 @@ const App: React.FC = () => {
       console.error('loadUserData error:', err);
       setView('onboarding');
     }
+    console.log('setting appState to ready');
     setAppState('ready');
   };
 
