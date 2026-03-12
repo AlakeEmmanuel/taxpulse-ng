@@ -10,6 +10,7 @@ import { AIAssistant } from './pages/AIAssistant';
 import { EvidenceVault } from './pages/EvidenceVault';
 import { PenaltyCalculator } from './pages/PenaltyCalculator';
 import { TaxExport } from './pages/TaxExport';
+import { BankImport } from './pages/BankImport';
 import { AuthPage } from './pages/AuthPage';
 import { Paywall } from './pages/Paywall';
 import { Company } from './types';
@@ -19,9 +20,9 @@ import { supabase } from './services/supabaseClient';
 
 export type AppView =
   | 'dashboard' | 'onboarding' | 'calculators' | 'pit'
-  | 'ledger' | 'settings' | 'ai' | 'vault' | 'penalties' | 'export';
+  | 'ledger' | 'settings' | 'ai' | 'vault' | 'penalties' | 'export' | 'import';
 
-const PRO_VIEWS: AppView[] = ['ai', 'vault', 'export'];
+const PRO_VIEWS: AppView[] = ['ai', 'vault', 'export', 'import'];
 
 const LockedFeature: React.FC<{ name: string; onUpgrade: () => void }> = ({ name, onUpgrade }) => (
   <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-6 space-y-5">
@@ -196,6 +197,7 @@ const App: React.FC = () => {
       {view === 'ai'     && (proUser ? <AIAssistant company={activeCompany!} /> : <LockedFeature name="AI Tax Assistant" onUpgrade={() => setShowPaywall(true)} />)}
       {view === 'vault'  && (proUser ? <EvidenceVault company={activeCompany!} /> : <LockedFeature name="Evidence Vault" onUpgrade={() => setShowPaywall(true)} />)}
       {view === 'export' && (proUser ? <TaxExport company={activeCompany!} /> : <LockedFeature name="PDF Export" onUpgrade={() => setShowPaywall(true)} />)}
+      {view === 'import' && (proUser ? <BankImport company={activeCompany!} /> : <LockedFeature name="Bank Import" onUpgrade={() => setShowPaywall(true)} />)}
     </Layout>
   );
 };

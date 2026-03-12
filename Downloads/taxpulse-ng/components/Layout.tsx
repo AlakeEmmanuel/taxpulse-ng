@@ -27,6 +27,7 @@ const TOOLS_NAV: { icon: string; label: string; view: AppView }[] = [
   { icon: '🗄️',  label: 'Evidence Vault', view: 'vault' },
   { icon: '⚠️',  label: 'Penalties',      view: 'penalties' },
   { icon: '📄',  label: 'PDF Export',     view: 'export' },
+  { icon: '🏦',  label: 'Bank Import',    view: 'import' },
 ];
 
 // Mobile shows only the 5 most-used + settings
