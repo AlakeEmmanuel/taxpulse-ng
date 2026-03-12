@@ -49,6 +49,7 @@ type AppState = 'loading' | 'unauthenticated' | 'ready';
 
 const App: React.FC = () => {
   const [appState, setAppState]       = useState<AppState>('loading');
+  const [dataLoading, setDataLoading] = useState(true);
   const [userId, setUserId]           = useState<string | null>(null);
   const [profile, setProfile]         = useState<UserProfile | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
@@ -116,6 +117,7 @@ const App: React.FC = () => {
     setCompanies(list);
     setActiveCompany(list[0] || null);
     setView(list.length > 0 ? 'dashboard' : 'onboarding');
+    setDataLoading(false);
     setAppState('ready');
   };
 
@@ -148,7 +150,7 @@ const App: React.FC = () => {
     setShowPaywall(false);
   };
 
-  if (appState === 'loading')          return <Spinner msg="Starting TaxPulse NG..." />;
+  if (appState === 'loading' || dataLoading) return <Spinner msg="Starting TaxPulse NG..." />;
   if (appState === 'unauthenticated')  return <AuthPage />;
   if (showPaywall) return (
     <Paywall profile={profile!} onUpgraded={handleUpgraded} onContinueFree={() => setShowPaywall(false)} />
