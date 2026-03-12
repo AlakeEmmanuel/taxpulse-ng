@@ -205,6 +205,8 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
   const [error, setError]             = useState('');
   const [saving, setSaving]           = useState(false);
   const [savedCount, setSavedCount]   = useState(0);
+  const [vaultSaved, setVaultSaved]   = useState(false);
+  const [vaultError, setVaultError]   = useState('');
   const [dragOver, setDragOver]       = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -275,7 +277,7 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
       } catch (e) { console.error('Failed to save entry:', e); }
     }
 
-    // 2. Save original bank statement directly to Evidence Vault (no base64 conversion)
+    // 2. Save original bank statement directly to Evidence Vault
     if (file) {
       try {
         await db.addEvidenceFile(file, {
@@ -285,9 +287,10 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
           category: 'bank_statement',
           notes: count + ' transactions imported to ledger on ' + new Date().toLocaleDateString('en-NG'),
         });
-      } catch (e) {
-        // Don't block the user if vault save fails — ledger entries are already saved
+        setVaultSaved(true);
+      } catch (e: any) {
         console.error('Failed to save statement to vault:', e);
+        setVaultError(e?.message || 'Unknown error saving to vault');
       }
     }
 
@@ -496,7 +499,15 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
       <div className="w-20 h-20 bg-green-50 border-2 border-green-200 rounded-2xl flex items-center justify-center text-4xl">✅</div>
       <div>
         <h2 className="text-xl font-extrabold text-slate-900">Import Complete!</h2>
-        <p className="text-slate-500 text-sm mt-2">{savedCount} transactions added to your ledger. Your tax obligations have been updated automatically.</p>
+        <p className="text-slate-500 text-sm mt-2">{savedCount} transactions added to your ledger.</p>
+        {vaultSaved && <p className="text-xs text-cac-green font-bold mt-1">✅ Bank statement saved to Evidence Vault</p>}
+        {vaultError && (
+          <div className="mt-2 bg-red-50 border border-red-200 rounded-xl px-3 py-2 text-left">
+            <p className="text-xs font-bold text-red-700">⚠️ Could not save to Evidence Vault:</p>
+            <p className="text-xs text-red-600 mt-0.5">{vaultError}</p>
+            <p className="text-xs text-slate-500 mt-1">Check Supabase → Storage → evidence bucket → Policies (allow authenticated users to insert)</p>
+          </div>
+        )}
       </div>
       <div className="grid grid-cols-2 gap-3 w-full">
         <button onClick={() => { setStep('upload'); setFile(null); setTransactions([]); }} className="border border-slate-200 text-slate-700 px-4 py-3 rounded-xl font-bold text-sm hover:bg-slate-50">
