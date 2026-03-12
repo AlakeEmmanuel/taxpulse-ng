@@ -225,10 +225,11 @@ export async function getEvidence(companyId: string): Promise<EvidenceFile[]> {
 }
 
 export async function addEvidence(file: EvidenceFile): Promise<EvidenceFile> {
-  // 1. Upload file data to Supabase Storage
   const storagePath = `${file.companyId}/${file.id}_${file.name}`;
-  const byteArray = Uint8Array.from(atob(file.data), c => c.charCodeAt(0));
-  const blob = new Blob([byteArray], { type: file.mimeType });
+
+  // Convert base64 to blob safely (handles large files)
+  const fetchRes = await fetch(`data:${file.mimeType};base64,${file.data}`);
+  const blob = await fetchRes.blob();
 
   const { error: storageError } = await supabase.storage
     .from('evidence')
@@ -236,7 +237,6 @@ export async function addEvidence(file: EvidenceFile): Promise<EvidenceFile> {
 
   if (storageError) throw storageError;
 
-  // 2. Save metadata to DB
   const { data, error } = await supabase
     .from('evidence_files')
     .insert({
@@ -251,6 +251,38 @@ export async function addEvidence(file: EvidenceFile): Promise<EvidenceFile> {
       upload_date:      file.uploadDate,
       category:         file.category,
       notes:            file.notes || null,
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return toEvidence(data);
+}
+
+// Upload a raw File object directly — used by BankImport to avoid base64 on large PDFs
+export async function addEvidenceFile(rawFile: File, meta: Omit<EvidenceFile, 'data' | 'sizeBytes' | 'mimeType' | 'name'>): Promise<EvidenceFile> {
+  const storagePath = `${meta.companyId}/${meta.id}_${rawFile.name}`;
+
+  const { error: storageError } = await supabase.storage
+    .from('evidence')
+    .upload(storagePath, rawFile, { contentType: rawFile.type, upsert: true });
+
+  if (storageError) throw storageError;
+
+  const { data, error } = await supabase
+    .from('evidence_files')
+    .insert({
+      id:               meta.id,
+      company_id:       meta.companyId,
+      obligation_id:    meta.obligationId || null,
+      ledger_entry_id:  meta.ledgerEntryId || null,
+      name:             rawFile.name,
+      mime_type:        rawFile.type || 'application/pdf',
+      size_bytes:       rawFile.size,
+      storage_path:     storagePath,
+      upload_date:      meta.uploadDate,
+      category:         meta.category,
+      notes:            meta.notes || null,
     })
     .select()
     .single();
