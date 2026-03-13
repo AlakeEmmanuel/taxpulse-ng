@@ -54,7 +54,6 @@ export const Paywall: React.FC<PaywallProps> = ({ profile, onUpgraded, onContinu
 
     const runPaystack = () => {
       const planCode = selectedPlan === 'annual' ? ANNUAL_PLAN_CODE : MONTHLY_PLAN_CODE;
-      const amount   = (selectedPlan === 'annual' ? ANNUAL_PRICE_NGN : MONTHLY_PRICE_NGN) * 100;
 
       if (!planCode) {
         setPayLoading(false);
@@ -65,8 +64,6 @@ export const Paywall: React.FC<PaywallProps> = ({ profile, onUpgraded, onContinu
       const handler = window.PaystackPop.setup({
         key:      PAYSTACK_PUBLIC_KEY,
         email:    profile.email,
-        amount:   amount,
-        currency: 'NGN',
         plan:     planCode,
         ref:      'TAXPULSE_' + Date.now(),
         metadata: {
