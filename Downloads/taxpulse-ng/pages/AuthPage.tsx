@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { signInEmail, signUpEmail } from '../services/auth';
+import { supabase } from '../services/supabaseClient';
 
 type AuthMode = 'login' | 'signup';
 
@@ -37,9 +38,10 @@ export const AuthPage: React.FC = () => {
 
   const handleForgotPassword = async () => {
     if (!email) { setError('Enter your email address first.'); return; }
-    const { supabase } = await import('../services/supabaseClient');
-    await supabase.auth.resetPasswordForEmail(email);
-    setMessage('Password reset email sent!');
+    await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + '/reset-password',
+    });
+    setMessage('Password reset link sent! Check your inbox and spam folder.');
   };
 
   const EyeIcon = () => showPassword ? (
