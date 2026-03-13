@@ -8,13 +8,22 @@ import * as db from '../services/db';
 
 const fmt = (n: number) => '₦' + n.toLocaleString(undefined, { maximumFractionDigits: 2 });
 
-const PERIODS = [
-  'January 2026', 'February 2026', 'March 2026', 'April 2026',
-  'May 2026', 'June 2026', 'July 2026', 'August 2026',
-  'September 2026', 'October 2026', 'November 2026', 'December 2026',
-  'Q1 2026 (Jan–Mar)', 'Q2 2026 (Apr–Jun)', 'Q3 2026 (Jul–Sep)', 'Q4 2026 (Oct–Dec)',
-  'Full Year 2026',
-];
+const MONTHS_LIST = ['January','February','March','April','May','June',
+  'July','August','September','October','November','December'];
+
+const buildPeriods = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const periods: string[] = [];
+  // Current and previous year months
+  for (const y of [year - 1, year]) {
+    MONTHS_LIST.forEach(m => periods.push(`${m} ${y}`));
+    periods.push(`Q1 ${y} (Jan–Mar)`, `Q2 ${y} (Apr–Jun)`, `Q3 ${y} (Jul–Sep)`, `Q4 ${y} (Oct–Dec)`);
+    periods.push(`Full Year ${y}`);
+  }
+  return periods;
+};
+const PERIODS = buildPeriods();
 
 interface TaxExportProps { company: Company; }
 
@@ -360,6 +369,8 @@ export const TaxExport: React.FC<TaxExportProps> = ({ company }) => {
       // Save
       const filename = `TaxPulse_${company.name.replace(/\s+/g, '_')}_${period.replace(/\s+/g, '_')}.pdf`;
       doc.save(filename);
+      // Mark PDF as generated for the Getting Started checklist
+      try { localStorage.setItem('taxpulse_pdf_generated_' + company.id, '1'); } catch {}
       setGenerated(true);
       setTimeout(() => setGenerated(false), 3000);
     } catch (e: any) {

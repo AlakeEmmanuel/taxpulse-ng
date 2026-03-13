@@ -81,13 +81,19 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
 
   const back = () => setStep(s => Math.max(s - 1, 1));
 
+  const [submitting, setSubmitting] = useState(false);
+
   const handleSubmit = () => {
+    if (submitting) return;
+    setSubmitting(true);
     const company: Company = {
       ...form,
-      id: Date.now().toString(),
+      id: Date.now().toString(), // Temp ID — DB will assign real UUID in App.tsx
       complianceScore: 50,
     };
     onComplete(company);
+    // Note: obligation seeding happens in App.tsx handleCompanyAdded
+    // AFTER the company is saved to DB and we have the real UUID
   };
 
   const progress = ((step - 1) / 3) * 100;
@@ -390,7 +396,8 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             ) : (
               <button
                 onClick={handleSubmit}
-                className="px-8 py-2.5 bg-cac-green text-white rounded-xl text-sm font-bold hover:bg-cac-dark transition-all shadow-lg shadow-cac-green/30 flex items-center gap-2"
+                disabled={submitting}
+                className="px-8 py-2.5 bg-cac-green text-white rounded-xl text-sm font-bold hover:bg-cac-dark transition-all shadow-lg shadow-cac-green/30 flex items-center gap-2 disabled:opacity-70"
               >
                 🚀 Launch Dashboard
               </button>

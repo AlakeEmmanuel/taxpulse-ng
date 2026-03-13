@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Company, EntityType } from '../types';
+import { generateObligations } from '../utils/taxEngine';
 import { Card, Input, Button } from '../components/Shared';
 import * as db from '../services/db';
 import { subscribeToPush, unsubscribeFromPush, isPushSubscribed } from '../services/notifications';
@@ -66,6 +67,56 @@ const NotificationToggle: React.FC = () => {
       </div>
       {error && <p className="text-xs text-red-500 bg-red-50 rounded-lg px-3 py-2">{error}</p>}
       {!subscribed && !error && <p className="text-xs text-slate-400">Note: your browser will only ask for permission once. If you previously denied it, go to browser Settings → Notifications to re-enable.</p>}
+    </div>
+  );
+};
+
+const RegenerateButton: React.FC<{ company: Company }> = ({ company }) => {
+  const [loading, setLoading] = useState(false);
+  const [done, setDone]       = useState(false);
+  const [err, setErr]         = useState('');
+
+  const handleRegenerate = async () => {
+    if (!window.confirm(
+      'This will add any missing tax obligations based on your current settings.\n\n' +
+      'Existing obligations will NOT be deleted — only new ones added.\n\nContinue?'
+    )) return;
+
+    setLoading(true); setErr(''); setDone(false);
+    try {
+      const obligations = generateObligations(company);
+      let added = 0;
+      for (const ob of obligations) {
+        try {
+          await db.addObligation({ ...ob, id: '' });
+          added++;
+        } catch (e: any) {
+          // Ignore duplicate key errors — obligation already exists
+          if (!e?.message?.includes('duplicate') && !e?.message?.includes('unique')) {
+            console.warn('Obligation insert skipped:', e?.message);
+          }
+        }
+      }
+      setDone(true);
+      setTimeout(() => setDone(false), 4000);
+    } catch (e: any) {
+      setErr(e?.message || 'Failed to regenerate.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <button
+        onClick={handleRegenerate}
+        disabled={loading}
+        className="w-full bg-blue-600 text-white py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 disabled:opacity-50 transition-colors"
+      >
+        {loading ? '⏳ Generating...' : '🔄 Regenerate Tax Schedule'}
+      </button>
+      {done && <p className="text-xs text-cac-green font-bold text-center">✅ Tax schedule updated!</p>}
+      {err  && <p className="text-xs text-red-600 text-center">{err}</p>}
     </div>
   );
 };
@@ -179,6 +230,14 @@ export const SettingsPage: React.FC<SettingsProps> = ({ company, onCompanyUpdate
       </div>
 
       <Button onClick={handleSave} className="w-full py-3">Save Settings</Button>
+
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-3">
+        <div>
+          <p className="font-bold text-blue-900 text-sm">Updated your tax configuration?</p>
+          <p className="text-xs text-blue-700 mt-1">If you changed your VAT, PAYE, or WHT settings, regenerate your tax schedule to add the new obligations.</p>
+        </div>
+        <RegenerateButton company={form} />
+      </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-50">

@@ -43,14 +43,25 @@ export const Paywall: React.FC<PaywallProps> = ({ profile, onUpgraded, onContinu
 
   const handlePaystack = () => {
     if (!profile?.email) { alert('No email on your account.'); return; }
-    if (!PAYSTACK_PUBLIC_KEY) { alert('Payment is not configured yet. Please contact support.'); return; }
+
+    // Diagnose missing config clearly instead of Paystack's cryptic error
+    if (!PAYSTACK_PUBLIC_KEY) {
+      alert('⚠️ Paystack public key missing.\n\nAdd VITE_PAYSTACK_PUBLIC_KEY to Vercel environment variables and redeploy.');
+      return;
+    }
 
     setPayLoading(true);
 
     const runPaystack = () => {
       const planCode = selectedPlan === 'annual' ? ANNUAL_PLAN_CODE : MONTHLY_PLAN_CODE;
       const amount   = (selectedPlan === 'annual' ? ANNUAL_PRICE_NGN : MONTHLY_PRICE_NGN) * 100;
-      if (!planCode) { setPayLoading(false); alert('Plan not configured. Please contact support.'); return; }
+
+      if (!planCode) {
+        setPayLoading(false);
+        const missingVar = selectedPlan === 'annual' ? 'VITE_PAYSTACK_PLAN_ANNUAL' : 'VITE_PAYSTACK_PLAN_MONTHLY';
+        alert(`⚠️ Plan code missing.\n\nAdd ${missingVar} to Vercel environment variables and redeploy.\n\nGet your plan codes from Paystack Dashboard → Recurring → Plans.`);
+        return;
+      }
       const handler = window.PaystackPop.setup({
         key:      PAYSTACK_PUBLIC_KEY,
         email:    profile.email,

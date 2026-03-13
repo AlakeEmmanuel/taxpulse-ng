@@ -4,6 +4,8 @@
  * Signed by President Bola Tinubu, 26 June 2025
  */
 
+import { Company, TaxObligation, TaxType, TaxStatus } from '../types';
+
 // ─── VAT ─────────────────────────────────────────────────────────────────────
 // VAT Act (consolidated under NTA 2025) — rate unchanged at 7.5%
 export const VAT_RATE = 0.075;
@@ -165,3 +167,169 @@ export const FILING_DEADLINES = [
   { tax: 'PIT',  due: '31st March annually',                 authority: 'State IRS' },
   { tax: 'DEV LEVY', due: 'Same as CIT filing',             authority: 'NRS (formerly FIRS)' },
 ];
+
+// ─── AUTO-GENERATE TAX OBLIGATIONS ───────────────────────────────────────────
+// Called after onboarding — seeds a full 12-month schedule based on company profile
+
+
+const MONTHS = ['January','February','March','April','May','June',
+                'July','August','September','October','November','December'];
+
+function pad(n: number) { return String(n).padStart(2, '0'); }
+
+function makeId() {
+  return 'ob_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7);
+}
+
+// Parse "December 31" → month index (0-based)
+function parseYearEndMonth(yearEnd: string): number {
+  const parts = yearEnd.split(' ');
+  const idx = MONTHS.findIndex(m => m.toLowerCase() === parts[0].toLowerCase());
+  return idx >= 0 ? idx : 11; // default December
+}
+
+export function generateObligations(company: Company): Omit<TaxObligation, 'id'>[] {
+  const obligations: Omit<TaxObligation, 'id'>[] = [];
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth(); // 0-based
+
+  // ── VAT — monthly, due 21st of following month ─────────────────────────────
+  if (company.collectsVat) {
+    for (let i = 0; i < 12; i++) {
+      const month = (currentMonth + i) % 12;
+      const year = currentYear + Math.floor((currentMonth + i) / 12);
+      const dueMonth = (month + 1) % 12;
+      const dueYear = dueMonth === 0 ? year + 1 : (month === 11 ? year + 1 : year);
+      const dueDate = `${dueYear}-${pad(dueMonth + 1)}-21`;
+      const periodLabel = `${MONTHS[month]} ${year}`;
+
+      const status = new Date(dueDate) < now
+        ? TaxStatus.OVERDUE
+        : new Date(dueDate) <= new Date(now.getTime() + 30 * 86400000)
+          ? TaxStatus.DUE
+          : TaxStatus.UPCOMING;
+
+      obligations.push({
+        companyId: company.id,
+        type: TaxType.VAT,
+        period: periodLabel,
+        dueDate,
+        status,
+        estimatedAmount: 0,
+        checklist: [
+          { label: 'Download VAT schedule from NRS portal', completed: false },
+          { label: 'Reconcile output VAT (sales)', completed: false },
+          { label: 'Reconcile input VAT (purchases)', completed: false },
+          { label: 'File VAT return on NRS e-Services', completed: false },
+          { label: 'Make payment & keep receipt', completed: false },
+        ],
+      });
+    }
+  }
+
+  // ── PAYE — monthly, due 10th of following month ────────────────────────────
+  if (company.hasEmployees) {
+    for (let i = 0; i < 12; i++) {
+      const month = (currentMonth + i) % 12;
+      const year = currentYear + Math.floor((currentMonth + i) / 12);
+      const dueMonth = (month + 1) % 12;
+      const dueYear = dueMonth === 0 ? year + 1 : (month === 11 ? year + 1 : year);
+      const dueDate = `${dueYear}-${pad(dueMonth + 1)}-10`;
+      const periodLabel = `${MONTHS[month]} ${year}`;
+
+      const status = new Date(dueDate) < now
+        ? TaxStatus.OVERDUE
+        : new Date(dueDate) <= new Date(now.getTime() + 30 * 86400000)
+          ? TaxStatus.DUE
+          : TaxStatus.UPCOMING;
+
+      obligations.push({
+        companyId: company.id,
+        type: TaxType.PAYE,
+        period: periodLabel,
+        dueDate,
+        status,
+        estimatedAmount: 0,
+        checklist: [
+          { label: 'Prepare payroll schedule for the month', completed: false },
+          { label: 'Calculate PAYE per employee (NTA 2025 bands)', completed: false },
+          { label: 'File PAYE returns with State IRS', completed: false },
+          { label: 'Remit PAYE to State IRS', completed: false },
+          { label: 'Issue payslips to all employees', completed: false },
+        ],
+      });
+    }
+  }
+
+  // ── WHT — monthly, due 21st of following month ─────────────────────────────
+  if (company.paysVendors) {
+    for (let i = 0; i < 12; i++) {
+      const month = (currentMonth + i) % 12;
+      const year = currentYear + Math.floor((currentMonth + i) / 12);
+      const dueMonth = (month + 1) % 12;
+      const dueYear = dueMonth === 0 ? year + 1 : (month === 11 ? year + 1 : year);
+      const dueDate = `${dueYear}-${pad(dueMonth + 1)}-21`;
+      const periodLabel = `${MONTHS[month]} ${year}`;
+
+      const status = new Date(dueDate) < now
+        ? TaxStatus.OVERDUE
+        : new Date(dueDate) <= new Date(now.getTime() + 30 * 86400000)
+          ? TaxStatus.DUE
+          : TaxStatus.UPCOMING;
+
+      obligations.push({
+        companyId: company.id,
+        type: TaxType.WHT,
+        period: periodLabel,
+        dueDate,
+        status,
+        estimatedAmount: 0,
+        checklist: [
+          { label: 'List all vendor payments made this month', completed: false },
+          { label: 'Calculate WHT deducted (5% goods, 10% services)', completed: false },
+          { label: 'File WHT schedule on NRS portal', completed: false },
+          { label: 'Remit WHT to NRS', completed: false },
+          { label: 'Issue WHT credit notes to vendors', completed: false },
+        ],
+      });
+    }
+  }
+
+  // ── CIT — once, due 6 months after financial year end ─────────────────────
+  {
+    const yearEndMonth = parseYearEndMonth(company.yearEnd);
+    // Find next year-end date
+    let citYear = currentYear;
+    if (currentMonth > yearEndMonth) citYear = currentYear + 1;
+    const citDueMonth = (yearEndMonth + 6) % 12;
+    const citDueYear = yearEndMonth + 6 >= 12 ? citYear + 1 : citYear;
+    const citDueDate = `${citDueYear}-${pad(citDueMonth + 1)}-01`;
+    const periodLabel = `FY ${citYear} (Year ending ${company.yearEnd} ${citYear})`;
+
+    const citStatus = new Date(citDueDate) < now
+      ? TaxStatus.OVERDUE
+      : new Date(citDueDate) <= new Date(now.getTime() + 60 * 86400000)
+        ? TaxStatus.DUE
+        : TaxStatus.UPCOMING;
+
+    obligations.push({
+      companyId: company.id,
+      type: TaxType.CIT,
+      period: periodLabel,
+      dueDate: citDueDate,
+      status: citStatus,
+      estimatedAmount: 0,
+      checklist: [
+        { label: 'Prepare audited financial statements', completed: false },
+        { label: 'Compute assessable profit (NTA 2025)', completed: false },
+        { label: 'Check if small company exemption applies (≤₦50M turnover)', completed: false },
+        { label: 'Compute 30% CIT + 4% Development Levy', completed: false },
+        { label: 'File CIT return on NRS portal', completed: false },
+        { label: 'Pay CIT liability and keep receipt', completed: false },
+      ],
+    });
+  }
+
+  return obligations;
+}

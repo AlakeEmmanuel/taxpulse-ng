@@ -86,7 +86,10 @@ function monthYearLabel(my: string): string {
 
 const MONTH_OPTIONS = (() => {
   const opts = [];
-  for (let y = 2024; y <= 2027; y++) {
+  const now = new Date();
+  const startYear = now.getFullYear() - 2;
+  const endYear   = now.getFullYear() + 1;
+  for (let y = startYear; y <= endYear; y++) {
     for (let m = 1; m <= 12; m++) {
       const val = y + '-' + String(m).padStart(2, '0');
       opts.push({ value: val, label: monthYearLabel(val) });
@@ -387,7 +390,8 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
     setSaving(true);
     setError('');
 
-    const stmtId = 'stmt_' + Date.now();
+    // Use UUID so it matches evidence_files.id which is UUID type
+    const stmtId = crypto.randomUUID();
     setStatementId(stmtId);
     let count = 0;
 
@@ -508,7 +512,7 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
                     <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Statement Month</label>
                     <select
                       value={monthYear}
-                      onChange={e => setMonthYear(e.target.value)}
+                      onChange={e => { setMonthYear(e.target.value); setError(''); }}
                       className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-cac-green bg-white"
                     >
                       {MONTH_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}

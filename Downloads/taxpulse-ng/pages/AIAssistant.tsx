@@ -1,17 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Company } from '../types';
+import { Company, LedgerEntry, TaxObligation } from '../types';
+import * as db from '../services/db';
 
 interface Message { role: 'user' | 'assistant'; content: string; }
 
 const SUGGESTIONS = [
-  'What are the NTA 2025 PAYE bands?',
-  'How is rent relief calculated under NTA 2025?',
-  'What changed for CIT under the tax reform?',
-  'Is my company exempt from VAT under NTA 2025?',
-  'What is the Development Levy and who pays it?',
-  'When is PAYE due to the State IRS?',
-  'Explain WHT exemption for small businesses',
-  'What penalties apply for late filing under NTA 2025?',
+  'How much VAT do I owe this month?',
+  'Am I eligible for the small company CIT exemption?',
+  'What are my upcoming tax deadlines?',
+  'How is my PAYE calculated under NTA 2025?',
+  'What is the Development Levy and do I pay it?',
+  'How do I calculate WHT for my vendors?',
+  'What records must I keep for an NRS audit?',
+  'What penalties apply for late filing?',
 ];
 
 const FormattedMessage: React.FC<{ content: string }> = ({ content }) => {
@@ -37,15 +38,32 @@ const FormattedMessage: React.FC<{ content: string }> = ({ content }) => {
 interface AIAssistantProps { company: Company; }
 
 export const AIAssistant: React.FC<AIAssistantProps> = ({ company }) => {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [messages, setMessages]       = useState<Message[]>([]);
+  const [input, setInput]             = useState('');
+  const [loading, setLoading]         = useState(false);
+  const [error, setError]             = useState('');
+  const [ledger, setLedger]           = useState<LedgerEntry[]>([]);
+  const [obligations, setObligations] = useState<TaxObligation[]>([]);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    db.getLedgers(company.id).then(setLedger).catch(() => {});
+    db.getObligations(company.id).then(obs => setObligations(obs as TaxObligation[])).catch(() => {});
+  }, [company.id]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
+
+  // Compute real financials from ledger for AI context
+  const totalIncome   = ledger.filter(l => l.type === 'sale').reduce((s, l) => s + l.amount, 0);
+  const totalExpenses = ledger.filter(l => l.type === 'expense').reduce((s, l) => s + l.amount, 0);
+  const vatOwed       = ledger.filter(l => l.type === 'sale').reduce((s, l) => s + l.taxAmount, 0);
+  const whtDeducted   = ledger.filter(l => l.type === 'expense').reduce((s, l) => s + l.taxAmount, 0);
+  const overdueObs    = obligations.filter(o => o.status === 'Overdue');
+  const dueObs        = obligations.filter(o => o.status === 'Due');
+
+  const fmt = (n: number) => '₦' + n.toLocaleString(undefined, { maximumFractionDigits: 2 });
 
   const systemPrompt = `You are TaxPulse NG's AI Tax Advisor — an expert in Nigerian tax law, specifically the Nigeria Tax Act (NTA) 2025 signed by President Bola Tinubu on 26 June 2025, effective from 1 January 2026.
 
@@ -54,10 +72,25 @@ COMPANY CONTEXT:
 - Type: ${company.entityType}
 - Industry: ${company.industry}
 - State: ${company.state}
+- RC Number: ${company.rcNumber || 'Not provided'}
+- TIN: ${company.tin || 'Not provided'}
 - Has employees: ${company.hasEmployees ? 'Yes (' + (company.employeeCount || 'unknown count') + ')' : 'No'}
 - Pays vendors (WHT): ${company.paysVendors ? 'Yes' : 'No'}
 - Collects VAT: ${company.collectsVat ? 'Yes' : 'No'}
 - Year end: ${company.yearEnd}
+
+LIVE FINANCIAL DATA (from their TaxPulse ledger — use this when answering questions about their finances):
+- Total income recorded: ${fmt(totalIncome)}
+- Total expenses recorded: ${fmt(totalExpenses)}
+- Net profit: ${fmt(totalIncome - totalExpenses)}
+- VAT collected (output VAT): ${fmt(vatOwed)}
+- WHT deducted from vendors: ${fmt(whtDeducted)}
+- Total ledger transactions: ${ledger.length}
+- Overdue tax obligations: ${overdueObs.length > 0 ? overdueObs.map(o => o.type + ' (' + o.period + ')').join(', ') : 'None'}
+- Due soon obligations: ${dueObs.length > 0 ? dueObs.map(o => o.type + ' (' + o.period + ', due ' + o.dueDate + ')').join(', ') : 'None'}
+- Total tax obligations tracked: ${obligations.length}
+
+When the user asks "how much do I owe" or "what are my taxes", use the live data above to give specific answers.
 
 NTA 2025 KEY PROVISIONS (use these — not the old PITA/CITA rules):
 
