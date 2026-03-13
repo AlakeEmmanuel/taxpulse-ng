@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { UserProfile, redeemPromoCode, activateSubscription } from '../services/auth';
 
 // Your Paystack public key — replace with yours from dashboard.paystack.com
-const PAYSTACK_PUBLIC_KEY  = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY  || '';
-const MONTHLY_PLAN_CODE    = import.meta.env.VITE_PAYSTACK_PLAN_CODE   || '';
-const ANNUAL_PLAN_CODE     = import.meta.env.VITE_PAYSTACK_PLAN_CODE   || '';
-const MONTHLY_PRICE_NGN    = 2500;
-const ANNUAL_PRICE_NGN     = 25000;
+const PAYSTACK_PUBLIC_KEY  = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY       || '';
+const MONTHLY_PLAN_CODE    = import.meta.env.VITE_PAYSTACK_PLAN_MONTHLY  || '';
+const ANNUAL_PLAN_CODE     = import.meta.env.VITE_PAYSTACK_PLAN_ANNUAL   || '';
+const MONTHLY_PRICE_NGN    = 5000;
+const ANNUAL_PRICE_NGN     = 50000;
 
 interface PaywallProps {
   profile: UserProfile;
@@ -43,15 +43,14 @@ export const Paywall: React.FC<PaywallProps> = ({ profile, onUpgraded, onContinu
 
   const handlePaystack = () => {
     if (!profile?.email) { alert('No email on your account.'); return; }
-    console.log('Paystack key:', PAYSTACK_PUBLIC_KEY ? PAYSTACK_PUBLIC_KEY.substring(0,10) + '...' : 'MISSING');
-    console.log('Plan code:', MONTHLY_PLAN_CODE || 'MISSING');
-    if (!PAYSTACK_PUBLIC_KEY) { alert('Paystack key not configured.'); return; }
+    if (!PAYSTACK_PUBLIC_KEY) { alert('Payment is not configured yet. Please contact support.'); return; }
 
     setPayLoading(true);
 
     const runPaystack = () => {
       const planCode = selectedPlan === 'annual' ? ANNUAL_PLAN_CODE : MONTHLY_PLAN_CODE;
       const amount   = (selectedPlan === 'annual' ? ANNUAL_PRICE_NGN : MONTHLY_PRICE_NGN) * 100;
+      if (!planCode) { setPayLoading(false); alert('Plan not configured. Please contact support.'); return; }
       const handler = window.PaystackPop.setup({
         key:      PAYSTACK_PUBLIC_KEY,
         email:    profile.email,
@@ -65,9 +64,10 @@ export const Paywall: React.FC<PaywallProps> = ({ profile, onUpgraded, onContinu
           activateSubscription(
             profile.id,
             response.customer?.customer_code || '',
-            response.subscription?.subscription_code || response.reference
+            response.subscription?.subscription_code || response.reference,
+            selectedPlan
           ).then(onUpgraded).catch(() => {
-            alert('Payment received! Ref: ' + response.reference + '. Contact support if not activated.');
+            alert('Payment received! Your reference is: ' + response.reference + '.\n\nYour account will be activated within a few minutes. If not, email support@taxpulse.ng with this reference.');
           });
         },
         onClose: function() { setPayLoading(false); },
@@ -100,7 +100,7 @@ export const Paywall: React.FC<PaywallProps> = ({ profile, onUpgraded, onContinu
           {(['monthly', 'annual'] as const).map(plan => (
             <button key={plan} onClick={() => setSelectedPlan(plan)}
               className={`flex-1 py-3 rounded-xl text-sm font-bold transition-colors relative ${selectedPlan === plan ? 'bg-cac-green text-white' : 'text-slate-500 hover:bg-slate-50'}`}>
-              {plan === 'monthly' ? '₦2,500 / month' : '₦25,000 / year'}
+              {plan === 'monthly' ? '₦5,000 / month' : '₦50,000 / year'}
               {plan === 'annual' && (
                 <span className={`ml-2 text-[9px] font-black px-2 py-0.5 rounded-full ${selectedPlan === 'annual' ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-700'}`}>
                   SAVE 17%
@@ -141,9 +141,9 @@ export const Paywall: React.FC<PaywallProps> = ({ profile, onUpgraded, onContinu
             <p className="text-xs font-black text-green-200 uppercase tracking-wider mb-3">Pro</p>
             <div className="mb-4">
               {selectedPlan === 'monthly' ? (
-                <><span className="text-2xl font-extrabold">₦2,500</span><span className="text-green-200 text-xs">/month</span></>
+                <><span className="text-2xl font-extrabold">₦5,000</span><span className="text-green-200 text-xs">/month</span></>
               ) : (
-                <><span className="text-2xl font-extrabold">₦25,000</span><span className="text-green-200 text-xs">/year</span></>
+                <><span className="text-2xl font-extrabold">₦50,000</span><span className="text-green-200 text-xs">/year</span></>
               )}
             </div>
             <div className="space-y-2 text-xs text-green-100">
@@ -178,7 +178,7 @@ export const Paywall: React.FC<PaywallProps> = ({ profile, onUpgraded, onContinu
             {payLoading ? (
               <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Processing...</>
             ) : (
-  <>💳 Subscribe — {selectedPlan === 'monthly' ? '₦2,500/month' : '₦25,000/year'}</>
+  <>💳 Subscribe — {selectedPlan === 'monthly' ? '₦5,000/month' : '₦50,000/year'}</>
             )}
           </button>
           <p className="text-[10px] text-slate-400 text-center">Powered by Paystack · 100% secure · NGN payments</p>

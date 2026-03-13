@@ -13,6 +13,7 @@ import { TaxExport } from './pages/TaxExport';
 import { BankImport } from './pages/BankImport';
 import { AuthPage } from './pages/AuthPage';
 import { Paywall } from './pages/Paywall';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { Company } from './types';
 import { UserProfile, getProfile, isPro, signOut } from './services/auth';
 import * as db from './services/db';
@@ -32,7 +33,7 @@ const LockedFeature: React.FC<{ name: string; onUpgrade: () => void }> = ({ name
       <p className="text-slate-500 text-sm mt-2 max-w-sm">Upgrade to TaxPulse Pro to unlock AI assistance, PDF exports, Evidence Vault and unlimited companies.</p>
     </div>
     <button onClick={onUpgrade} className="bg-cac-green text-white px-8 py-3.5 rounded-xl font-bold text-sm hover:bg-cac-dark transition-colors">
-      Upgrade to Pro — ₦2,500/month
+      Upgrade to Pro — ₦5,000/month
     </button>
   </div>
 );
@@ -64,7 +65,6 @@ const App: React.FC = () => {
     // Fallback: if onAuthStateChange doesn't fire within 3s, check session manually
     const fallback = setTimeout(async () => {
       if (handled) return;
-      console.log('Fallback: checking session manually');
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         handled = true;
@@ -208,4 +208,10 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+const AppWithBoundary: React.FC = () => (
+  <ErrorBoundary>
+    <App />
+  </ErrorBoundary>
+);
+
+export default AppWithBoundary;

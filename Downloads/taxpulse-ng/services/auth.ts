@@ -27,29 +27,6 @@ export async function signInEmail(email: string, password: string) {
   return data;
 }
 
-export async function signInGoogle() {
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: { redirectTo: window.location.origin }
-  });
-  if (error) throw error;
-}
-
-export async function sendPhoneOTP(phone: string) {
-  // Format to E.164 — add +234 if needed
-  const formatted = phone.startsWith('+') ? phone : '+234' + phone.replace(/^0/, '');
-  const { error } = await supabase.auth.signInWithOtp({ phone: formatted });
-  if (error) throw error;
-  return formatted;
-}
-
-export async function verifyPhoneOTP(phone: string, token: string) {
-  const { data, error } = await supabase.auth.verifyOtp({
-    phone, token, type: 'sms'
-  });
-  if (error) throw error;
-  return data;
-}
 
 export async function signOut() {
   await supabase.auth.signOut();
@@ -135,10 +112,15 @@ export async function redeemPromoCode(userId: string, code: string): Promise<str
 export async function activateSubscription(
   userId: string,
   paystackCustomerCode: string,
-  paystackSubCode: string
+  paystackSubCode: string,
+  plan: 'monthly' | 'annual' = 'monthly'
 ) {
   const expiresAt = new Date();
-  expiresAt.setMonth(expiresAt.getMonth() + 1); // 1 month
+  if (plan === 'annual') {
+    expiresAt.setFullYear(expiresAt.getFullYear() + 1); // 1 year
+  } else {
+    expiresAt.setMonth(expiresAt.getMonth() + 1); // 1 month
+  }
 
   const { error } = await supabase
     .from('profiles')
