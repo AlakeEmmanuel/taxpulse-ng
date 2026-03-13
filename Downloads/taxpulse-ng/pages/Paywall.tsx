@@ -58,7 +58,13 @@ export const Paywall: React.FC<PaywallProps> = ({ profile, onUpgraded, onContinu
         currency: 'NGN',
         plan:     planCode,
         ref:      'TAXPULSE_' + Date.now(),
-        metadata: { custom_fields: [{ display_name: 'User ID', variable_name: 'user_id', value: profile.id }] },
+        metadata: {
+          custom_fields: [
+            { display_name: 'User ID',   variable_name: 'user_id',   value: profile.id },
+            { display_name: 'Plan Type', variable_name: 'plan_type', value: selectedPlan },
+            { display_name: 'Plan Code', variable_name: 'plan_code', value: planCode },
+          ]
+        },
         callback: function(response: any) {
           setPayLoading(false);
           activateSubscription(
