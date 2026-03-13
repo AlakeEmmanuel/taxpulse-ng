@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Company, TaxStatus, TaxType, LedgerEntry } from '../types';
 import { Card, Badge, Button, Input } from '../components/Shared';
 import * as db from '../services/db';
-import { calcPAYE, calcCIT, calcVAT, WHT_RATES, VAT_RATE } from '../utils/taxEngine';
+import { calcPAYE, calcCIT, calcVAT, WHT_RATES, VAT_RATE, generateObligations } from '../utils/taxEngine';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
 const fmt = (n: number) => '₦' + n.toLocaleString(undefined, { maximumFractionDigits: 2 });
@@ -19,7 +19,7 @@ const QuickActionButton: React.FC<{ icon: string; label: string; onClick: () => 
 );
 
 // ─── Add Sale Modal (NTA 2025: VAT 7.5%, unchanged) ──────────────────────────
-const AddSaleModal: React.FC<{ company: Company; onClose: () => void }> = ({ company, onClose }) => {
+const AddSaleModal: React.FC<{ company: Company; onClose: () => void; onSaved?: () => void }> = ({ company, onClose, onSaved }) => {
   const [desc, setDesc] = useState('');
   const [amount, setAmount] = useState('');
   const [vatIncl, setVatIncl] = useState(false);
@@ -44,6 +44,7 @@ const AddSaleModal: React.FC<{ company: Company; onClose: () => void }> = ({ com
     };
     db.addLedgerEntry({ ...entry, id: Date.now().toString() }).then(() => {
       setSaved(true);
+      onSaved?.();
       setTimeout(onClose, 1200);
     }).catch(e => { console.error('Ledger error:', e); alert('Failed to save. Please try again.'); });
   };
@@ -91,7 +92,7 @@ const AddSaleModal: React.FC<{ company: Company; onClose: () => void }> = ({ com
 };
 
 // ─── Add Expense Modal (WHT per NTA 2025) ────────────────────────────────────
-const AddExpenseModal: React.FC<{ company: Company; onClose: () => void }> = ({ company, onClose }) => {
+const AddExpenseModal: React.FC<{ company: Company; onClose: () => void; onSaved?: () => void }> = ({ company, onClose, onSaved }) => {
   const [vendor, setVendor] = useState('');
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('Supply of Goods');
@@ -115,6 +116,7 @@ const AddExpenseModal: React.FC<{ company: Company; onClose: () => void }> = ({ 
     };
     db.addLedgerEntry({ ...entry, id: Date.now().toString() }).then(() => {
       setSaved(true);
+      onSaved?.();
       setTimeout(onClose, 1200);
     }).catch(e => { console.error('Ledger error:', e); alert('Failed to save. Please try again.'); });
   };
@@ -321,18 +323,24 @@ const PayrollModal: React.FC<{ company: Company; onClose: () => void }> = ({ com
 };
 
 // ─── Mark Filed Modal ─────────────────────────────────────────────────────────
-const MarkFiledModal: React.FC<{ company: Company; onClose: () => void }> = ({ company, onClose }) => {
+const MarkFiledModal: React.FC<{ company: Company; onClose: () => void; onSaved?: () => void }> = ({ company, onClose, onSaved }) => {
   const [unfiled, setUnfiled] = React.useState<any[]>([]);
   React.useEffect(() => {
     db.getObligations(company.id).then(obs => setUnfiled(obs.filter(o =>
       o.status === TaxStatus.DUE || o.status === TaxStatus.OVERDUE || o.status === TaxStatus.UPCOMING
     ))).catch(() => {});
   }, [company.id]);
+  // Default to first unfiled item once loaded — avoids silent no-op on Confirm
   const [selectedId, setSelectedId] = useState('');
   const [actualAmount, setActualAmount] = useState('');
   const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split('T')[0]);
   const [receiptRef, setReceiptRef] = useState('');
   const [saved, setSaved] = useState(false);
+
+  // Pre-select first obligation once list loads
+  React.useEffect(() => {
+    if (unfiled.length > 0 && !selectedId) setSelectedId(unfiled[0].id);
+  }, [unfiled]);
 
   const handleFile = () => {
     if (!selectedId) return;
@@ -340,7 +348,9 @@ const MarkFiledModal: React.FC<{ company: Company; onClose: () => void }> = ({ c
       status: TaxStatus.FILED,
       actualAmount: parseFloat(actualAmount) || undefined,
       paymentDate,
+      proofUrl: receiptRef || undefined,   // FIX: save receipt ref
     }).then(() => {
+      onSaved?.();
       setSaved(true);
       setTimeout(onClose, 1200);
     }).catch(e => { console.error('Update error:', e); alert('Failed to update. Please try again.'); });
@@ -411,7 +421,7 @@ const ScoreRing: React.FC<{ score: number }> = ({ score }) => {
   const color = score >= 80 ? '#00843D' : score >= 50 ? '#f59e0b' : '#ef4444';
   return (
     <div className="relative w-32 h-32">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width={128} height={128}>
         <PieChart>
           <Pie data={data} cx="50%" cy="50%" innerRadius={44} outerRadius={60} startAngle={90} endAngle={-270} dataKey="value" strokeWidth={0}>
             <Cell fill={color} />
@@ -438,12 +448,70 @@ interface DashboardProps {
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ company, onNavigate }) => {
-  const [modal, setModal] = useState<ModalType>(null);
+  const [modal, setModal]             = useState<ModalType>(null);
   const [obligations, setObligations] = useState<any[]>([]);
+  const [ledger, setLedger]           = useState<LedgerEntry[]>([]);
+  const [evidence, setEvidence]       = useState<any[]>([]);
+  const [loading, setLoading]         = useState(true);
+  const [seeding, setSeeding]           = useState(false);
 
-  React.useEffect(() => {
-    db.getObligations(company.id).then(setObligations).catch(() => setObligations([]));
+  const refreshData = () => {
+    db.refreshObligationStatuses(company.id).catch(() => {}).finally(() => {
+      Promise.all([
+        db.getObligations(company.id),
+        db.getLedgers(company.id),
+        db.getEvidence(company.id),
+      ]).then(([obs, led, ev]) => {
+        setObligations(obs);
+        setLedger(led);
+        setEvidence(ev);
+      }).catch(() => {});
+    });
+  };
+
+  useEffect(() => {
+    setLoading(true);
+    // First refresh stale statuses silently, then load everything
+    db.refreshObligationStatuses(company.id)
+      .catch(() => {}) // never block the UI
+      .finally(() => {
+        Promise.all([
+          db.getObligations(company.id),
+          db.getLedgers(company.id),
+          db.getEvidence(company.id),
+        ]).then(([obs, led, ev]) => {
+          setObligations(obs);
+          setLedger(led);
+          setEvidence(ev);
+        }).catch(() => {}).finally(() => setLoading(false));
+      });
   }, [company.id]);
+
+  // Compute real compliance score
+  const computeScore = () => {
+    if (obligations.length === 0) return company.complianceScore;
+    const total = obligations.length;
+    const filedCount = obligations.filter(o => o.status === TaxStatus.FILED).length;
+    const overdueCount = obligations.filter(o => o.status === TaxStatus.OVERDUE).length;
+    const base = Math.round((filedCount / total) * 80);
+    const penalty = Math.min(overdueCount * 8, 40);
+    const profileBonus = company.tin ? 10 : 0;
+    const vaultBonus = evidence.length > 0 ? 10 : 0;
+    return Math.min(100, Math.max(0, base + profileBonus + vaultBonus - penalty));
+  };
+  const score = computeScore();
+
+  // Getting started checklist
+  const gettingStarted = [
+    { id: 'profile',  label: 'Complete company profile',       done: !!(company.tin && company.rcNumber),  action: () => onNavigate('settings'), actionLabel: 'Go to Settings' },
+    { id: 'ledger',   label: 'Record your first transaction',  done: ledger.length > 0,                    action: () => setModal('sale'),       actionLabel: 'Add Sale' },
+    { id: 'import',   label: 'Import a bank statement',        done: ledger.some(l => l.sourceId),         action: () => onNavigate('import'),   actionLabel: 'Import Now' },
+    { id: 'vault',    label: 'Upload a receipt or invoice',    done: evidence.length > 0,                  action: () => onNavigate('vault'),    actionLabel: 'Open Vault' },
+    { id: 'export',   label: 'Generate your first PDF report', done: !!localStorage.getItem('taxpulse_pdf_generated_' + company.id), action: () => onNavigate('export'),   actionLabel: 'Export PDF' },
+  ];
+  const completedSteps = gettingStarted.filter(s => s.done).length;
+  const allDone = completedSteps === gettingStarted.length;
+  const showChecklist = completedSteps < gettingStarted.length;
 
   const overdue  = obligations.filter(o => o.status === TaxStatus.OVERDUE);
   const due      = obligations.filter(o => o.status === TaxStatus.DUE);
@@ -468,6 +536,98 @@ const Dashboard: React.FC<DashboardProps> = ({ company, onNavigate }) => {
         <p className="text-slate-500 text-sm">{company.entityType} · {company.state} · {company.industry}</p>
       </header>
 
+      {/* Empty Obligations Banner — shown to existing users who have no schedule yet */}
+      {!loading && obligations.length === 0 && !seeding && (
+        <div className="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl p-6 space-y-4">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center text-2xl shrink-0">📅</div>
+            <div>
+              <h2 className="font-extrabold text-slate-900">Your tax schedule is empty</h2>
+              <p className="text-sm text-slate-600 mt-1">
+                TaxPulse needs to generate your 12-month tax obligation calendar based on your company profile — VAT, PAYE, WHT, and CIT deadlines.
+              </p>
+            </div>
+          </div>
+          <div className="bg-white/70 rounded-xl p-4 text-xs text-slate-600 space-y-1">
+            <p className="font-bold text-slate-800 mb-2">Based on your profile, you need:</p>
+            {company.collectsVat  && <p>✅ <strong>VAT</strong> — Monthly returns, due 21st of each month → NRS</p>}
+            {company.hasEmployees && <p>✅ <strong>PAYE</strong> — Monthly payroll tax, due 10th of each month → State IRS</p>}
+            {company.paysVendors  && <p>✅ <strong>WHT</strong> — Monthly withholding, due 21st of each month → NRS</p>}
+            <p>✅ <strong>CIT</strong> — Annual filing, 6 months after your {company.yearEnd} year-end</p>
+          </div>
+          <button
+            onClick={async () => {
+              setSeeding(true);
+              try {
+                const obs = generateObligations(company);
+                for (const ob of obs) {
+                  await db.addObligation({ ...ob, id: '' }).catch(() => {});
+                }
+                await db.refreshObligationStatuses(company.id).catch(() => {});
+                const fresh = await db.getObligations(company.id);
+                setObligations(fresh);
+              } catch (e) {
+                console.error('Seeding failed:', e);
+              } finally {
+                setSeeding(false);
+              }
+            }}
+            className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl text-sm transition-colors"
+          >
+            🚀 Generate My Tax Schedule Now
+          </button>
+        </div>
+      )}
+
+      {/* Seeding overlay */}
+      {seeding && (
+        <div className="bg-cac-green/5 border border-cac-green/20 rounded-2xl p-8 text-center space-y-3">
+          <div className="w-12 h-12 border-4 border-cac-green border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="font-bold text-slate-800">Building your tax calendar...</p>
+          <p className="text-sm text-slate-500">Creating 12 months of obligations based on your profile</p>
+        </div>
+      )}
+
+      {/* Getting Started Checklist — shown until all done */}
+      {showChecklist && (
+        <div className="bg-gradient-to-br from-cac-green/5 to-emerald-50 border border-cac-green/20 rounded-2xl p-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="font-extrabold text-slate-900">🚀 Get started with TaxPulse</h2>
+              <p className="text-xs text-slate-500 mt-0.5">{completedSteps} of {gettingStarted.length} steps complete</p>
+            </div>
+            <div className="text-right">
+              <p className="text-2xl font-extrabold text-cac-green">{Math.round((completedSteps / gettingStarted.length) * 100)}%</p>
+            </div>
+          </div>
+          {/* Progress bar */}
+          <div className="w-full h-2 bg-white rounded-full overflow-hidden border border-cac-green/20">
+            <div
+              className="h-full bg-cac-green rounded-full transition-all duration-500"
+              style={{ width: (completedSteps / gettingStarted.length * 100) + '%' }}
+            />
+          </div>
+          <div className="space-y-2">
+            {gettingStarted.map((step, i) => (
+              <div key={step.id} className={"flex items-center gap-3 p-3 rounded-xl transition-all " + (step.done ? 'bg-white/60 opacity-60' : 'bg-white border border-slate-100 shadow-sm')}>
+                <div className={"w-7 h-7 rounded-full flex items-center justify-center text-sm font-extrabold shrink-0 " + (step.done ? 'bg-cac-green text-white' : 'bg-slate-100 text-slate-400')}>
+                  {step.done ? '✓' : i + 1}
+                </div>
+                <p className={"flex-1 text-sm font-semibold " + (step.done ? 'line-through text-slate-400' : 'text-slate-800')}>{step.label}</p>
+                {!step.done && (
+                  <button
+                    onClick={step.action}
+                    className="text-xs font-bold text-cac-green bg-green-50 hover:bg-green-100 px-3 py-1.5 rounded-lg transition-colors shrink-0"
+                  >
+                    {step.actionLabel} →
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* NTA 2025 Reform Banner */}
       <div className="bg-gradient-to-r from-cac-green to-emerald-600 rounded-2xl p-4 text-white flex items-center gap-4">
         <span className="text-3xl shrink-0">📋</span>
@@ -480,7 +640,7 @@ const Dashboard: React.FC<DashboardProps> = ({ company, onNavigate }) => {
       {/* Score + Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="col-span-2 md:col-span-1 flex items-center gap-4 p-4">
-          <ScoreRing score={company.complianceScore} />
+          <ScoreRing score={score} />
           <div>
             <p className="text-xs font-bold text-slate-400 uppercase">Compliance</p>
             <p className="text-sm font-bold text-slate-700 mt-0.5">
@@ -557,10 +717,10 @@ const Dashboard: React.FC<DashboardProps> = ({ company, onNavigate }) => {
       </Card>
 
       {/* Modals */}
-      {modal === 'sale'    && <AddSaleModal    company={company} onClose={() => setModal(null)} />}
-      {modal === 'expense' && <AddExpenseModal company={company} onClose={() => setModal(null)} />}
+      {modal === 'sale'    && <AddSaleModal    company={company} onClose={() => setModal(null)} onSaved={refreshData} />}
+      {modal === 'expense' && <AddExpenseModal company={company} onClose={() => setModal(null)} onSaved={refreshData} />}
       {modal === 'payroll' && <PayrollModal    company={company} onClose={() => setModal(null)} />}
-      {modal === 'filed'   && <MarkFiledModal  company={company} onClose={() => setModal(null)} />}
+      {modal === 'filed'   && <MarkFiledModal  company={company} onClose={() => setModal(null)} onSaved={refreshData} />}
     </div>
   );
 };

@@ -330,6 +330,47 @@ export async function bankStatementExists(companyId: string, monthYear: string):
   return (data?.length || 0) > 0;
 }
 
+// ─── Obligation Status Refresh ────────────────────────────────────────────────
+// Compares each obligation's due date to today and corrects stale statuses.
+// Call this on every dashboard load — silent, only writes when something changed.
+export async function refreshObligationStatuses(companyId: string): Promise<void> {
+  const { data, error } = await supabase
+    .from('tax_obligations')
+    .select('id, due_date, status')
+    .eq('company_id', companyId);
+
+  if (error || !data) return;
+
+  const now  = new Date();
+  const soon = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days
+
+  const updates: Promise<void>[] = [];
+
+  for (const ob of data) {
+    // Never touch already-filed obligations
+    if (ob.status === 'Filed') continue;
+
+    const due = new Date(ob.due_date);
+    let correct: string;
+
+    if (due < now)         correct = 'Overdue';
+    else if (due <= soon)  correct = 'Due';
+    else                   correct = 'Upcoming';
+
+    if (ob.status !== correct) {
+      updates.push(
+        supabase
+          .from('tax_obligations')
+          .update({ status: correct })
+          .eq('id', ob.id)
+          .then(() => {}) // fire-and-forget per row
+      );
+    }
+  }
+
+  await Promise.allSettled(updates);
+}
+
 export async function downloadEvidence(file: EvidenceFile & { storagePath?: string }): Promise<string> {
   const path = (file as any).storagePath;
   if (!path) throw new Error('No storage path');

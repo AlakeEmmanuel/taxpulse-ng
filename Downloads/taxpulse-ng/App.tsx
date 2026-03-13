@@ -17,6 +17,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { Company } from './types';
 import { UserProfile, getProfile, isPro, signOut } from './services/auth';
 import * as db from './services/db';
+import { generateObligations } from './utils/taxEngine';
 import { supabase } from './services/supabaseClient';
 
 export type AppView =
@@ -52,6 +53,7 @@ type AppState = 'loading' | 'unauthenticated' | 'ready';
 
 const App: React.FC = () => {
   const [appState, setAppState]           = useState<AppState>('loading');
+  const [seedingSchedule, setSeedingSchedule] = useState(false);
   const [userId, setUserId]               = useState<string | null>(null);
   const [profile, setProfile]             = useState<UserProfile | null>(null);
   const [showPaywall, setShowPaywall]     = useState(false);
@@ -139,11 +141,19 @@ const App: React.FC = () => {
   const handleCompanyAdded = async (company: Company) => {
     if (companies.length >= 1 && !isPro(profile)) { setShowPaywall(true); return; }
     try {
+      // 1. Save company first — DB returns real UUID
       const saved = await db.addCompany(company);
+      // 2. Show seeding overlay, seed obligations with real company ID
+      setSeedingSchedule(true);
+      const obligations = generateObligations({ ...company, id: saved.id });
+      for (const ob of obligations) {
+        await db.addObligation({ ...ob, id: '' }).catch(() => {});
+      }
       setCompanies(prev => [...prev, saved]);
       setActiveCompany(saved);
       setView('dashboard');
-    } catch (e: any) { alert('Error: ' + e.message); }
+    } catch (e: any) { alert('Error saving company: ' + e.message); }
+    finally { setSeedingSchedule(false); }
   };
 
   const handleCompanySaved = async (updated: Company) => {
@@ -161,6 +171,25 @@ const App: React.FC = () => {
 
   // Always show spinner until we know the auth state AND data is loaded
   if (appState === 'loading')         return <Spinner msg="Starting TaxPulse NG..." />;
+  if (seedingSchedule) return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-green-50">
+      <div className="text-center space-y-5 px-6">
+        <div className="w-20 h-20 border-4 border-cac-green border-t-transparent rounded-full animate-spin mx-auto" />
+        <div>
+          <h2 className="text-xl font-extrabold text-slate-900">Building your tax calendar</h2>
+          <p className="text-slate-500 text-sm mt-2">Creating 12 months of obligations based on your company profile...</p>
+        </div>
+        <div className="space-y-2 text-left max-w-xs mx-auto">
+          {['VAT deadlines (monthly, 21st)', 'PAYE schedule (monthly, 10th)', 'WHT remittance (monthly, 21st)', 'CIT filing (annual)'].map(item => (
+            <div key={item} className="flex items-center gap-2 text-sm text-slate-600">
+              <span className="w-4 h-4 bg-cac-green rounded-full flex items-center justify-center text-white text-xs">✓</span>
+              {item}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
   if (appState === 'unauthenticated') return <AuthPage />;
   if (showPaywall) return (
     <Paywall profile={profile!} onUpgraded={handleUpgraded} onContinueFree={() => setShowPaywall(false)} />
