@@ -27,5 +27,14 @@
     "@vitejs/plugin-react": "^5.0.0",
     "typescript": "~5.8.2",
     "vite": "^6.2.0"
+  },
+  "overrides": {
+    "xlsx": "^0.18.5",
+    "path-to-regexp": "^8.0.0",
+    "tough-cookie": "^5.0.0",
+    "cookie": "^0.7.0",
+    "semver": "^7.5.4",
+    "braces": "^3.0.3",
+    "ws": "^8.17.1"
   }
 }
