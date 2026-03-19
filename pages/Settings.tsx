@@ -191,6 +191,7 @@ export const SettingsPage: React.FC<SettingsProps> = ({ company, onCompanyUpdate
       <Card className="space-y-4">
         <h2 className="font-bold text-slate-800">Tax Configuration (NTA 2025)</h2>
 
+        {form.entityType !== 'Individual (Personal Income Tax)' && (<>
         <label className="flex items-center justify-between p-3 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition">
           <div>
             <p className="font-semibold text-sm text-slate-800">Has Employees (PAYE Applicable)</p>
@@ -210,14 +211,47 @@ export const SettingsPage: React.FC<SettingsProps> = ({ company, onCompanyUpdate
           </div>
           <input type="checkbox" className="accent-cac-green w-4 h-4" checked={form.paysVendors} onChange={e => update('paysVendors', e.target.checked)} />
         </label>
+        </>)}
 
-        <label className="flex items-center justify-between p-3 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition">
-          <div>
-            <p className="font-semibold text-sm text-slate-800">Collects VAT (≥₦100M Turnover)</p>
-            <p className="text-xs text-slate-400">NTA 2025: VAT registration threshold raised to ₦100M (was ₦25M)</p>
+        {form.entityType !== 'Individual (Personal Income Tax)' && (
+          <label className="flex items-center justify-between p-3 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition">
+            <div>
+              <p className="font-semibold text-sm text-slate-800">Collects VAT (≥₦100M Turnover)</p>
+              <p className="text-xs text-slate-400">NTA 2025: VAT registration threshold raised to ₦100M (was ₦25M)</p>
+            </div>
+            <input type="checkbox" className="accent-cac-green w-4 h-4" checked={form.collectsVat} onChange={e => update('collectsVat', e.target.checked)} />
+          </label>
+        )}
+
+        {/* Individual-specific fields */}
+        {form.entityType === 'Individual (Personal Income Tax)' && (
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-4">
+            <p className="text-xs font-bold text-blue-800">📋 Personal Income Tax Settings</p>
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Employment Type</label>
+              <select
+                value={form.employmentType || 'employed'}
+                onChange={e => update('employmentType', e.target.value)}
+                className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cac-green bg-white"
+              >
+                <option value="employed">Employed (Salary earner)</option>
+                <option value="self-employed">Self-Employed / Freelancer</option>
+                <option value="both">Both (Salary + Business income)</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">Estimated Annual Gross Income (₦)</label>
+              <input
+                type="number"
+                value={form.annualIncome || ''}
+                onChange={e => update('annualIncome', parseFloat(e.target.value) || undefined)}
+                placeholder="e.g. 4800000"
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-cac-green/30 focus:border-cac-green text-sm"
+              />
+              <p className="text-xs text-slate-400 mt-1">Used to estimate your PIT liability in reports.</p>
+            </div>
           </div>
-          <input type="checkbox" className="accent-cac-green w-4 h-4" checked={form.collectsVat} onChange={e => update('collectsVat', e.target.checked)} />
-        </label>
+        )}
       </Card>
 
       {/* NTA 2025 info box */}
@@ -225,7 +259,7 @@ export const SettingsPage: React.FC<SettingsProps> = ({ company, onCompanyUpdate
         <p className="font-bold">💡 NTA 2025 Reminder</p>
         <p>• Small company threshold (CIT-free): ≤₦50M turnover (raised from ₦25M)</p>
         <p>• VAT registration threshold: ≤₦100M turnover (raised from ₦25M)</p>
-        <p>• FIRS is now called Nigeria Revenue Service (NRS)</p>
+        <p>• Nigeria Revenue Service (NRS) — formerly FIRS</p>
         <p>• Development Levy (4%) applies to all non-small companies</p>
       </div>
 

@@ -390,7 +390,7 @@ const MarkFiledModal: React.FC<{ company: Company; onClose: () => void; onSaved?
           </div>
           <Input label="Actual Amount Paid (₦)" type="number" value={actualAmount} onChange={e => setActualAmount(e.target.value)} placeholder="Leave blank to use estimate" />
           <Input label="Payment Date" type="date" value={paymentDate} onChange={e => setPaymentDate(e.target.value)} />
-          <Input label="Receipt / Reference No." value={receiptRef} onChange={e => setReceiptRef(e.target.value)} placeholder="e.g., FIRS-20260310-XXXXX" />
+          <Input label="Receipt / Reference No." value={receiptRef} onChange={e => setReceiptRef(e.target.value)} placeholder="e.g., NRS-20260310-XXXXX" />
           <div className="flex gap-3 pt-2">
             <Button variant="ghost" onClick={onClose} className="flex-1">Cancel</Button>
             <Button onClick={handleFile} className="flex-1">Confirm Filing</Button>
@@ -633,7 +633,7 @@ const Dashboard: React.FC<DashboardProps> = ({ company, onNavigate }) => {
         <span className="text-3xl shrink-0">📋</span>
         <div>
           <p className="font-bold text-sm">Nigeria Tax Act 2025 — Active from 1 Jan 2026</p>
-          <p className="text-xs text-green-200 mt-0.5">All calculations use new PAYE bands (0%–25%), CIT ≤₦50M exempt, 4% Dev Levy. FIRS → NRS.</p>
+          <p className="text-xs text-green-200 mt-0.5">All calculations use new PAYE bands (0%–25%), CIT ≤₦50M exempt, 4% Dev Levy. Now: Nigeria Revenue Service (NRS).</p>
         </div>
       </div>
 

@@ -5,25 +5,25 @@ import * as db from '../services/db';
 interface Message { role: 'user' | 'assistant'; content: string; }
 
 const BUSINESS_SUGGESTIONS = [
-  'How much VAT do I owe based on my ledger?',
+  'How much VAT do I owe and how do I file it?',
+  'Walk me through filing my PAYE return step by step',
   'Do I qualify for 0% CIT as a small company?',
-  'What taxes are overdue for my company right now?',
-  'Calculate my PAYE under the new NTA 2025 bands',
+  'How do I file my WHT schedule with NRS?',
   'What is the Development Levy and do I pay it?',
-  'How do I calculate WHT on my vendor payments?',
-  'What records does NRS require for an audit?',
-  'What penalties apply if I file my VAT return late?',
+  'What documents do I need to file my CIT return?',
+  'What records must I keep to avoid an NRS audit?',
+  'What penalties apply if I miss my VAT deadline?',
 ];
 
 const INDIVIDUAL_SUGGESTIONS = [
+  'Walk me through how to file my PIT return (Form A)',
   'How much PIT do I owe this year based on my income?',
   'What deductions reduce my taxable income under NTA 2025?',
-  'When is my PIT annual return due and where do I file?',
-  'How does rent relief work for my income tax calculation?',
-  'I am self-employed — what quarterly payments must I make?',
-  'How do I get a tax clearance certificate in Nigeria?',
+  'How do I file my annual return with my State IRS?',
+  'I am self-employed — how do quarterly advance payments work?',
+  'How do I get a Tax Clearance Certificate (TCC)?',
   'My employer deducts PAYE — do I still need to file a return?',
-  'What happens if I miss my 31 March PIT filing deadline?',
+  'What documents do I need to file my PIT return?',
 ];
 
 const FormattedMessage: React.FC<{ content: string }> = ({ content }) => {
@@ -174,13 +174,72 @@ INSTITUTIONAL CHANGES:
 - State IRS handles: PAYE, PIT (self-employed file by 31 March)
 - NRS handles: VAT, WHT, CIT, Dev Levy
 
+HOW TO FILE — STEP BY STEP (educate users on this):
+
+VAT RETURN (monthly, due 21st):
+- Register on NRS e-Services portal: www.nrs.gov.ng
+- Log in, select "File VAT Return", choose the period
+- Enter: total taxable sales, output VAT (7.5%), taxable purchases, input VAT (7.5%), net VAT payable
+- Attach all sales invoices and purchase receipts
+- Pay via REMITA or NRS e-payment portal
+- Download the filing confirmation (keep 6 years minimum)
+- Nil returns: still file even if ₦0 transactions in the period
+- Small businesses (≤₦100M turnover, ≤₦250M fixed assets, not professional services): EXEMPT from VAT filing under NTAA 2025
+
+PAYE MONTHLY (due 10th, filed with STATE IRS):
+- Go to your State IRS portal (e.g., Lagos: lagosirs.gov.ng, FCT: fcta-irs.gov.ng, Rivers: rirs.gov.ng)
+- Prepare payroll schedule: employee name, TIN, gross income, deductions, taxable income, PAYE deducted
+- Apply NTA 2025 bands: 0% on first ₦800k → max 25%
+- Submit remittance schedule and pay via REMITA
+- Obtain payment receipt — keep as evidence
+- Annual employer return (Form H1): file by 31 January each year for all employees
+
+WHT SCHEDULE (monthly, due 21st, filed with NRS):
+- Log in to NRS TaxPro Max: taxpayerportal.nrs.gov.ng
+- Upload WHT schedule: vendor name, TIN, address, transaction type, invoice number, gross amount, WHT rate, WHT deducted
+- Rates: 5% for goods/construction, 10% for all services/professional fees
+- Pay via REMITA
+- Issue WHT Credit Notes to each vendor after remittance
+- Exemption: small businesses with valid TIN, transactions ≤₦2M/month are exempt
+
+CIT ANNUAL RETURN (due 6 months after year-end, filed with NRS):
+- Prepare audited financial statements (mandatory for non-small companies)
+- Compute assessable profit: revenue - allowable expenses - capital allowances
+- Small company check: turnover ≤₦50M AND fixed assets ≤₦250M → 0% CIT, 0% Dev Levy, 0% CGT
+- Standard company: 30% CIT + 4% Development Levy on assessable profit
+- Professional services firms (law, accounting, consulting) CANNOT claim small company status
+- File via NRS TaxPro Max portal with audited accounts and tax computation schedule
+- Development Levy replaces: TET Levy, IT Development Levy, NASENI Levy, Police Trust Fund Levy
+
+PIT SELF-ASSESSMENT — FORM A (due 31 March annually, filed with STATE IRS):
+- Download Form A from your State IRS website
+- Declare ALL income: employment, business, rental, investment, other
+- Deductions: Pension (8%), NHIS (1.5%), NHF (2.5%), Rent Relief (20% of rent, max ₦500k), Life Assurance (max ₦100k)
+- Apply NTA 2025 bands: 0% → first ₦800k taxable, then 15%→25%
+- If employed: reconcile with PAYE already deducted by employer (attach payslips)
+- If self-employed: make quarterly advance payments — 31 Mar, 30 Jun, 30 Sep, 31 Dec (25% of estimated annual PIT each)
+- After filing and paying: apply for Tax Clearance Certificate (TCC) from State IRS
+- TCC needed for: government contracts, loan applications, visa processing, school applications
+
+DOCUMENTS TO KEEP (minimum 6 years — NTA 2025, Section 98):
+- All sales invoices and purchase receipts
+- Bank statements showing tax payments
+- VAT filing confirmations and payment receipts
+- PAYE remittance schedules and payslips
+- WHT credit notes issued to vendors
+- Audited financial statements
+- CIT and PIT return confirmations
+- Tax Clearance Certificates
+
 INSTRUCTIONS:
 - Always reference NTA 2025 rules, never the old PITA/CITA/VAT Act unless explaining what changed
 - Give specific figures and rates, not vague answers
-- Tailor advice to the company's context above when relevant
+- Tailor advice to the company context above when relevant
+- When explaining how to file, give the step-by-step process above for that specific tax type
 - Flag if something requires a tax professional's formal opinion
 - Be concise but thorough. Use bullet points for multi-part answers.
-- Always mention relevant deadlines and which authority to file with`;
+- Always mention relevant deadlines and which authority to file with
+- For filing questions, always tell the user they can use the "Tax Filing Returns" section in TaxPulse NG to generate the pre-filled PDF forms`;
 
   const sendMessage = async (text: string) => {
     const apiKey = import.meta.env.VITE_GROQ_API_KEY;
