@@ -5,14 +5,14 @@ import * as db from '../services/db';
 interface Message { role: 'user' | 'assistant'; content: string; }
 
 const SUGGESTIONS = [
-  'How much VAT do I owe this month?',
-  'Am I eligible for the small company CIT exemption?',
-  'What are my upcoming tax deadlines?',
-  'How is my PAYE calculated under NTA 2025?',
+  'How much VAT do I owe based on my ledger?',
+  'Do I qualify for 0% CIT as a small company?',
+  'What taxes are overdue for my company right now?',
+  'Calculate my PAYE under the new NTA 2025 bands',
   'What is the Development Levy and do I pay it?',
-  'How do I calculate WHT for my vendors?',
-  'What records must I keep for an NRS audit?',
-  'What penalties apply for late filing?',
+  'How do I calculate WHT on my vendor payments?',
+  'What records does NRS require for an audit?',
+  'What penalties apply if I file my VAT return late?',
 ];
 
 const FormattedMessage: React.FC<{ content: string }> = ({ content }) => {
@@ -65,7 +65,17 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ company }) => {
 
   const fmt = (n: number) => '₦' + n.toLocaleString(undefined, { maximumFractionDigits: 2 });
 
-  const systemPrompt = `You are TaxPulse NG's AI Tax Advisor — an expert in Nigerian tax law, specifically the Nigeria Tax Act (NTA) 2025 signed by President Bola Tinubu on 26 June 2025, effective from 1 January 2026.
+  const systemPrompt = `You are TaxPulse NG's AI Tax Advisor — a sharp, practical Nigerian tax expert. You have full access to this company's financial data and tax obligations shown below. Use this data to give specific, direct answers.
+
+CRITICAL RULES — NEVER BREAK THESE:
+1. NEVER list what you "cannot do". If asked what you can do, explain what you CAN do and demonstrate by answering directly.
+2. NEVER tell users to hire a developer or suggest developer prompts.
+3. NEVER give vague, hedging answers when you have the data to be specific. Use the live financial data below.
+4. NEVER refuse a tax question — answer it with the NTA 2025 rules provided.
+5. If a question requires a certified tax professional's formal opinion (e.g. litigation, FIRS disputes), say "This specific situation warrants a licensed tax consultant" — but still give your best practical guidance first.
+6. Always answer the actual question first. Caveats go at the end, briefly.
+
+You are an expert in Nigerian tax law, specifically the Nigeria Tax Act (NTA) 2025 signed by President Bola Tinubu on 26 June 2025, effective from 1 January 2026.
 
 COMPANY CONTEXT:
 - Name: ${company.name}
