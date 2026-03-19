@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Company, TaxStatus, TaxType, LedgerEntry } from '../types';
 import { Card, Badge, Button, Input } from '../components/Shared';
 import * as db from '../services/db';
+import { sendDueReminders } from '../services/notifications';
 import { calcPAYE, calcCIT, calcVAT, WHT_RATES, VAT_RATE, generateObligations } from '../utils/taxEngine';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
@@ -483,6 +484,15 @@ const Dashboard: React.FC<DashboardProps> = ({ company, onNavigate }) => {
           setObligations(obs);
           setLedger(led);
           setEvidence(ev);
+          // Auto-send WhatsApp reminders once per day if opted in
+          if (company.whatsappOptin && company.phone) {
+            const sentKey = `taxpulse_wa_${company.id}_${new Date().toDateString()}`;
+            if (!localStorage.getItem(sentKey)) {
+              sendDueReminders(obs, company.name, company.phone, true)
+                .then(n => { if (n > 0) localStorage.setItem(sentKey, '1'); })
+                .catch(() => {});
+            }
+          }
         }).catch(() => {}).finally(() => setLoading(false));
       });
   }, [company.id]);
@@ -705,8 +715,9 @@ const Dashboard: React.FC<DashboardProps> = ({ company, onNavigate }) => {
           {[
             { icon: '📊', title: 'PAYE Bands 2026', body: '0% first ₦800k · 15% next ₦2.2M · 18% next ₦9M · 21% next ₦13M · 23% next ₦25M · 25% above ₦50M' },
             { icon: '🏢', title: 'CIT (NTA 2025)', body: 'Small cos (≤₦50M turnover): 0% CIT + 0% Dev Levy. Standard: 30% CIT + 4% Dev Levy. Medium category removed.' },
+            { icon: '🛡️', title: 'NSITF + Pension', body: 'NSITF: 1% payroll → NSITF (due 16th). Pension: 8% employee + 10% employer → PFAs (due within 7 days of payday). CAC annual returns: 30 June.' },
             { icon: '🏠', title: 'Rent Relief (replaces CRA)', body: '20% of annual rent paid, max ₦500,000. CRA is fully abolished from 1 Jan 2026.' },
-            { icon: '📅', title: 'Filing Deadlines', body: 'VAT: 21st monthly · PAYE: 10th monthly · WHT: 21st monthly · CIT: 6 months after year-end · PIT: 31 March' },
+            { icon: '📅', title: 'Filing Deadlines', body: 'VAT: 21st · PAYE: 10th · WHT: 21st · CIT: 6 months after year-end · PIT: 31 March · NSITF: 16th · Pension: 7 days after payday · CAC: 30 June · ITF: 1 April' },
           ].map(({ icon, title, body }) => (
             <div key={title} className="bg-slate-50 rounded-xl p-3 space-y-1">
               <p className="font-bold text-slate-800">{icon} {title}</p>

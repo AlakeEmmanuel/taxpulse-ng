@@ -4,7 +4,7 @@
  * Signed by President Bola Tinubu, 26 June 2025
  */
 
-import { Company, TaxObligation, TaxType, TaxStatus, EntityType } from '../types';
+import { Company, TaxObligation, TaxType, TaxStatus, EntityType, PayslipEmployee } from '../types';
 
 // ─── VAT ─────────────────────────────────────────────────────────────────────
 // VAT Act (consolidated under NTA 2025) — rate unchanged at 7.5%
@@ -182,6 +182,41 @@ function makeId() {
 }
 
 // Parse "December 31" → month index (0-based)
+
+// ─── PAYSLIP COMPUTATION ──────────────────────────────────────────────────────
+export function calcPayslip(grossSalary: number, annualRent = 0): PayslipEmployee & { netPay: number; totalDeductions: number } {
+  const basicSalary  = grossSalary * 0.60; // 60% basic (standard split)
+  const housing      = grossSalary * 0.20;
+  const transport    = grossSalary * 0.10;
+  const other        = grossSalary * 0.10;
+
+  // Statutory deductions
+  const pension      = grossSalary * 0.08;           // 8% employee pension
+  const nhis         = grossSalary * 0.015;          // 1.5% NHIS
+  const nhf          = basicSalary * 0.025;          // 2.5% of basic salary
+  const rentRelief   = Math.min(annualRent * 0.20, 500_000); // 20% of rent, max ₦500k
+
+  // PAYE on annual equivalent
+  const annualGross  = grossSalary * 12;
+  const annualPAYE   = calcPAYE({ grossAnnual: annualGross, annualRent }).annual;
+  const paye         = annualPAYE / 12;
+
+  // Employer contributions (informational)
+  const employerPension = grossSalary * 0.10;
+  const nsitf           = grossSalary * 0.01;
+
+  const totalDeductions = pension + nhis + nhf + paye;
+  const netPay = grossSalary - totalDeductions;
+
+  return {
+    name: '', tin: '', department: '',
+    grossSalary, basicSalary, housing, transport,
+    pension, nhis, nhf, paye,
+    employerPension, nsitf,
+    netPay, totalDeductions,
+  };
+}
+
 function parseYearEndMonth(yearEnd: string): number {
   const parts = yearEnd.split(' ');
   const idx = MONTHS.findIndex(m => m.toLowerCase() === parts[0].toLowerCase());
@@ -393,6 +428,150 @@ export function generateObligations(company: Company): Omit<TaxObligation, 'id'>
           ],
         });
       }
+    }
+  }
+
+
+  // ── CAC Annual Returns — due 30 June each year ─────────────────────────────
+  if (company.cacAnnualReturns !== false && company.entityType !== EntityType.INDIVIDUAL &&
+      (company.cacStatus === 'Registered' || company.rcNumber)) {
+    const cacDueYear = currentMonth >= 5 ? currentYear + 1 : currentYear; // after June, plan for next year
+    const cacDueDate = `${cacDueYear}-06-30`;
+    const cacStatus  = new Date(cacDueDate) < now ? TaxStatus.OVERDUE
+      : new Date(cacDueDate) <= new Date(now.getTime() + 60 * 86400000) ? TaxStatus.DUE
+      : TaxStatus.UPCOMING;
+
+    obligations.push({
+      companyId: company.id,
+      type: TaxType.CAC,
+      period: `FY ${cacDueYear - 1} Annual Returns`,
+      dueDate: cacDueDate,
+      status: cacStatus,
+      estimatedAmount: 0,
+      checklist: [
+        { label: 'Log in to CAC portal: www.cac.gov.ng', completed: false },
+        { label: 'Prepare annual returns form (CAC 10 for LTDs)', completed: false },
+        { label: 'Attach audited accounts (if turnover > ₦50M)', completed: false },
+        { label: 'Attach list of shareholders/directors (current)', completed: false },
+        { label: 'Pay annual returns filing fee on CAC portal', completed: false },
+        { label: 'Submit online and download filing confirmation', completed: false },
+        { label: 'Keep confirmation — needed for CAC Certificate of Compliance', completed: false },
+      ],
+    });
+  }
+
+  // ── NSITF — 1% of payroll, due 16th of following month ────────────────────
+  if (company.hasNSITF && company.hasEmployees) {
+    for (let i = 0; i < 12; i++) {
+      const month    = (currentMonth + i) % 12;
+      const year     = currentYear + Math.floor((currentMonth + i) / 12);
+      const dueMonth = (month + 1) % 12;
+      const dueYear  = dueMonth === 0 ? year + 1 : (month === 11 ? year + 1 : year);
+      const dueDate  = `${dueYear}-${pad(dueMonth + 1)}-16`;
+      const status   = new Date(dueDate) < now ? TaxStatus.OVERDUE
+        : new Date(dueDate) <= new Date(now.getTime() + 30 * 86400000) ? TaxStatus.DUE
+        : TaxStatus.UPCOMING;
+
+      obligations.push({
+        companyId: company.id,
+        type: TaxType.NSITF,
+        period: `${MONTHS[month]} ${year}`,
+        dueDate,
+        status,
+        estimatedAmount: 0,
+        checklist: [
+          { label: 'Log in to NSITF employer portal: www.nsitf.gov.ng', completed: false },
+          { label: 'Calculate 1% of total gross payroll for the month', completed: false },
+          { label: 'File monthly contribution schedule', completed: false },
+          { label: 'Remit via REMITA or bank transfer to NSITF', completed: false },
+          { label: 'Download and file payment receipt', completed: false },
+        ],
+      });
+    }
+  }
+
+  // ── Pension — 18% total (8% emp + 10% employer), due 7 days after payday ──
+  if (company.hasPension && company.hasEmployees) {
+    for (let i = 0; i < 12; i++) {
+      const month    = (currentMonth + i) % 12;
+      const year     = currentYear + Math.floor((currentMonth + i) / 12);
+      // Due 7 days after salary payment — we approximate as 7th of current month
+      const dueDate  = `${year}-${pad(month + 1)}-07`;
+      const status   = new Date(dueDate) < now ? TaxStatus.OVERDUE
+        : new Date(dueDate) <= new Date(now.getTime() + 30 * 86400000) ? TaxStatus.DUE
+        : TaxStatus.UPCOMING;
+
+      obligations.push({
+        companyId: company.id,
+        type: TaxType.PENSION,
+        period: `${MONTHS[month]} ${year}`,
+        dueDate,
+        status,
+        estimatedAmount: 0,
+        checklist: [
+          { label: 'Calculate 8% employee contribution per payslip', completed: false },
+          { label: 'Calculate 10% employer contribution', completed: false },
+          { label: 'Remit total 18% to employees' respective PFAs', completed: false },
+          { label: 'Deadline: 7 days after salary payment date (PRA 2014)', completed: false },
+          { label: 'Keep pension remittance advice from each PFA', completed: false },
+        ],
+      });
+    }
+  }
+
+  // ── ITF — 1% of payroll annually, due 1 April ─────────────────────────────
+  if (company.hasITF && company.hasEmployees) {
+    const itfDueYear = currentMonth >= 2 ? currentYear + 1 : currentYear;
+    const itfDueDate = `${itfDueYear}-04-01`;
+    const itfStatus  = new Date(itfDueDate) < now ? TaxStatus.OVERDUE
+      : new Date(itfDueDate) <= new Date(now.getTime() + 60 * 86400000) ? TaxStatus.DUE
+      : TaxStatus.UPCOMING;
+
+    obligations.push({
+      companyId: company.id,
+      type: TaxType.ITF,
+      period: `FY ${itfDueYear - 1} ITF Levy`,
+      dueDate: itfDueDate,
+      status: itfStatus,
+      estimatedAmount: 0,
+      checklist: [
+        { label: 'Calculate 1% of total annual payroll', completed: false },
+        { label: 'Register/log in at ITF portal: www.itf.gov.ng', completed: false },
+        { label: 'Complete ITF Training Levy Return form', completed: false },
+        { label: 'Remit via REMITA by 1 April', completed: false },
+        { label: 'Apply for ITF reimbursement (up to 50% back if staff were trained)', completed: false },
+        { label: 'Keep proof of training and receipts for reimbursement claim', completed: false },
+      ],
+    });
+  }
+
+  // ── NHF — 2.5% employee basic salary, monthly, due 1st of following month ─
+  if (company.hasNHF && company.hasEmployees) {
+    for (let i = 0; i < 12; i++) {
+      const month    = (currentMonth + i) % 12;
+      const year     = currentYear + Math.floor((currentMonth + i) / 12);
+      const dueMonth = (month + 1) % 12;
+      const dueYear  = dueMonth === 0 ? year + 1 : (month === 11 ? year + 1 : year);
+      const dueDate  = `${dueYear}-${pad(dueMonth + 1)}-01`;
+      const status   = new Date(dueDate) < now ? TaxStatus.OVERDUE
+        : new Date(dueDate) <= new Date(now.getTime() + 30 * 86400000) ? TaxStatus.DUE
+        : TaxStatus.UPCOMING;
+
+      obligations.push({
+        companyId: company.id,
+        type: TaxType.NHF,
+        period: `${MONTHS[month]} ${year}`,
+        dueDate,
+        status,
+        estimatedAmount: 0,
+        checklist: [
+          { label: 'Calculate 2.5% of each employee's basic salary', completed: false },
+          { label: 'Log in to FMBN portal: www.fmbn.gov.ng', completed: false },
+          { label: 'Submit NHF remittance schedule for all employees', completed: false },
+          { label: 'Remit via REMITA to Federal Mortgage Bank of Nigeria (FMBN)', completed: false },
+          { label: 'Keep remittance confirmation — employees need it for mortgage access', completed: false },
+        ],
+      });
     }
   }
 

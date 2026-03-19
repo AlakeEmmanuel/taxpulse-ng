@@ -14,6 +14,7 @@ import { BankImport } from './pages/BankImport';
 import { AuthPage } from './pages/AuthPage';
 import LandingPage from './pages/LandingPage';
 import { Paywall } from './pages/Paywall';
+import { PayslipGenerator } from './pages/PayslipGenerator';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Company } from './types';
 import { UserProfile, getProfile, isPro, signOut } from './services/auth';
@@ -23,9 +24,9 @@ import { supabase } from './services/supabaseClient';
 
 export type AppView =
   | 'dashboard' | 'onboarding' | 'calculators' | 'pit'
-  | 'ledger' | 'settings' | 'ai' | 'vault' | 'penalties' | 'export' | 'import';
+  | 'ledger' | 'settings' | 'ai' | 'vault' | 'penalties' | 'export' | 'import' | 'payslip';
 
-const PRO_VIEWS: AppView[] = ['ai', 'vault', 'export', 'import'];
+const PRO_VIEWS: AppView[] = ['ai', 'vault', 'export', 'import', 'payslip'];
 
 const LockedFeature: React.FC<{ name: string; onUpgrade: () => void }> = ({ name, onUpgrade }) => (
   <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-6 space-y-5">
@@ -237,7 +238,8 @@ const App: React.FC = () => {
       {view === 'ai'     && (proUser ? <AIAssistant company={activeCompany!} /> : <LockedFeature name="AI Tax Assistant" onUpgrade={() => setShowPaywall(true)} />)}
       {view === 'vault'  && (proUser ? <EvidenceVault company={activeCompany!} /> : <LockedFeature name="Evidence Vault" onUpgrade={() => setShowPaywall(true)} />)}
       {view === 'export' && (proUser ? <TaxExport company={activeCompany!} /> : <LockedFeature name="PDF Export" onUpgrade={() => setShowPaywall(true)} />)}
-      {view === 'import' && (proUser ? <BankImport company={activeCompany!} onNavigate={handleNavigate} /> : <LockedFeature name="Bank Import" onUpgrade={() => setShowPaywall(true)} />)}
+      {view === 'import'   && (proUser ? <BankImport company={activeCompany!} onNavigate={handleNavigate} /> : <LockedFeature name="Bank Import" onUpgrade={() => setShowPaywall(true)} />)}
+      {view === 'payslip'  && (proUser ? <PayslipGenerator company={activeCompany!} /> : <LockedFeature name="Payslip Generator" onUpgrade={() => setShowPaywall(true)} />)}
     </Layout>
   );
 };

@@ -31,6 +31,15 @@ const toCompany = (r: any): Company => ({
   paysVendors:     r.pays_vendors,
   collectsVat:     r.collects_vat,
   complianceScore: r.compliance_score,
+  employmentType:  r.employment_type,
+  annualIncome:    r.annual_income,
+  hasNSITF:        r.has_nsitf,
+  hasPension:      r.has_pension,
+  hasITF:          r.has_itf,
+  hasNHF:          r.has_nhf,
+  cacAnnualReturns: r.cac_annual_returns,
+  phone:           r.phone,
+  whatsappOptin:   r.whatsapp_optin,
 });
 
 const fromCompany = (c: Company) => ({
@@ -49,6 +58,15 @@ const fromCompany = (c: Company) => ({
   pays_vendors:     c.paysVendors,
   collects_vat:     c.collectsVat,
   compliance_score: c.complianceScore,
+  employment_type:   c.employmentType,
+  annual_income:     c.annualIncome,
+  has_nsitf:         c.hasNSITF,
+  has_pension:       c.hasPension,
+  has_itf:           c.hasITF,
+  has_nhf:           c.hasNHF,
+  cac_annual_returns: c.cacAnnualReturns,
+  phone:             c.phone,
+  whatsapp_optin:    c.whatsappOptin,
   user_id: getCurrentUserId() || undefined,
 });
 

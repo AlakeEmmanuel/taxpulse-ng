@@ -254,6 +254,82 @@ export const SettingsPage: React.FC<SettingsProps> = ({ company, onCompanyUpdate
         )}
       </Card>
 
+      {/* Payroll statutory contributions */}
+      {form.entityType !== 'Individual (Personal Income Tax)' && form.hasEmployees && (
+        <Card className="space-y-4">
+          <h2 className="font-bold text-slate-800">Payroll Statutory Contributions</h2>
+          <p className="text-xs text-slate-500">These create monthly/annual obligations on your dashboard alongside VAT, PAYE, and WHT.</p>
+
+          <label className="flex items-center justify-between p-3 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition">
+            <div>
+              <p className="font-semibold text-sm text-slate-800">NSITF (3+ employees)</p>
+              <p className="text-xs text-slate-400">1% of gross payroll · due 16th monthly → National Social Insurance Trust Fund</p>
+            </div>
+            <input type="checkbox" className="accent-cac-green w-4 h-4" checked={form.hasNSITF || false} onChange={e => update('hasNSITF', e.target.checked)} />
+          </label>
+
+          <label className="flex items-center justify-between p-3 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition">
+            <div>
+              <p className="font-semibold text-sm text-slate-800">Pension (3+ employees)</p>
+              <p className="text-xs text-slate-400">8% employee + 10% employer · due 7 days after payday → Pension Fund Admins</p>
+            </div>
+            <input type="checkbox" className="accent-cac-green w-4 h-4" checked={form.hasPension || false} onChange={e => update('hasPension', e.target.checked)} />
+          </label>
+
+          <label className="flex items-center justify-between p-3 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition">
+            <div>
+              <p className="font-semibold text-sm text-slate-800">ITF (5+ staff or ₦50M+ turnover)</p>
+              <p className="text-xs text-slate-400">1% of annual payroll · due 1 April → Industrial Training Fund</p>
+            </div>
+            <input type="checkbox" className="accent-cac-green w-4 h-4" checked={form.hasITF || false} onChange={e => update('hasITF', e.target.checked)} />
+          </label>
+
+          <label className="flex items-center justify-between p-3 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition">
+            <div>
+              <p className="font-semibold text-sm text-slate-800">NHF contributions</p>
+              <p className="text-xs text-slate-400">2.5% of employee basic salary · monthly → Federal Mortgage Bank of Nigeria</p>
+            </div>
+            <input type="checkbox" className="accent-cac-green w-4 h-4" checked={form.hasNHF || false} onChange={e => update('hasNHF', e.target.checked)} />
+          </label>
+        </Card>
+      )}
+
+      {/* CAC Annual Returns */}
+      {form.entityType !== 'Individual (Personal Income Tax)' && form.cacStatus === 'Registered' && (
+        <Card className="space-y-3">
+          <h2 className="font-bold text-slate-800">CAC Annual Returns</h2>
+          <label className="flex items-center justify-between p-3 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition">
+            <div>
+              <p className="font-semibold text-sm text-slate-800">Track CAC annual returns</p>
+              <p className="text-xs text-slate-400">All registered companies must file with CAC by 30 June each year. Penalty: ₦3,000/day.</p>
+            </div>
+            <input type="checkbox" className="accent-cac-green w-4 h-4" checked={form.cacAnnualReturns !== false} onChange={e => update('cacAnnualReturns', e.target.checked)} />
+          </label>
+        </Card>
+      )}
+
+      {/* WhatsApp Reminders */}
+      <Card className="space-y-4">
+        <h2 className="font-bold text-slate-800">WhatsApp Deadline Reminders</h2>
+        <p className="text-xs text-slate-500">Get tax deadline reminders sent directly to your WhatsApp — 7 days and 1 day before each obligation is due.</p>
+        <Input
+          label="WhatsApp / Phone Number"
+          type="tel"
+          value={form.phone || ''}
+          onChange={e => update('phone', e.target.value)}
+          placeholder="e.g. 08012345678 or +2348012345678"
+        />
+        {form.phone && (
+          <label className="flex items-center justify-between p-3 bg-green-50 rounded-xl cursor-pointer hover:bg-green-100 transition border border-green-200">
+            <div>
+              <p className="font-semibold text-sm text-slate-800">Enable WhatsApp reminders</p>
+              <p className="text-xs text-slate-400">Agree to receive deadline alerts from TaxPulse NG on WhatsApp</p>
+            </div>
+            <input type="checkbox" className="accent-cac-green w-4 h-4" checked={form.whatsappOptin || false} onChange={e => update('whatsappOptin', e.target.checked)} />
+          </label>
+        )}
+      </Card>
+
       {/* NTA 2025 info box */}
       <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-xs text-amber-800 space-y-1">
         <p className="font-bold">💡 NTA 2025 Reminder</p>

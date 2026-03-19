@@ -76,3 +76,141 @@ export async function unsubscribeFromPush(userId: string): Promise<void> {
     console.error('Push unsubscribe error:', e);
   }
 }
+
+// ─── WhatsApp Reminders via Termii ───────────────────────────────────────────
+// Termii is a Nigerian messaging API — www.termii.com
+// Set VITE_TERMII_API_KEY in your Vercel environment variables
+// IMPORTANT: This is a client-side call for demo purposes.
+// For production, move this to a Vercel serverless function to protect your API key.
+
+const TERMII_API_KEY = import.meta.env.VITE_TERMII_API_KEY as string;
+
+export interface WhatsAppReminder {
+  phone:       string;  // Nigerian number e.g. "2348012345678"
+  taxType:     string;
+  period:      string;
+  dueDate:     string;
+  daysLeft:    number;
+  companyName: string;
+  amount?:     number;
+}
+
+export async function sendWhatsAppReminder(reminder: WhatsAppReminder): Promise<boolean> {
+  if (!TERMII_API_KEY) {
+    console.warn('VITE_TERMII_API_KEY not set — WhatsApp reminders disabled');
+    return false;
+  }
+
+  // Sanitize phone number — ensure it starts with 234
+  const phone = reminder.phone.replace(/^0/, '234').replace(/[^0-9]/g, '');
+
+  const urgency = reminder.daysLeft <= 1 ? '🚨 URGENT' : reminder.daysLeft <= 3 ? '⚠️ DUE SOON' : '📅 REMINDER';
+  const amountText = reminder.amount && reminder.amount > 0
+    ? `
+Estimated amount: ₦${reminder.amount.toLocaleString('en-NG')}`
+    : '';
+
+  const message = `${urgency} — TaxPulse NG
+
+Hi, this is a tax filing reminder for ${reminder.companyName}.
+
+📋 *${reminder.taxType}* for ${reminder.period}
+📆 Due: ${new Date(reminder.dueDate).toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric' })}
+⏰ Days left: ${reminder.daysLeft}${amountText}
+
+Log in to TaxPulse NG to file and mark as done:
+🔗 taxpulse-ng.vercel.app/app
+
+Reply STOP to unsubscribe.`;
+
+  try {
+    const response = await fetch('https://api.ng.termii.com/api/sms/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        to:        phone,
+        from:      'TaxPulse',
+        sms:       message,
+        type:      'plain',
+        channel:   'whatsapp',  // Use WhatsApp channel
+        api_key:   TERMII_API_KEY,
+      }),
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      console.error('Termii WhatsApp error:', result);
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error('WhatsApp send failed:', e);
+    return false;
+  }
+}
+
+export async function sendSMSReminder(reminder: WhatsAppReminder): Promise<boolean> {
+  // Fallback to SMS if WhatsApp fails
+  if (!TERMII_API_KEY) return false;
+
+  const phone = reminder.phone.replace(/^0/, '234').replace(/[^0-9]/g, '');
+  const daysText = reminder.daysLeft <= 0 ? 'OVERDUE' : `due in ${reminder.daysLeft} day(s)`;
+
+  const message = `TaxPulse NG: ${reminder.taxType} for ${reminder.companyName} is ${daysText} (${reminder.period}). Login: taxpulse-ng.vercel.app/app`;
+
+  try {
+    const response = await fetch('https://api.ng.termii.com/api/sms/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        to:      phone,
+        from:    'TaxPulse',
+        sms:     message,
+        type:    'plain',
+        channel: 'generic', // SMS fallback
+        api_key: TERMII_API_KEY,
+      }),
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+// Called from the dashboard — checks all overdue/due-soon obligations
+// and sends WhatsApp if user has opted in
+export async function sendDueReminders(
+  obligations: Array<{ type: string; period: string; dueDate: string; estimatedAmount?: number; status: string }>,
+  companyName: string,
+  phone: string,
+  whatsappOptin: boolean
+): Promise<number> {
+  if (!phone || !whatsappOptin) return 0;
+
+  const now = new Date();
+  const toAlert = obligations.filter(o => {
+    if (o.status === 'Filed') return false;
+    const due = new Date(o.dueDate);
+    const daysLeft = Math.ceil((due.getTime() - now.getTime()) / 86400000);
+    return daysLeft <= 7; // Alert for obligations due within 7 days or overdue
+  });
+
+  let sent = 0;
+  for (const ob of toAlert) {
+    const due = new Date(ob.dueDate);
+    const daysLeft = Math.ceil((due.getTime() - now.getTime()) / 86400000);
+    const success = await sendWhatsAppReminder({
+      phone,
+      taxType: ob.type,
+      period: ob.period,
+      dueDate: ob.dueDate,
+      daysLeft,
+      companyName,
+      amount: ob.estimatedAmount,
+    });
+    if (success) sent++;
+    // Small delay between messages to avoid rate limiting
+    await new Promise(r => setTimeout(r, 500));
+  }
+  return sent;
+}
