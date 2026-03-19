@@ -6,7 +6,7 @@ interface OnboardingProps {
 }
 
 const STEPS = [
-  { id: 1, title: 'Business Identity', subtitle: 'Tell us about your business', icon: '🏢' },
+  { id: 1, title: 'Your Profile', subtitle: 'Tell us about yourself or your business', icon: '🏢' },
   { id: 2, title: 'Registration', subtitle: 'CAC & Tax registration details', icon: '📋' },
   { id: 3, title: 'Tax Profile', subtitle: 'Configure your tax obligations', icon: '🧾' },
   { id: 4, title: 'Ready!', subtitle: 'Review and launch', icon: '🚀' },
@@ -107,8 +107,8 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
           <div className="inline-flex items-center gap-2 bg-cac-green/10 text-cac-green px-4 py-1.5 rounded-full text-sm font-bold mb-4">
             <span>🇳🇬</span> TaxPulse NG
           </div>
-          <h1 className="text-3xl font-bold text-slate-900">Set Up Your Business</h1>
-          <p className="text-slate-500 mt-1">Get your tax compliance dashboard ready in minutes</p>
+          <h1 className="text-3xl font-bold text-slate-900">Set Up Your Tax Profile</h1>
+          <p className="text-slate-500 mt-1">For businesses and individuals — ready in minutes</p>
         </div>
 
         {/* Step indicators */}
@@ -160,12 +160,16 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             {step === 1 && (
               <div className="space-y-5">
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">Business Name *</label>
+                  {/* Name label changes based on entity type */}
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                    {form.entityType === EntityType.INDIVIDUAL ? 'Your Full Name *' : 'Business Name *'}
+                  </label>
                   <input
                     type="text"
                     value={form.name}
                     onChange={e => update('name', e.target.value)}
-                    placeholder="e.g. SwiftLogistics Ltd"
+                    placeholder={form.entityType === EntityType.INDIVIDUAL ? 'e.g. Chukwuemeka Obi' : 'e.g. SwiftLogistics Ltd'}
                     className={`w-full px-4 py-3 rounded-xl border ${errors.name ? 'border-red-400 bg-red-50' : 'border-slate-200'} focus:outline-none focus:ring-2 focus:ring-cac-green/30 focus:border-cac-green text-slate-800 transition-all`}
                   />
                   {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
@@ -297,57 +301,116 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             {step === 3 && (
               <div className="space-y-5">
                 <p className="text-sm text-slate-500 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3">
-                  💡 This helps us generate the right tax obligations and reminders for your business.
+                  💡 {form.entityType === EntityType.INDIVIDUAL
+                    ? 'This helps us generate the right PIT obligations and reminders for you.'
+                    : 'This helps us generate the right tax obligations and reminders for your business.'}
                 </p>
 
-                <ToggleCard
-                  icon="🧾"
-                  title="Registered for VAT?"
-                  description="Your business charges VAT (7.5%) on goods or services"
-                  checked={form.collectsVat}
-                  onChange={v => update('collectsVat', v)}
-                />
-                {form.collectsVat && (
-                  <div className="ml-4 pl-4 border-l-2 border-cac-green/30">
-                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">VAT Registration Number</label>
-                    <input
-                      type="text"
-                      value={form.vatNumber || ''}
-                      onChange={e => update('vatNumber', e.target.value)}
-                      placeholder="e.g. 0123456789"
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-cac-green/30 focus:border-cac-green text-slate-800 transition-all"
-                    />
-                  </div>
-                )}
+                {/* INDIVIDUAL: employment type + income */}
+                {form.entityType === EntityType.INDIVIDUAL ? (
+                  <div className="space-y-5">
+                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                      <p className="text-xs font-bold text-blue-800 mb-1">📋 Personal Income Tax Setup (NTA 2025)</p>
+                      <p className="text-xs text-blue-600">Your annual PIT return is due <strong>31 March</strong> each year with your State Internal Revenue Service. Self-employed individuals also make quarterly advance payments.</p>
+                    </div>
 
-                <ToggleCard
-                  icon="👥"
-                  title="Do you have employees?"
-                  description="You'll need to file PAYE returns with your state IRS"
-                  checked={form.hasEmployees}
-                  onChange={v => update('hasEmployees', v)}
-                />
-                {form.hasEmployees && (
-                  <div className="ml-4 pl-4 border-l-2 border-cac-green/30">
-                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">Number of Employees</label>
-                    <input
-                      type="number"
-                      min={1}
-                      value={form.employeeCount || ''}
-                      onChange={e => update('employeeCount', parseInt(e.target.value) || undefined)}
-                      placeholder="e.g. 12"
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-cac-green/30 focus:border-cac-green text-slate-800 transition-all"
-                    />
-                  </div>
-                )}
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-2">Employment Type *</label>
+                      <div className="grid grid-cols-1 gap-2">
+                        {([
+                          { val: 'employed', label: 'Employed', desc: 'Salary earner — PAYE deducted by employer' },
+                          { val: 'self-employed', label: 'Self-Employed / Freelancer', desc: 'Runs own business — must file & pay PIT directly' },
+                          { val: 'both', label: 'Both (Salary + Business Income)', desc: 'Employed and has other income sources' },
+                        ] as const).map(opt => (
+                          <button
+                            key={opt.val}
+                            type="button"
+                            onClick={() => update('employmentType', opt.val)}
+                            className={`text-left px-4 py-3 rounded-xl border transition-all ${
+                              form.employmentType === opt.val
+                                ? 'bg-cac-green/10 border-cac-green text-cac-green'
+                                : 'bg-white border-slate-200 text-slate-700 hover:border-cac-green/40'
+                            }`}
+                          >
+                            <p className="font-bold text-sm">{opt.label}</p>
+                            <p className="text-xs opacity-70 mt-0.5">{opt.desc}</p>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
 
-                <ToggleCard
-                  icon="🤝"
-                  title="Do you pay vendors / contractors?"
-                  description="You'll need to deduct and remit Withholding Tax (WHT)"
-                  checked={form.paysVendors}
-                  onChange={v => update('paysVendors', v)}
-                />
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-1.5">Estimated Annual Gross Income (₦)</label>
+                      <input
+                        type="number"
+                        value={form.annualIncome || ''}
+                        onChange={e => update('annualIncome', parseFloat(e.target.value) || undefined)}
+                        placeholder="e.g. 4,800,000"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-cac-green/30 focus:border-cac-green text-slate-800"
+                      />
+                      <p className="text-xs text-slate-400 mt-1">Used to estimate your PIT liability. You can update anytime in Settings.</p>
+                      {(form.annualIncome || 0) > 0 && (
+                        <p className="text-xs text-cac-green mt-1 font-semibold">
+                          {(form.annualIncome || 0) <= 800000
+                            ? '✓ First ₦800k is tax-free under NTA 2025'
+                            : `Estimated monthly PIT: ₦${Math.round(((form.annualIncome || 0) * 0.12) / 12).toLocaleString()} (rough estimate)`}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  /* BUSINESS: existing VAT, PAYE, WHT toggles */
+                  <>
+                    <ToggleCard
+                      icon="🧾"
+                      title="Registered for VAT?"
+                      description="Your business charges VAT (7.5%) on goods or services"
+                      checked={form.collectsVat}
+                      onChange={v => update('collectsVat', v)}
+                    />
+                    {form.collectsVat && (
+                      <div className="ml-4 pl-4 border-l-2 border-cac-green/30">
+                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">VAT Registration Number</label>
+                        <input
+                          type="text"
+                          value={form.vatNumber || ''}
+                          onChange={e => update('vatNumber', e.target.value)}
+                          placeholder="e.g. 0123456789"
+                          className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-cac-green/30 focus:border-cac-green text-slate-800 transition-all"
+                        />
+                      </div>
+                    )}
+
+                    <ToggleCard
+                      icon="👥"
+                      title="Do you have employees?"
+                      description="You'll need to file PAYE returns with your state IRS"
+                      checked={form.hasEmployees}
+                      onChange={v => update('hasEmployees', v)}
+                    />
+                    {form.hasEmployees && (
+                      <div className="ml-4 pl-4 border-l-2 border-cac-green/30">
+                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">Number of Employees</label>
+                        <input
+                          type="number"
+                          min={1}
+                          value={form.employeeCount || ''}
+                          onChange={e => update('employeeCount', parseInt(e.target.value) || undefined)}
+                          placeholder="e.g. 12"
+                          className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-cac-green/30 focus:border-cac-green text-slate-800 transition-all"
+                        />
+                      </div>
+                    )}
+
+                    <ToggleCard
+                      icon="🤝"
+                      title="Do you pay vendors / contractors?"
+                      description="You'll need to deduct and remit Withholding Tax (WHT)"
+                      checked={form.paysVendors}
+                      onChange={v => update('paysVendors', v)}
+                    />
+                  </>
+                )}
               </div>
             )}
 
@@ -355,7 +418,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             {step === 4 && (
               <div className="space-y-4">
                 <div className="bg-slate-50 rounded-2xl p-5 space-y-3">
-                  <ReviewRow label="Business Name" value={form.name} />
+                  <ReviewRow label={form.entityType === EntityType.INDIVIDUAL ? "Full Name" : "Business Name"} value={form.name} />
                   <ReviewRow label="Entity Type" value={form.entityType} />
                   <ReviewRow label="Industry" value={form.industry} />
                   <ReviewRow label="State" value={form.state} />
@@ -366,10 +429,21 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                   <div className="pt-2 border-t border-slate-200">
                     <p className="text-xs font-bold text-slate-400 uppercase mb-2">Tax Obligations</p>
                     <div className="flex flex-wrap gap-2">
-                      <span className="bg-cac-green/10 text-cac-green text-xs font-bold px-2.5 py-1 rounded-full">CIT ✓</span>
-                      {form.collectsVat && <span className="bg-cac-green/10 text-cac-green text-xs font-bold px-2.5 py-1 rounded-full">VAT ✓</span>}
-                      {form.hasEmployees && <span className="bg-cac-green/10 text-cac-green text-xs font-bold px-2.5 py-1 rounded-full">PAYE ✓</span>}
-                      {form.paysVendors && <span className="bg-cac-green/10 text-cac-green text-xs font-bold px-2.5 py-1 rounded-full">WHT ✓</span>}
+                      {form.entityType === EntityType.INDIVIDUAL ? (
+                        <>
+                          <span className="bg-cac-green/10 text-cac-green text-xs font-bold px-2.5 py-1 rounded-full">PIT ✓</span>
+                          {(form.employmentType === 'self-employed' || form.employmentType === 'both') && (
+                            <span className="bg-blue-50 text-blue-700 text-xs font-bold px-2.5 py-1 rounded-full">Quarterly Advance ✓</span>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          <span className="bg-cac-green/10 text-cac-green text-xs font-bold px-2.5 py-1 rounded-full">CIT ✓</span>
+                          {form.collectsVat && <span className="bg-cac-green/10 text-cac-green text-xs font-bold px-2.5 py-1 rounded-full">VAT ✓</span>}
+                          {form.hasEmployees && <span className="bg-cac-green/10 text-cac-green text-xs font-bold px-2.5 py-1 rounded-full">PAYE ✓</span>}
+                          {form.paysVendors && <span className="bg-cac-green/10 text-cac-green text-xs font-bold px-2.5 py-1 rounded-full">WHT ✓</span>}
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>

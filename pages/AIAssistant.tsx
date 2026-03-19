@@ -4,7 +4,7 @@ import * as db from '../services/db';
 
 interface Message { role: 'user' | 'assistant'; content: string; }
 
-const SUGGESTIONS = [
+const BUSINESS_SUGGESTIONS = [
   'How much VAT do I owe based on my ledger?',
   'Do I qualify for 0% CIT as a small company?',
   'What taxes are overdue for my company right now?',
@@ -13,6 +13,17 @@ const SUGGESTIONS = [
   'How do I calculate WHT on my vendor payments?',
   'What records does NRS require for an audit?',
   'What penalties apply if I file my VAT return late?',
+];
+
+const INDIVIDUAL_SUGGESTIONS = [
+  'How much PIT do I owe this year based on my income?',
+  'What deductions reduce my taxable income under NTA 2025?',
+  'When is my PIT annual return due and where do I file?',
+  'How does rent relief work for my income tax calculation?',
+  'I am self-employed — what quarterly payments must I make?',
+  'How do I get a tax clearance certificate in Nigeria?',
+  'My employer deducts PAYE — do I still need to file a return?',
+  'What happens if I miss my 31 March PIT filing deadline?',
 ];
 
 const FormattedMessage: React.FC<{ content: string }> = ({ content }) => {
@@ -77,17 +88,22 @@ CRITICAL RULES — NEVER BREAK THESE:
 
 You are an expert in Nigerian tax law, specifically the Nigeria Tax Act (NTA) 2025 signed by President Bola Tinubu on 26 June 2025, effective from 1 January 2026.
 
-COMPANY CONTEXT:
+PROFILE CONTEXT:
 - Name: ${company.name}
 - Type: ${company.entityType}
-- Industry: ${company.industry}
+- ${company.entityType === 'Individual (Personal Income Tax)'
+    ? `Employment type: ${company.employmentType || 'Not specified'}
+- Estimated annual income: ${company.annualIncome ? fmt(company.annualIncome) : 'Not provided'}
+- State (tax jurisdiction): ${company.state}
+- TIN: ${company.tin || 'Not provided'}`
+    : `Industry: ${company.industry}
 - State: ${company.state}
 - RC Number: ${company.rcNumber || 'Not provided'}
 - TIN: ${company.tin || 'Not provided'}
 - Has employees: ${company.hasEmployees ? 'Yes (' + (company.employeeCount || 'unknown count') + ')' : 'No'}
 - Pays vendors (WHT): ${company.paysVendors ? 'Yes' : 'No'}
 - Collects VAT: ${company.collectsVat ? 'Yes' : 'No'}
-- Year end: ${company.yearEnd}
+- Year end: ${company.yearEnd}`}
 
 LIVE FINANCIAL DATA (from their TaxPulse ledger — use this when answering questions about their finances):
 - Total income recorded: ${fmt(totalIncome)}
@@ -101,6 +117,17 @@ LIVE FINANCIAL DATA (from their TaxPulse ledger — use this when answering ques
 - Total tax obligations tracked: ${obligations.length}
 
 When the user asks "how much do I owe" or "what are my taxes", use the live data above to give specific answers.
+${company.entityType === 'Individual (Personal Income Tax)'
+  ? `
+INDIVIDUAL TAX CONTEXT (NTA 2025):
+- This user files a Personal Income Tax (PIT) annual return by 31 March each year with their State Internal Revenue Service
+- ${company.employmentType === 'self-employed' || company.employmentType === 'both'
+    ? 'As self-employed, they must also make quarterly advance PIT payments (due 31 Mar, 30 Jun, 30 Sep, 31 Dec)'
+    : 'As an employed individual, their employer deducts PAYE monthly — they may still need to file an annual return to reconcile'}
+- Key NTA 2025 deductions: Pension (8% of gross), NHIS (1.5%), NHF (2.5%), Rent Relief (20% of annual rent, max ₦500,000), Life assurance (max ₦100,000)
+- First ₦800,000 of taxable income is tax-free
+- Self-employed PIT filing deadline: 31 March annually to State IRS (NOT NRS/FIRS)
+` : ''}
 
 NTA 2025 KEY PROVISIONS (use these — not the old PITA/CITA rules):
 
@@ -222,7 +249,11 @@ INSTRUCTIONS:
             <div className="bg-gradient-to-br from-cac-green to-emerald-700 rounded-2xl p-5 text-white">
               <p className="text-2xl mb-2">🤖</p>
               <p className="font-bold text-lg mb-1">Hello! I'm your NTA 2025 tax advisor.</p>
-              <p className="text-green-200 text-sm">I know the Nigeria Tax Act 2025 inside out — new PAYE bands, CIT changes, Development Levy, rent relief, VAT reforms, and more. Ask me anything!</p>
+              <p className="text-green-200 text-sm">
+                {company.entityType === 'Individual (Personal Income Tax)'
+                  ? 'I know personal income tax under NTA 2025 — PIT bands, rent relief, pension deductions, self-assessment, quarterly payments and more. Ask me anything!'
+                  : 'I know the Nigeria Tax Act 2025 inside out — PAYE bands, CIT changes, Development Levy, rent relief, VAT reforms, and more. Ask me anything!'}
+              </p>
             </div>
             {/* Reform summary */}
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-xs text-blue-800 space-y-1">
@@ -236,7 +267,7 @@ INSTRUCTIONS:
             </div>
             {/* Suggestions */}
             <div className="grid grid-cols-2 gap-2">
-              {SUGGESTIONS.map(s => (
+              {(company.entityType === 'Individual (Personal Income Tax)' ? INDIVIDUAL_SUGGESTIONS : BUSINESS_SUGGESTIONS).map(s => (
                 <button
                   key={s}
                   onClick={() => sendMessage(s)}

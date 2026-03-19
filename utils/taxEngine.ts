@@ -4,7 +4,7 @@
  * Signed by President Bola Tinubu, 26 June 2025
  */
 
-import { Company, TaxObligation, TaxType, TaxStatus } from '../types';
+import { Company, TaxObligation, TaxType, TaxStatus, EntityType } from '../types';
 
 // ─── VAT ─────────────────────────────────────────────────────────────────────
 // VAT Act (consolidated under NTA 2025) — rate unchanged at 7.5%
@@ -329,6 +329,71 @@ export function generateObligations(company: Company): Omit<TaxObligation, 'id'>
         { label: 'Pay CIT liability and keep receipt', completed: false },
       ],
     });
+  }
+
+
+  // ── PIT — Personal Income Tax (INDIVIDUAL entity type only) ───────────────
+  // Annual self-assessment: due 31 March for employed & self-employed
+  // Quarterly advance payment: due 31 March, 30 June, 30 Sept, 31 Dec (self-employed)
+  if (company.entityType === EntityType.INDIVIDUAL) {
+    const assessmentYear = currentMonth >= 2 ? currentYear + 1 : currentYear; // after March, file for next year
+    const annualDueDate = `${assessmentYear}-03-31`;
+    const annualStatus = new Date(annualDueDate) < now
+      ? TaxStatus.OVERDUE
+      : new Date(annualDueDate) <= new Date(now.getTime() + 60 * 86400000)
+        ? TaxStatus.DUE
+        : TaxStatus.UPCOMING;
+
+    obligations.push({
+      companyId: company.id,
+      type: TaxType.PIT,
+      period: `FY ${assessmentYear - 1} (Tax Year)`,
+      dueDate: annualDueDate,
+      status: annualStatus,
+      estimatedAmount: 0,
+      checklist: [
+        { label: 'Gather all income statements & payslips', completed: false },
+        { label: 'Complete PIT self-assessment form (Form A)', completed: false },
+        { label: 'Calculate chargeable income after rent relief, pension, NHF', completed: false },
+        { label: 'Apply NTA 2025 bands (0% on first ₦800k, up to 25%)', completed: false },
+        { label: 'File annual return with your State Internal Revenue Service', completed: false },
+        { label: 'Pay any outstanding tax balance', completed: false },
+        { label: 'Obtain tax clearance certificate', completed: false },
+      ],
+    });
+
+    // Quarterly advance payments for self-employed / both
+    if (company.employmentType === 'self-employed' || company.employmentType === 'both') {
+      const quarters = [
+        { label: 'Q1', dueDate: `${currentYear}-03-31` },
+        { label: 'Q2', dueDate: `${currentYear}-06-30` },
+        { label: 'Q3', dueDate: `${currentYear}-09-30` },
+        { label: 'Q4', dueDate: `${currentYear}-12-31` },
+      ];
+      for (const q of quarters) {
+        const qDue = new Date(q.dueDate);
+        if (qDue < new Date(now.getTime() - 30 * 86400000)) continue; // skip very old quarters
+        const qStatus = qDue < now
+          ? TaxStatus.OVERDUE
+          : qDue <= new Date(now.getTime() + 30 * 86400000)
+            ? TaxStatus.DUE
+            : TaxStatus.UPCOMING;
+        obligations.push({
+          companyId: company.id,
+          type: TaxType.PIT,
+          period: `${q.label} ${currentYear} (Advance Payment)`,
+          dueDate: q.dueDate,
+          status: qStatus,
+          estimatedAmount: 0,
+          checklist: [
+            { label: `Calculate estimated income for ${q.label}`, completed: false },
+            { label: 'Compute 25% of estimated annual PIT liability', completed: false },
+            { label: 'Pay advance PIT instalment to State IRS', completed: false },
+            { label: 'Keep payment receipt for annual reconciliation', completed: false },
+          ],
+        });
+      }
+    }
   }
 
   return obligations;
