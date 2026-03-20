@@ -811,7 +811,7 @@ export function generateObligations(company: Company): Omit<TaxObligation, 'id'>
         status,
         estimatedAmount: 0,
         checklist: [
-          { label: 'Calculate 2.5% of each employee's basic salary', completed: false },
+          { label: "Calculate 2.5% of each employee's basic salary", completed: false },
           { label: 'Log in to FMBN portal: www.fmbn.gov.ng', completed: false },
           { label: 'Submit NHF remittance schedule for all employees', completed: false },
           { label: 'Remit via REMITA to Federal Mortgage Bank of Nigeria (FMBN)', completed: false },

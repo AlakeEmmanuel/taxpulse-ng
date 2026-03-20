@@ -355,7 +355,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               {[
                 { n: '01', title: 'Create your company profile', desc: 'Tell us your business type, state, and whether you collect VAT or have employees. Takes under 2 minutes.' },
                 { n: '02', title: 'Get your 12-month tax calendar', desc: 'VAT, PAYE, WHT, CIT -- all generated instantly with exact NRS due dates based on your profile.' },
-                { n: '03', title: 'Import your bank statement', desc: 'Upload last month's statement. AI extracts transactions, calculates taxes owed, and fills your ledger.' },
+                { n: '03', title: 'Import your bank statement', desc: "Upload last month's statement. AI extracts transactions, calculates taxes owed, and fills your ledger." },
                 { n: '04', title: 'Stay compliant automatically', desc: 'Mark obligations as filed, track your compliance score, and get push reminders before every deadline.' },
               ].map((s, i) => (
                 <FadeIn key={i} delay={i * 120}>
