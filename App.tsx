@@ -17,6 +17,7 @@ import { Paywall } from './pages/Paywall';
 import { PayslipGenerator } from './pages/PayslipGenerator';
 import { InvoiceGenerator } from './pages/InvoiceGenerator';
 import { SalarySimulator, AnnualTaxPlanner, TCCTracker, PayrollCSVExport } from './pages/Phase2Tools';
+import { AdminDashboard } from './pages/AdminDashboard';
 import { AccountantView } from './pages/AccountantShare';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Company } from './types';
@@ -183,6 +184,22 @@ const App: React.FC = () => {
     : null;
   if (shareToken) return <AccountantView token={shareToken} />;
 
+  // Handle /admin route — only for admin email
+  const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL as string || '';
+  const isAdminRoute = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin');
+  const isAdminUser  = profile?.email === ADMIN_EMAIL && !!ADMIN_EMAIL;
+  if (isAdminRoute && appState === 'ready' && isAdminUser) return <AdminDashboard />;
+  if (isAdminRoute && appState === 'ready' && !isAdminUser) return (
+    <div className="min-h-screen flex items-center justify-center bg-slate-900">
+      <div className="text-center text-white">
+        <p className="text-4xl mb-4">🔒</p>
+        <p className="font-bold text-lg">Admin access denied</p>
+        <p className="text-slate-400 text-sm mt-2">This page is only accessible to TaxPulse administrators.</p>
+        <a href="/app" className="block mt-4 text-cac-green hover:underline text-sm">← Back to app</a>
+      </div>
+    </div>
+  );
+
   if (appState === 'loading')         return <Spinner msg="Starting TaxPulse NG..." />;
   if (seedingSchedule) return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-green-50">
@@ -235,6 +252,7 @@ const App: React.FC = () => {
       onSelectCompany={(c) => { setActiveCompany(c); setView('dashboard'); }}
       onAddCompany={() => setView('onboarding')}
       isPro={proUser}
+      isAdmin={isAdminUser}
       onSignOut={async () => { await signOut(); }}
       onUpgrade={() => setShowPaywall(true)}
     >

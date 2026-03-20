@@ -11,6 +11,7 @@ interface LayoutProps {
   companies?: Company[];
   onNavigate: (view: AppView) => void;
   isPro?: boolean;
+  isAdmin?: boolean;
   onSignOut?: () => void;
   onUpgrade?: () => void;
 }
@@ -48,7 +49,7 @@ const MOBILE_NAV: { icon: string; label: string; view: AppView }[] = [
 const Layout: React.FC<LayoutProps> = ({
   children, activeCompany, currentView, companies = [],
   onSelectCompany, onAddCompany, onNavigate,
-  isPro = false, onSignOut, onUpgrade
+  isPro = false, isAdmin = false, onSignOut, onUpgrade
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
@@ -69,6 +70,7 @@ const Layout: React.FC<LayoutProps> = ({
             {isPro && <span className="hidden sm:block bg-amber-400 text-amber-900 text-[9px] font-black px-2.5 py-1 rounded-full">PRO</span>}
             {!isPro && onUpgrade && <button onClick={onUpgrade} className="hidden sm:block text-[10px] font-black text-cac-green border border-cac-green/30 px-2.5 py-1 rounded-full hover:bg-green-50">Upgrade</button>}
             <button onClick={() => onNavigate('settings')} className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${currentView === 'settings' ? 'bg-cac-green text-white' : 'text-slate-400 hover:bg-slate-100'}`} title="Settings">⚙️</button>
+            {isAdmin && <a href="/admin" className="w-9 h-9 rounded-xl flex items-center justify-center text-amber-500 hover:bg-amber-50 transition-colors font-bold text-xs" title="Admin Panel">ADM</a>}
             {onSignOut && <button onClick={onSignOut} className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors" title="Sign out"><svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>}
           </div>
 
