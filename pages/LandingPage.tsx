@@ -51,7 +51,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
     <div style={{ fontFamily: "'DM Sans', system-ui, -apple-system, sans-serif", background: '#F7F7F5', color: '#1a1a1a', overflowX: 'hidden' }}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-      {/* ── NAV ── */}
+      {/* ?? NAV ?? */}
       <nav style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
         background: scrolled ? 'rgba(255,255,255,0.95)' : 'transparent',
@@ -79,13 +79,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
         </div>
       </nav>
 
-      {/* ── HERO ── */}
+      {/* ?? HERO ?? */}
       <section style={{ paddingTop: 120, paddingBottom: 80, padding: '120px 24px 80px' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center' }} className="hero-grid">
           <div>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#e8f5ee', border: '1px solid #b8dfc8', borderRadius: 100, padding: '6px 14px', marginBottom: 24 }}>
               <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#00843D', display: 'block', animation: 'pulse 2s infinite' }} />
-              <span style={{ fontSize: 12, fontWeight: 700, color: '#00843D', letterSpacing: '0.06em', textTransform: 'uppercase' }}>NTA 2025 Compliant · Updated Jan 2026</span>
+              <span style={{ fontSize: 12, fontWeight: 700, color: '#00843D', letterSpacing: '0.06em', textTransform: 'uppercase' }}>NTA 2025 Compliant ? Updated Jan 2026</span>
             </div>
 
             <h1 style={{ fontSize: 'clamp(36px, 5vw, 56px)', fontWeight: 800, lineHeight: 1.06, letterSpacing: '-0.03em', color: '#0d0d0d', marginBottom: 20 }}>
@@ -107,13 +107,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               >Start Free -- No Card Needed</button>
               <a href="#how-it-works"
                 style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#fff', color: '#222', border: '1.5px solid #ddd', padding: '14px 22px', borderRadius: 12, fontSize: 15, fontWeight: 600, cursor: 'pointer', textDecoration: 'none', letterSpacing: '-0.01em' }}
-              >See how it works →</a>
+              >See how it works ?</a>
             </div>
 
             <div style={{ marginTop: 36, display: 'flex', gap: 24, flexWrap: 'wrap' }}>
               {['Free to start', 'No credit card', 'NRS audit-ready'].map(t => (
                 <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#666', fontWeight: 500 }}>
-                  <span style={{ color: '#00843D', fontSize: 15, fontWeight: 800 }}>✓</span> {t}
+                  <span style={{ color: '#00843D', fontSize: 15, fontWeight: 800 }}>?</span> {t}
                 </div>
               ))}
             </div>
@@ -135,7 +135,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               boxShadow: '0 12px 40px rgba(0,0,0,0.12)', border: '1px solid #f0f0f0'
             }}>
               <p style={{ fontSize: 11, color: '#999', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Next VAT deadline</p>
-              <p style={{ fontSize: 22, fontWeight: 800, color: '#0d0d0d', letterSpacing: '-0.02em' }}>21 days <span style={{ color: '#00843D' }}>✓</span></p>
+              <p style={{ fontSize: 22, fontWeight: 800, color: '#0d0d0d', letterSpacing: '-0.02em' }}>21 days <span style={{ color: '#00843D' }}>?</span></p>
               <p style={{ fontSize: 12, color: '#888', marginTop: 2 }}>You're on track</p>
             </div>
             {/* Floating compliance badge */}
@@ -145,13 +145,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               boxShadow: '0 8px 24px rgba(0,132,61,0.3)'
             }}>
               <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.8)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>Compliance</p>
-              <p style={{ fontSize: 20, fontWeight: 800, color: '#fff' }}>100% ✅</p>
+              <p style={{ fontSize: 20, fontWeight: 800, color: '#fff' }}>100% ?</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── PAIN POINTS ── */}
+      {/* ?? PAIN POINTS ?? */}
       <section style={{ background: '#fff', padding: '80px 24px', borderTop: '1px solid #eee', borderBottom: '1px solid #eee' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <FadeIn>
@@ -168,7 +168,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
             {[
               {
                 img: "https://images.unsplash.com/photo-1586473219010-2ffc57b0d282?w=480&q=80&fit=crop",
-                quote: '"I missed my VAT deadline again. Now I'm paying a ₦50,000 penalty I can't afford."',
+                quote: "I missed my VAT deadline again. Now I'm paying a N50,000 penalty I can't afford.",
                 name: "Bello A.",
                 role: "Retail shop owner, Kano",
               },
@@ -180,7 +180,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               },
               {
                 img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=480&q=80&fit=crop",
-                quote: '"I honestly don't know how much tax I owe each month. My accountant charges ₦80k to tell me."',
+                quote: '"I honestly don't know how much tax I owe each month. My accountant charges ?80k to tell me."',
                 name: "Emeka T.",
                 role: "Tech consultant, Abuja",
               }
@@ -215,7 +215,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
         </div>
       </section>
 
-      {/* ── FEATURES ── */}
+      {/* ?? FEATURES ?? */}
       <section id="features" style={{ padding: '80px 24px' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <FadeIn>
@@ -234,12 +234,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }} className="features-grid">
             {[
-              { icon: '📅', title: 'Auto Tax Calendar', desc: 'Sign up once. Get 12 months of VAT, PAYE, WHT and CIT deadlines generated based on your company profile.', tag: 'Core' },
-              { icon: '🏦', title: 'Bank Statement Import', desc: 'Upload your PDF, Excel or CSV. AI reads every transaction, categorises it and fills your ledger in seconds.', tag: 'Pro' },
-              { icon: '🤖', title: 'AI Tax Assistant', desc: 'Ask "How much VAT do I owe this month?" Get an answer based on your actual ledger -- not generic advice.', tag: 'Pro' },
-              { icon: '🗄️', title: 'Evidence Vault', desc: 'Store receipts and invoices securely. NTA 2025 requires 6-year retention. Be audit-ready in minutes.', tag: 'Pro' },
-              { icon: '📄', title: 'PDF Tax Reports', desc: 'Generate professional reports ready to send your accountant or submit to the Nigeria Revenue Service.', tag: 'Pro' },
-              { icon: '🔔', title: 'Deadline Reminders', desc: 'Push notifications 7 days and 1 day before every obligation. Never miss a VAT return or PAYE filing again.', tag: 'Core' },
+              { icon: '?', title: 'Auto Tax Calendar', desc: 'Sign up once. Get 12 months of VAT, PAYE, WHT and CIT deadlines generated based on your company profile.', tag: 'Core' },
+              { icon: '?', title: 'Bank Statement Import', desc: 'Upload your PDF, Excel or CSV. AI reads every transaction, categorises it and fills your ledger in seconds.', tag: 'Pro' },
+              { icon: '?', title: 'AI Tax Assistant', desc: 'Ask "How much VAT do I owe this month?" Get an answer based on your actual ledger -- not generic advice.', tag: 'Pro' },
+              { icon: '??', title: 'Evidence Vault', desc: 'Store receipts and invoices securely. NTA 2025 requires 6-year retention. Be audit-ready in minutes.', tag: 'Pro' },
+              { icon: '?', title: 'PDF Tax Reports', desc: 'Generate professional reports ready to send your accountant or submit to the Nigeria Revenue Service.', tag: 'Pro' },
+              { icon: '?', title: 'Deadline Reminders', desc: 'Push notifications 7 days and 1 day before every obligation. Never miss a VAT return or PAYE filing again.', tag: 'Core' },
             ].map((f, i) => (
               <FadeIn key={i} delay={i * 80}>
                 <div style={{
@@ -274,7 +274,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
         </div>
       </section>
 
-      {/* ── DASHBOARD PREVIEW ── */}
+      {/* ?? DASHBOARD PREVIEW ?? */}
       <section style={{ background: '#0d0d0d', padding: '80px 24px', overflow: 'hidden' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <FadeIn>
@@ -304,7 +304,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                     { label: 'Compliance Score', value: '94%', color: '#00843D', bg: '#0a2e1a' },
                     { label: 'Obligations Due', value: '3', color: '#fbbf24', bg: '#2a1e00' },
                     { label: 'Filed This Year', value: '11', color: '#60a5fa', bg: '#0a1a2e' },
-                    { label: 'Est. VAT Owing', value: '₦184k', color: '#f87171', bg: '#2e0a0a' },
+                    { label: 'Est. VAT Owing', value: '?184k', color: '#f87171', bg: '#2e0a0a' },
                   ].map(s => (
                     <div key={s.label} style={{ background: s.bg, borderRadius: 12, padding: '16px 18px', border: `1px solid ${s.color}22` }}>
                       <p style={{ fontSize: 11, color: '#666', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{s.label}</p>
@@ -336,7 +336,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ── */}
+      {/* ?? HOW IT WORKS ?? */}
       <section id="how-it-works" style={{ padding: '80px 24px', background: '#fff' }}>
         <div style={{ maxWidth: 800, margin: '0 auto' }}>
           <FadeIn>
@@ -375,14 +375,14 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
         </div>
       </section>
 
-      {/* ── PRICING ── */}
+      {/* ?? PRICING ?? */}
       <section id="pricing" style={{ padding: '80px 24px', background: '#F7F7F5' }}>
         <div style={{ maxWidth: 880, margin: '0 auto' }}>
           <FadeIn>
             <div style={{ textAlign: 'center', marginBottom: 52 }}>
               <p style={{ fontSize: 12, fontWeight: 700, color: '#00843D', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Pricing</p>
               <h2 style={{ fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.15 }}>Less than what a single penalty costs you.</h2>
-              <p style={{ color: '#888', fontSize: 16, marginTop: 12 }}>Late VAT filing attracts a minimum ₦50,000 penalty. Pro plan is ₦5,000/month.</p>
+              <p style={{ color: '#888', fontSize: 16, marginTop: 12 }}>Late VAT filing attracts a minimum ?50,000 penalty. Pro plan is ?5,000/month.</p>
             </div>
           </FadeIn>
 
@@ -392,13 +392,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               <div style={{ background: '#fff', borderRadius: 20, padding: '36px', border: '1.5px solid #e8e8e4' }}>
                 <p style={{ fontSize: 12, fontWeight: 700, color: '#999', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>Free Forever</p>
                 <div style={{ marginBottom: 8 }}>
-                  <span style={{ fontSize: 40, fontWeight: 800, letterSpacing: '-0.04em', color: '#0d0d0d' }}>₦0</span>
+                  <span style={{ fontSize: 40, fontWeight: 800, letterSpacing: '-0.04em', color: '#0d0d0d' }}>?0</span>
                 </div>
                 <p style={{ fontSize: 14, color: '#999', marginBottom: 28 }}>Get started, no card needed</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 28 }}>
                   {['1 company', 'Tax obligation calendar', 'All tax calculators', 'Tax ledger', 'Penalty calculator'].map(f => (
                     <div key={f} style={{ display: 'flex', gap: 10, alignItems: 'center', fontSize: 14, color: '#333' }}>
-                      <span style={{ color: '#00843D', fontWeight: 800, fontSize: 15 }}>✓</span> {f}
+                      <span style={{ color: '#00843D', fontWeight: 800, fontSize: 15 }}>?</span> {f}
                     </div>
                   ))}
                   {['AI Tax Assistant', 'PDF Export', 'Evidence Vault', 'Bank Import'].map(f => (
@@ -422,15 +422,15 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                 <div style={{ position: 'absolute', top: 20, right: 20, background: 'rgba(255,255,255,0.2)', borderRadius: 100, padding: '4px 12px', fontSize: 11, fontWeight: 700, color: '#fff', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Most popular</div>
                 <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 16 }}>Pro</p>
                 <div style={{ marginBottom: 4 }}>
-                  <span style={{ fontSize: 40, fontWeight: 800, letterSpacing: '-0.04em', color: '#fff' }}>₦5,000</span>
+                  <span style={{ fontSize: 40, fontWeight: 800, letterSpacing: '-0.04em', color: '#fff' }}>?5,000</span>
                   <span style={{ fontSize: 15, color: 'rgba(255,255,255,0.7)' }}>/month</span>
                 </div>
-                <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', marginBottom: 4 }}>or <strong style={{ color: '#fff' }}>₦50,000/year</strong> -- save 2 months</p>
+                <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', marginBottom: 4 }}>or <strong style={{ color: '#fff' }}>?50,000/year</strong> -- save 2 months</p>
                 <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', marginBottom: 28 }}>Cheaper than one late-filing penalty</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 28 }}>
-                  {['Everything in Free', 'Unlimited companies', '🤖 AI Tax Assistant', '🏦 Bank Statement Import', '📄 PDF Export & Reports', '🗄️ Evidence Vault', 'Push deadline reminders', 'Priority support'].map(f => (
+                  {['Everything in Free', 'Unlimited companies', '? AI Tax Assistant', '? Bank Statement Import', '? PDF Export & Reports', '?? Evidence Vault', 'Push deadline reminders', 'Priority support'].map(f => (
                     <div key={f} style={{ display: 'flex', gap: 10, alignItems: 'center', fontSize: 14, color: 'rgba(255,255,255,0.9)' }}>
-                      <span style={{ color: 'rgba(255,255,255,0.8)', fontWeight: 800, fontSize: 15 }}>✓</span> {f}
+                      <span style={{ color: 'rgba(255,255,255,0.8)', fontWeight: 800, fontSize: 15 }}>?</span> {f}
                     </div>
                   ))}
                 </div>
@@ -452,7 +452,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
         </div>
       </section>
 
-      {/* ── FINAL CTA ── */}
+      {/* ?? FINAL CTA ?? */}
       <section style={{ padding: '80px 24px', background: '#fff', borderTop: '1px solid #eee' }}>
         <div style={{ maxWidth: 680, margin: '0 auto', textAlign: 'center' }}>
           <FadeIn>
@@ -468,13 +468,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               style={{ background: '#00843D', color: '#fff', border: 'none', padding: '16px 36px', borderRadius: 14, fontSize: 16, fontWeight: 800, cursor: 'pointer', letterSpacing: '-0.01em', boxShadow: '0 4px 20px rgba(0,132,61,0.3)' }}
               onMouseEnter={e => (e.currentTarget.style.background = '#006B32')}
               onMouseLeave={e => (e.currentTarget.style.background = '#00843D')}
-            >Create Free Account →</button>
-            <p style={{ fontSize: 13, color: '#bbb', marginTop: 16 }}>No credit card required · Cancel anytime</p>
+            >Create Free Account ?</button>
+            <p style={{ fontSize: 13, color: '#bbb', marginTop: 16 }}>No credit card required ? Cancel anytime</p>
           </FadeIn>
         </div>
       </section>
 
-      {/* ── FOOTER ── */}
+      {/* ?? FOOTER ?? */}
       <footer style={{ background: '#0d0d0d', padding: '48px 24px 32px' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 32, marginBottom: 40 }}>
@@ -508,8 +508,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
             </div>
           </div>
           <div style={{ borderTop: '1px solid #222', paddingTop: 24, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-            <p style={{ fontSize: 13, color: '#555' }}>© 2026 TaxPulse NG. All rights reserved.</p>
-            <p style={{ fontSize: 13, color: '#444' }}>Built for Nigerian SMEs · NTA 2025 · Powered by Supabase & AI</p>
+            <p style={{ fontSize: 13, color: '#555' }}>? 2026 TaxPulse NG. All rights reserved.</p>
+            <p style={{ fontSize: 13, color: '#444' }}>Built for Nigerian SMEs ? NTA 2025 ? Powered by Supabase & AI</p>
           </div>
         </div>
       </footer>
