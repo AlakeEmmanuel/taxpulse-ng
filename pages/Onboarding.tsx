@@ -167,8 +167,6 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             {step === 1 && (
               <div className="space-y-5">
                 <div>
-                  {/* Name label changes based on entity type */}
-                <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-1.5">
                     {form.entityType === EntityType.INDIVIDUAL ? 'Your Full Name *' : 'Business Name *'}
                   </label>
