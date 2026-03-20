@@ -217,6 +217,252 @@ export function calcPayslip(grossSalary: number, annualRent = 0): PayslipEmploye
   };
 }
 
+
+// ─── CAPITAL GAINS TAX (CGT) — NTA 2025 ────────────────────────────────────
+// Rate: 10% on chargeable gains. Small companies (≤₦50M turnover): 0% CGT.
+// Applies to: property, shares, business assets, goodwill, debts, IP, foreign currency.
+
+export const CGT_RATE = 0.10;
+
+export interface CGTInputs {
+  assetType:        string;
+  saleProceeds:     number;
+  costOfAcquisition: number;
+  improvementCosts?: number;
+  disposalCosts?:   number;
+  isSmallCompany?:  boolean; // ≤₦50M turnover: exempt
+  isIndividual?:    boolean;
+  yearsHeld?:       number;  // informational
+}
+
+export const calcCGT = (inputs: CGTInputs) => {
+  const {
+    saleProceeds, costOfAcquisition,
+    improvementCosts = 0, disposalCosts = 0,
+    isSmallCompany = false,
+  } = inputs;
+
+  const totalCost     = costOfAcquisition + improvementCosts + disposalCosts;
+  const chargeableGain = Math.max(0, saleProceeds - totalCost);
+  const loss           = saleProceeds < totalCost ? totalCost - saleProceeds : 0;
+
+  if (isSmallCompany) {
+    return {
+      chargeableGain, loss, tax: 0, effectiveRate: 0,
+      exempt: true,
+      exemptionReason: 'Small Company Exemption — CGT 0% (turnover ≤₦50M, NTA 2025)',
+    };
+  }
+
+  const tax = chargeableGain * CGT_RATE;
+  return {
+    chargeableGain, loss, tax,
+    effectiveRate: saleProceeds > 0 ? tax / saleProceeds : 0,
+    exempt: false,
+    exemptionReason: '',
+  };
+};
+
+export const CGT_ASSET_TYPES = [
+  'Real Estate / Land',
+  'Shares / Securities',
+  'Business Assets (plant, machinery)',
+  'Goodwill / Intellectual Property',
+  'Debt instruments',
+  'Foreign currency gains',
+  'Motor vehicles (used for business)',
+  'Other chargeable assets',
+];
+
+// ─── STATE-SPECIFIC LEVIES ────────────────────────────────────────────────────
+// Each Nigerian state imposes levies beyond federal taxes.
+// Sources: State Revenue Laws, Lagos Finance Law 2019, Rivers Finance Law, etc.
+
+export interface StateLevyItem {
+  name:        string;
+  rate:        string;
+  basis:       string;
+  frequency:   string;
+  authority:   string;
+  notes?:      string;
+}
+
+export const STATE_LEVIES: Record<string, StateLevyItem[]> = {
+  'Lagos': [
+    { name: 'Business Premises Levy', rate: '₦10,000–₦100,000/yr', basis: 'Business premises area and type', frequency: 'Annual', authority: 'LIRS', notes: 'Due 31 March annually' },
+    { name: 'Development Levy (Individual)', rate: '₦1,000–₦5,000/yr', basis: 'Per adult employee', frequency: 'Annual', authority: 'LIRS' },
+    { name: 'Tenement Rate', rate: '2–5% of rateable value', basis: 'Property annual value', frequency: 'Annual', authority: 'Lagos State Land Use Charge' },
+    { name: 'Hotel Occupancy Tax', rate: '5% of room revenue', basis: 'Hotel/short-let income', frequency: 'Monthly', authority: 'LIRS', notes: 'Applies to hospitality businesses' },
+    { name: 'Signage & Advertisement Levy', rate: 'Varies by size/location', basis: 'Physical advertising boards', frequency: 'Annual', authority: 'LASAA' },
+  ],
+  'FCT - Abuja': [
+    { name: 'Business Premises Levy', rate: '₦5,000–₦50,000/yr', basis: 'Business type and size', frequency: 'Annual', authority: 'FCT-IRS' },
+    { name: 'Development Levy', rate: '₦2,000/employee/yr', basis: 'Per employee', frequency: 'Annual', authority: 'FCT-IRS' },
+    { name: 'Ground Rent', rate: 'Varies by plot size', basis: 'Land area', frequency: 'Annual', authority: 'AGIS (Abuja Geographic Information Service)' },
+  ],
+  'Rivers': [
+    { name: 'Business Premises Levy', rate: '₦5,000–₦80,000/yr', basis: 'Business premises', frequency: 'Annual', authority: 'Rivers IRS' },
+    { name: 'Development Levy', rate: '₦2,500/employee/yr', basis: 'Per employee', frequency: 'Annual', authority: 'Rivers IRS' },
+    { name: 'Hotel/Tourism Levy', rate: '5% of turnover', basis: 'Tourism/hospitality revenue', frequency: 'Monthly', authority: 'Rivers IRS' },
+  ],
+  'Kano': [
+    { name: 'Business Premises Levy', rate: '₦5,000–₦40,000/yr', basis: 'Business category', frequency: 'Annual', authority: 'Kano SIRS' },
+    { name: 'Development Levy', rate: '₦1,500/employee/yr', basis: 'Per employee', frequency: 'Annual', authority: 'Kano SIRS' },
+  ],
+  'Ogun': [
+    { name: 'Business Premises Levy', rate: '₦5,000–₦50,000/yr', basis: 'Business type', frequency: 'Annual', authority: 'Ogun SIRS' },
+    { name: 'Development Levy', rate: '₦1,000/employee/yr', basis: 'Per employee', frequency: 'Annual', authority: 'Ogun SIRS' },
+  ],
+  'Delta': [
+    { name: 'Business Premises Levy', rate: '₦5,000–₦60,000/yr', basis: 'Business type and size', frequency: 'Annual', authority: 'Delta SIRS' },
+    { name: 'Development Levy', rate: '₦2,000/employee/yr', basis: 'Per employee', frequency: 'Annual', authority: 'Delta SIRS' },
+  ],
+  'Anambra': [
+    { name: 'Business Premises Levy', rate: '₦5,000–₦40,000/yr', basis: 'Business premises', frequency: 'Annual', authority: 'Anambra SIRS' },
+    { name: 'Development Levy', rate: '₦1,500/employee/yr', basis: 'Per employee', frequency: 'Annual', authority: 'Anambra SIRS' },
+  ],
+};
+
+// Returns levies for a given state, falling back to a generic set
+export const getStateLevies = (state: string): StateLevyItem[] => {
+  return STATE_LEVIES[state] || [
+    { name: 'Business Premises Levy', rate: 'Varies', basis: 'Business premises', frequency: 'Annual', authority: `${state} State IRS`, notes: 'Contact your State IRS for exact rates' },
+    { name: 'Development Levy', rate: 'Varies', basis: 'Per employee', frequency: 'Annual', authority: `${state} State IRS` },
+  ];
+};
+
+// ─── VAT INVOICE COMPUTATION ──────────────────────────────────────────────────
+export interface InvoiceLineItem {
+  description:  string;
+  quantity:     number;
+  unitPrice:    number;
+  vatApplicable: boolean;  // false = zero-rated or exempt
+}
+
+export interface InvoiceComputed {
+  subtotal:    number;
+  vatAmount:   number;
+  total:       number;
+  lines:       Array<InvoiceLineItem & { lineTotal: number; vatAmount: number }>;
+}
+
+export const computeInvoice = (items: InvoiceLineItem[]): InvoiceComputed => {
+  const lines = items.map(item => {
+    const lineTotal = item.quantity * item.unitPrice;
+    const vatAmount = item.vatApplicable ? lineTotal * VAT_RATE : 0;
+    return { ...item, lineTotal, vatAmount };
+  });
+  const subtotal  = lines.reduce((s, l) => s + l.lineTotal, 0);
+  const vatAmount = lines.reduce((s, l) => s + l.vatAmount, 0);
+  return { subtotal, vatAmount, total: subtotal + vatAmount, lines };
+};
+
+
+// ─── STATE IRS PORTAL LINKS ───────────────────────────────────────────────────
+export const STATE_IRS_PORTALS: Record<string, { name: string; url: string; paye_url?: string }> = {
+  'Lagos':        { name: 'Lagos Internal Revenue Service', url: 'https://lagosirs.gov.ng', paye_url: 'https://lagosirs.gov.ng/e-tax' },
+  'FCT - Abuja':  { name: 'FCT Inland Revenue Service', url: 'https://fcta-irs.gov.ng', paye_url: 'https://fcta-irs.gov.ng' },
+  'Rivers':       { name: 'Rivers State Internal Revenue Service', url: 'https://rirs.gov.ng', paye_url: 'https://rirs.gov.ng' },
+  'Kano':         { name: 'Kano State Internal Revenue Service', url: 'https://kirs.gov.ng' },
+  'Ogun':         { name: 'Ogun State Internal Revenue Service', url: 'https://ogunirs.gov.ng' },
+  'Delta':        { name: 'Delta State Internal Revenue Service', url: 'https://dsirs.gov.ng' },
+  'Anambra':      { name: 'Anambra State Internal Revenue Service', url: 'https://airs.gov.ng' },
+  'Kaduna':       { name: 'Kaduna State Internal Revenue Service', url: 'https://kadirs.gov.ng' },
+  'Enugu':        { name: 'Enugu State Revenue Service', url: 'https://enrs.gov.ng' },
+  'Imo':          { name: 'Imo State Internal Revenue Service', url: 'https://iirs.gov.ng' },
+  'Edo':          { name: 'Edo State Internal Revenue Service', url: 'https://eirs.gov.ng' },
+  'Kwara':        { name: 'Kwara State Internal Revenue Service', url: 'https://kwirs.gov.ng' },
+  'Plateau':      { name: 'Plateau State Internal Revenue Service', url: 'https://plirs.gov.ng' },
+  'Benue':        { name: 'Benue State Internal Revenue Service', url: 'https://birs.gov.ng' },
+  'Cross River':  { name: 'Cross River State Internal Revenue Service', url: 'https://crirs.gov.ng' },
+};
+
+// NRS portal links for federal taxes
+export const NRS_PORTALS = {
+  main:          'https://www.nrs.gov.ng',
+  eServices:     'https://eservices.nrs.gov.ng',
+  taxProMax:     'https://taxpayerportal.nrs.gov.ng',
+  tin:           'https://tin.nrs.gov.ng',
+};
+
+export const getStateIRS = (state: string) =>
+  STATE_IRS_PORTALS[state] || { name: `${state} State Internal Revenue Service`, url: 'https://www.nrs.gov.ng' };
+
+// ─── SALARY CHANGE SIMULATOR ────────────────────────────────────────────────
+export interface SalaryScenario {
+  label:      string;
+  gross:      number;
+  paye:       number;
+  pension:    number; // employee 8%
+  nhis:       number; // 1.5%
+  nhf:        number; // 2.5% of basic (60%)
+  netPay:     number;
+  employerPension: number; // 10%
+  nsitf:      number; // 1%
+  totalEmployerCost: number;
+}
+
+export const calcSalaryScenario = (gross: number, annualRent = 0): SalaryScenario => {
+  const paye        = calcPAYE({ grossAnnual: gross * 12, annualRent }).annual / 12;
+  const pension     = gross * 0.08;
+  const nhis        = gross * 0.015;
+  const nhf         = (gross * 0.60) * 0.025; // 2.5% of basic (60%)
+  const netPay      = gross - paye - pension - nhis - nhf;
+  const ePension    = gross * 0.10;
+  const nsitf       = gross * 0.01;
+  return {
+    label: '', gross, paye, pension, nhis, nhf, netPay,
+    employerPension: ePension, nsitf,
+    totalEmployerCost: gross + ePension + nsitf,
+  };
+};
+
+// ─── ANNUAL TAX PLANNER ───────────────────────────────────────────────────────
+export interface AnnualPlanMonth {
+  month:       string;
+  vatDue:      number;
+  payeDue:     number;
+  whtDue:      number;
+  nsitfDue:    number;
+  pensionDue:  number;
+  nhfDue:      number;
+  totalDue:    number;
+}
+
+export const projectAnnualTax = (
+  monthlyRevenue:  number,
+  monthlyExpenses: number,
+  monthlyPayroll:  number,
+  collectsVat:     boolean,
+  hasEmployees:    boolean,
+  paysVendors:     boolean,
+  hasNSITF:        boolean,
+  hasPension:      boolean,
+  hasNHF:          boolean,
+): { months: AnnualPlanMonth[]; totals: Omit<AnnualPlanMonth, 'month'> } => {
+  const MONTHS_LABELS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  const months = MONTHS_LABELS.map(month => {
+    const vatDue     = collectsVat    ? monthlyRevenue * 0.075 : 0;
+    const payeDue    = hasEmployees   ? monthlyPayroll * 0.12  : 0; // rough avg 12%
+    const whtDue     = paysVendors    ? monthlyExpenses * 0.075 : 0; // rough avg 7.5%
+    const nsitfDue   = hasNSITF      ? monthlyPayroll * 0.01  : 0;
+    const pensionDue = hasPension     ? monthlyPayroll * 0.18  : 0; // 8% emp + 10% employer
+    const nhfDue     = hasNHF        ? monthlyPayroll * 0.60 * 0.025 : 0;
+    const totalDue   = vatDue + payeDue + whtDue + nsitfDue + pensionDue + nhfDue;
+    return { month, vatDue, payeDue, whtDue, nsitfDue, pensionDue, nhfDue, totalDue };
+  });
+
+  const totals = months.reduce((acc, m) => ({
+    month: '', vatDue: acc.vatDue + m.vatDue, payeDue: acc.payeDue + m.payeDue,
+    whtDue: acc.whtDue + m.whtDue, nsitfDue: acc.nsitfDue + m.nsitfDue,
+    pensionDue: acc.pensionDue + m.pensionDue, nhfDue: acc.nhfDue + m.nhfDue,
+    totalDue: acc.totalDue + m.totalDue,
+  }), { month: '', vatDue: 0, payeDue: 0, whtDue: 0, nsitfDue: 0, pensionDue: 0, nhfDue: 0, totalDue: 0 });
+
+  return { months, totals };
+};
+
 function parseYearEndMonth(yearEnd: string): number {
   const parts = yearEnd.split(' ');
   const idx = MONTHS.findIndex(m => m.toLowerCase() === parts[0].toLowerCase());

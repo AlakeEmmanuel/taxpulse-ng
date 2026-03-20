@@ -29,6 +29,11 @@ const TOOLS_NAV: { icon: string; label: string; view: AppView }[] = [
   { icon: '📄',  label: 'PDF Export',     view: 'export' },
   { icon: '🏦',  label: 'Bank Import',    view: 'import' },
   { icon: '🧾',  label: 'Payslips',        view: 'payslip' },
+  { icon: '📋',  label: 'Invoices',        view: 'invoice' },
+  { icon: '💰',  label: 'Salary Sim',     view: 'salary' },
+  { icon: '📆',  label: 'Tax Planner',    view: 'planner' },
+  { icon: '📜',  label: 'TCC Tracker',    view: 'tcc' },
+  { icon: '📊',  label: 'Payroll CSV',    view: 'payroll-csv' },
 ];
 
 // Mobile shows only the 5 most-used + settings
