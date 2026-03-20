@@ -174,13 +174,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               },
               {
                 img: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=480&q=80&fit=crop",
-                quote: '"The NRS sent an audit notice. I spent three days trying to find old receipts. Found half."',
+                quote: "\"The NRS sent an audit notice. I spent three days trying to find old receipts. Found half.\"",
                 name: "Chidinma O.",
                 role: "Boutique owner, Lagos",
               },
               {
                 img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=480&q=80&fit=crop",
-                quote: '"I honestly don't know how much tax I owe each month. My accountant charges ?80k to tell me."',
+                quote: "\"I honestly don't know how much tax I owe each month. My accountant charges ?80k to tell me.\"",
                 name: "Emeka T.",
                 role: "Tech consultant, Abuja",
               }
