@@ -59,7 +59,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
         borderBottom: scrolled ? '1px solid #e8e8e4' : '1px solid transparent',
         transition: 'all 0.3s ease',
       }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', height: 68, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', height: 68, display: 'flex', alignItems: 'center", justifyContent: 'space-between" }}>
           <img src={LOGO_SRC} alt="TaxPulse NG" style={{ height: 32, objectFit: 'contain' }} />
           <div style={{ display: 'flex', alignItems: 'center', gap: 32 }} className="hidden-mobile">
             {['Features', 'How it works', 'Pricing'].map(link => (
@@ -221,7 +221,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
           <FadeIn>
             <div style={{ marginBottom: 56 }}>
               <p style={{ fontSize: 12, fontWeight: 700, color: '#00843D', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Everything included</p>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 16 }}>
+              <div style={{ display: 'flex", justifyContent: 'space-between", alignItems: 'flex-end', flexWrap: 'wrap', gap: 16 }}>
                 <h2 style={{ fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.15, color: '#0d0d0d', maxWidth: 560 }}>
                   Built around how Nigerian businesses actually operate.
                 </h2>
@@ -256,7 +256,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                     (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
+                  <div style={{ display: 'flex", justifyContent: 'space-between", alignItems: 'flex-start', marginBottom: 16 }}>
                     <span style={{ fontSize: 28 }}>{f.icon}</span>
                     <span style={{
                       fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 100,
@@ -313,7 +313,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                   ))}
                 </div>
                 <div style={{ background: '#111', borderRadius: 12, border: '1px solid #2a2a2a', overflow: 'hidden' }}>
-                  <div style={{ padding: '12px 18px', borderBottom: '1px solid #222', display: 'flex', justifyContent: 'space-between' }}>
+                  <div style={{ padding: '12px 18px', borderBottom: '1px solid #222', display: 'flex", justifyContent: 'space-between" }}>
                     <span style={{ fontSize: 13, fontWeight: 600, color: '#ccc' }}>Upcoming Tax Obligations</span>
                     <span style={{ fontSize: 12, color: '#666' }}>April 2026</span>
                   </div>
@@ -323,7 +323,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                     { tax: 'WHT (March)', due: '21 Apr 2026', status: 'On Track', statusColor: '#4ade80', statusBg: '#0a2e1a' },
                     { tax: 'CIT Annual Return', due: '30 Jun 2026', status: 'On Track', statusColor: '#4ade80', statusBg: '#0a2e1a' },
                   ].map(row => (
-                    <div key={row.tax} style={{ padding: '12px 18px', borderBottom: '1px solid #1a1a1a', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div key={row.tax} style={{ padding: '12px 18px', borderBottom: '1px solid #1a1a1a', display: 'flex", justifyContent: 'space-between", alignItems: 'center' }}>
                       <span style={{ fontSize: 13, color: '#bbb' }}>{row.tax}</span>
                       <span style={{ fontSize: 12, color: '#666' }}>{row.due}</span>
                       <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 100, background: row.statusBg, color: row.statusColor }}>{row.status}</span>
@@ -477,7 +477,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
       {/* ?? FOOTER ?? */}
       <footer style={{ background: '#0d0d0d', padding: '48px 24px 32px' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 32, marginBottom: 40 }}>
+          <div style={{ display: 'flex", justifyContent: 'space-between", alignItems: 'flex-start', flexWrap: 'wrap', gap: 32, marginBottom: 40 }}>
             <div style={{ maxWidth: 280 }}>
               <img src={LOGO_SRC} alt="TaxPulse NG" style={{ height: 28, filter: 'brightness(0) invert(1)', objectFit: 'contain', marginBottom: 12 }} />
               <p style={{ fontSize: 13, color: '#666', lineHeight: 1.6 }}>Making Nigerian tax compliance simple and stress-free for small businesses. NTA 2025 compliant.</p>
@@ -507,7 +507,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               </div>
             </div>
           </div>
-          <div style={{ borderTop: '1px solid #222', paddingTop: 24, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+          <div style={{ borderTop: '1px solid #222', paddingTop: 24, display: 'flex", justifyContent: 'space-between", flexWrap: 'wrap', gap: 12 }}>
             <p style={{ fontSize: 13, color: '#555' }}>? 2026 TaxPulse NG. All rights reserved.</p>
             <p style={{ fontSize: 13, color: '#444' }}>Built for Nigerian SMEs ? NTA 2025 ? Powered by Supabase & AI</p>
           </div>
