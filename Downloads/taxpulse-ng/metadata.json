@@ -1,8 +1,0 @@
-
-{
-  "name": "TaxPulse NG",
-  "description": "A comprehensive tax compliance and management companion for Nigerian businesses, featuring multi-company support, automated tax calendars, and intelligent filing assistance.",
-  "requestFramePermissions": [
-    "camera"
-  ]
-}

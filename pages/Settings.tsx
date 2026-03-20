@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Company, EntityType } from '../types';
 import { generateObligations } from '../utils/taxEngine';
 import { Card, Input, Button } from '../components/Shared';
+import { AccountantShareManager } from './AccountantShare';
 import * as db from '../services/db';
 import { subscribeToPush, unsubscribeFromPush, isPushSubscribed } from '../services/notifications';
 
@@ -338,6 +339,9 @@ export const SettingsPage: React.FC<SettingsProps> = ({ company, onCompanyUpdate
         <p>• Nigeria Revenue Service (NRS) — formerly FIRS</p>
         <p>• Development Levy (4%) applies to all non-small companies</p>
       </div>
+
+      {/* Accountant share */}
+      <AccountantShareManager company={form} />
 
       <Button onClick={handleSave} className="w-full py-3">Save Settings</Button>
 

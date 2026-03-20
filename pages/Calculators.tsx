@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card, Input, Button } from '../components/Shared';
-import { VAT_RATE, WHT_RATES, calcCIT, calcVAT, isWHTExempt } from '../utils/taxEngine';
+import { VAT_RATE, WHT_RATES, calcCIT, calcVAT, isWHTExempt, calcCGT, CGT_ASSET_TYPES, STATE_LEVIES, getStateLevies } from '../utils/taxEngine';
 
 const fmt = (n: number) => '₦' + n.toLocaleString(undefined, { maximumFractionDigits: 2 });
 
@@ -245,8 +245,166 @@ const CITCalculator: React.FC = () => {
 };
 
 // ─── MAIN PAGE ────────────────────────────────────────────────────────────────
+
+// ─── CGT CALCULATOR ───────────────────────────────────────────────────────────
+const CGTCalculator: React.FC = () => {
+  const [assetType, setAssetType]   = useState(CGT_ASSET_TYPES[0]);
+  const [proceeds, setProceeds]     = useState('');
+  const [cost, setCost]             = useState('');
+  const [improvements, setImprovements] = useState('');
+  const [disposal, setDisposal]     = useState('');
+  const [isSmallCo, setIsSmallCo]   = useState(false);
+  const [yearsHeld, setYearsHeld]   = useState('');
+
+  const p = parseFloat(proceeds)     || 0;
+  const c = parseFloat(cost)         || 0;
+  const i = parseFloat(improvements) || 0;
+  const d = parseFloat(disposal)     || 0;
+
+  const result = p > 0 || c > 0 ? calcCGT({
+    assetType, saleProceeds: p, costOfAcquisition: c,
+    improvementCosts: i, disposalCosts: d, isSmallCompany: isSmallCo,
+    yearsHeld: parseFloat(yearsHeld) || undefined,
+  }) : null;
+
+  return (
+    <Card className="space-y-4">
+      <div className="flex items-center gap-2">
+        <span className="w-8 h-8 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center font-black text-sm">G</span>
+        <div>
+          <h3 className="font-bold text-slate-800">Capital Gains Tax (CGT)</h3>
+          <p className="text-xs text-slate-400">10% on chargeable gains · NTA 2025</p>
+        </div>
+      </div>
+
+      <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800">
+        <p className="font-bold mb-1">NTA 2025 CGT Rules</p>
+        <p>• Rate: <strong>10%</strong> on all chargeable gains</p>
+        <p>• Small companies (≤₦50M turnover): <strong>0% CGT</strong></p>
+        <p>• Applies to: property, shares, business assets, goodwill, IP, foreign currency</p>
+        <p>• File CGT return with NRS within 30 days of disposal</p>
+      </div>
+
+      <div>
+        <label className="block text-sm font-semibold text-slate-700 mb-1.5">Asset Type</label>
+        <select value={assetType} onChange={e => setAssetType(e.target.value)}
+          className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cac-green bg-white">
+          {CGT_ASSET_TYPES.map(t => <option key={t}>{t}</option>)}
+        </select>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <Input label="Sale Proceeds (₦)" type="number" value={proceeds} onChange={e => setProceeds(e.target.value)} placeholder="0" />
+        <Input label="Original Cost (₦)" type="number" value={cost} onChange={e => setCost(e.target.value)} placeholder="0" />
+        <Input label="Improvement Costs (₦)" type="number" value={improvements} onChange={e => setImprovements(e.target.value)} placeholder="0" />
+        <Input label="Disposal Costs (₦)" type="number" value={disposal} onChange={e => setDisposal(e.target.value)} placeholder="Legal fees, agent fees, etc." />
+        <Input label="Years Held (informational)" type="number" value={yearsHeld} onChange={e => setYearsHeld(e.target.value)} placeholder="e.g. 5" />
+        <div className="flex items-center">
+          <label className="flex items-center gap-2.5 cursor-pointer">
+            <input type="checkbox" checked={isSmallCo} onChange={e => setIsSmallCo(e.target.checked)}
+              className="w-4 h-4 accent-cac-green" />
+            <span className="text-sm text-slate-700">Small company (≤₦50M turnover)</span>
+          </label>
+        </div>
+      </div>
+
+      {result && (
+        <div className={`rounded-xl p-4 space-y-2 ${result.exempt ? 'bg-green-50 border border-green-200' : 'bg-slate-50 border border-slate-100'}`}>
+          {result.exempt ? (
+            <div className="text-center">
+              <p className="text-2xl mb-1">🎉</p>
+              <p className="font-bold text-cac-green text-sm">{result.exemptionReason}</p>
+            </div>
+          ) : (
+            <>
+              {[
+                { label: 'Sale Proceeds',        val: fmt(p),                     color: 'text-slate-700' },
+                { label: 'Total Allowable Costs', val: fmt(c + i + d),            color: 'text-slate-700' },
+                { label: result.chargeableGain > 0 ? 'Chargeable Gain' : 'Capital Loss',
+                  val: fmt(result.chargeableGain || result.loss),
+                  color: result.chargeableGain > 0 ? 'text-amber-600 font-bold' : 'text-blue-600 font-bold' },
+                { label: 'CGT @ 10%',            val: fmt(result.tax),            color: 'text-red-600 font-extrabold' },
+              ].map(r => (
+                <div key={r.label} className="flex justify-between text-sm">
+                  <span className="text-slate-500">{r.label}</span>
+                  <span className={r.color}>{r.val}</span>
+                </div>
+              ))}
+              {result.loss > 0 && (
+                <p className="text-xs text-blue-600 mt-1">Capital loss can be offset against future gains in the same year.</p>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
+      <div className="bg-slate-50 rounded-xl p-3 text-xs text-slate-500 space-y-1">
+        <p className="font-semibold text-slate-700">After disposal:</p>
+        <p>• File CGT return with NRS within 30 days of disposal date</p>
+        <p>• Pay CGT liability within 30 days or face 10% p.a. interest</p>
+        <p>• Keep all sale documents, original purchase receipts, improvement receipts</p>
+      </div>
+    </Card>
+  );
+};
+
+// ─── STATE LEVIES VIEWER ──────────────────────────────────────────────────────
+const StateLeviesViewer: React.FC = () => {
+  const availableStates = Object.keys(STATE_LEVIES);
+  const [selectedState, setSelectedState] = useState(availableStates[0]);
+  const levies = getStateLevies(selectedState);
+
+  return (
+    <Card className="space-y-4">
+      <div className="flex items-center gap-2">
+        <span className="w-8 h-8 bg-teal-100 text-teal-600 rounded-xl flex items-center justify-center font-black text-sm">S</span>
+        <div>
+          <h3 className="font-bold text-slate-800">State-Specific Levies</h3>
+          <p className="text-xs text-slate-400">Beyond federal taxes — what your state charges</p>
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-semibold text-slate-700 mb-1.5">Select State</label>
+        <select value={selectedState} onChange={e => setSelectedState(e.target.value)}
+          className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cac-green bg-white">
+          {availableStates.map(s => <option key={s}>{s}</option>)}
+          <option disabled>──────────────</option>
+          <option value="Other">Other states (generic)</option>
+        </select>
+        {!availableStates.includes(selectedState) && (
+          <p className="text-xs text-slate-400 mt-1">Showing typical rates — contact your State IRS for exact figures.</p>
+        )}
+      </div>
+
+      <div className="space-y-3">
+        {levies.map((levy, i) => (
+          <div key={i} className="bg-slate-50 rounded-xl p-3 space-y-1">
+            <div className="flex items-start justify-between gap-2">
+              <p className="font-bold text-slate-800 text-sm">{levy.name}</p>
+              <span className="bg-teal-100 text-teal-700 text-xs font-bold px-2 py-0.5 rounded-full shrink-0">{levy.frequency}</span>
+            </div>
+            <div className="grid grid-cols-2 gap-x-4 text-xs text-slate-500">
+              <span><strong className="text-slate-700">Rate:</strong> {levy.rate}</span>
+              <span><strong className="text-slate-700">Authority:</strong> {levy.authority}</span>
+              <span className="col-span-2"><strong className="text-slate-700">Basis:</strong> {levy.basis}</span>
+              {levy.notes && <span className="col-span-2 text-amber-600">{levy.notes}</span>}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-800">
+        <p className="font-bold mb-1">📋 Important</p>
+        <p>State levies are separate from federal taxes (NRS) and are collected by your State IRS. 
+        Always verify current rates directly with your State IRS as rates change annually.</p>
+      </div>
+    </Card>
+  );
+};
+
 export const CalculatorsPage: React.FC = () => {
-  const [tab, setTab] = useState<'vat' | 'wht' | 'cit'>('vat');
+  const [tab, setTab] = useState<'vat' | 'wht' | 'cit' | 'cgt' | 'state'>('vat');
 
   return (
     <div className="space-y-6 max-w-2xl">
@@ -258,18 +416,20 @@ export const CalculatorsPage: React.FC = () => {
         <p className="text-slate-500 text-sm">Nigeria Tax Act 2025 · Effective 1 January 2026</p>
       </header>
 
-      <div className="flex gap-2 bg-slate-100 p-1 rounded-xl w-fit">
-        {(['vat', 'wht', 'cit'] as const).map(t => (
+      <div className="flex flex-wrap gap-2 bg-slate-100 p-1 rounded-xl w-fit">
+        {(['vat', 'wht', 'cit', 'cgt', 'state'] as const).map(t => (
           <button key={t} onClick={() => setTab(t)}
             className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${tab === t ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>
-            {t.toUpperCase()}
+            {t === 'state' ? 'State Levies' : t.toUpperCase()}
           </button>
         ))}
       </div>
 
       {tab === 'vat' && <VATCalculator />}
       {tab === 'wht' && <WHTCalculator />}
-      {tab === 'cit' && <CITCalculator />}
+      {tab === 'cit'   && <CITCalculator />}
+      {tab === 'cgt'   && <CGTCalculator />}
+      {tab === 'state' && <StateLeviesViewer />}
     </div>
   );
 };

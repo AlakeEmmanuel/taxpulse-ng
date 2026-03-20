@@ -109,3 +109,27 @@ export interface PayslipEmployee {
   employerPension:  number; // 10% of gross
   nsitf:            number; // 1% of gross
 }
+
+// ── Evidence Vault ─────────────────────────────────────────────────────────────
+export type EvidenceCategory =
+  | 'receipt'
+  | 'invoice'
+  | 'payment_proof'
+  | 'bank_statement'
+  | 'other';
+
+export interface EvidenceFile {
+  id:             string;
+  companyId:      string;
+  obligationId?:  string;
+  ledgerEntryId?: string;
+  name:           string;
+  mimeType:       string;
+  sizeBytes:      number;
+  data:           string;       // base64 or empty — fetched from Storage on demand
+  uploadDate:     string;
+  category:       EvidenceCategory;
+  notes?:         string;
+  storagePath?:   string;       // Supabase Storage path
+  monthYear?:     string;       // e.g. "March 2026" — for bank statements
+}

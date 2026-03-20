@@ -1,42 +1,93 @@
-// TaxPulse NG Service Worker v3
-// Increment version number on every deploy to bust cache
+// TaxPulse NG Service Worker v5
+// Full offline support: cache shell + assets on install, stale-while-revalidate for assets
 
-const CACHE = 'taxpulse-v3';
-const ASSETS = ['/', '/index.html', '/manifest.json'];
+const CACHE_STATIC  = 'taxpulse-static-v5';
+const CACHE_DYNAMIC = 'taxpulse-dynamic-v5';
+
+const SHELL_ASSETS = [
+  '/', '/index.html', '/app', '/manifest.json',
+  '/icons/icon-192.png', '/icons/icon-512.png',
+];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
+  e.waitUntil(
+    caches.open(CACHE_STATIC).then(cache =>
+      cache.addAll(SHELL_ASSETS).catch(err => console.warn('[SW] Shell cache partial:', err))
+    )
+  );
   self.skipWaiting();
 });
 
 self.addEventListener('activate', e => {
-  // Delete ALL old caches
+  const valid = [CACHE_STATIC, CACHE_DYNAMIC];
   e.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+      Promise.all(keys.filter(k => !valid.includes(k)).map(k => caches.delete(k)))
     )
   );
   self.clients.claim();
 });
 
 self.addEventListener('fetch', e => {
-  if (e.request.method !== 'GET') return;
-  // Network first for HTML — always get fresh app shell
-  if (e.request.destination === 'document') {
+  const { request } = e;
+  const url = new URL(request.url);
+
+  if (request.method !== 'GET') return;
+  if (url.protocol === 'chrome-extension:') return;
+
+  // Supabase/API: network-first, cache fallback for offline
+  if (url.hostname.includes('supabase.co') || url.pathname.startsWith('/api/')) {
     e.respondWith(
-      fetch(e.request).catch(() => caches.match('/index.html'))
+      fetch(request).then(response => {
+        if (response.ok) {
+          const clone = response.clone();
+          caches.open(CACHE_DYNAMIC).then(c => c.put(request, clone));
+        }
+        return response;
+      }).catch(() => caches.match(request))
     );
     return;
   }
-  // Cache first for assets
+
+  // HTML navigation: network-first, serve shell when offline
+  if (request.destination === 'document' || request.mode === 'navigate') {
+    e.respondWith(
+      fetch(request).then(response => {
+        if (response.ok) {
+          const clone = response.clone();
+          caches.open(CACHE_STATIC).then(c => c.put(request, clone));
+        }
+        return response;
+      }).catch(() =>
+        caches.match(request).then(cached => cached || caches.match('/index.html'))
+      )
+    );
+    return;
+  }
+
+  // Static assets: stale-while-revalidate
   e.respondWith(
-    caches.match(e.request).then(cached => cached || fetch(e.request))
+    caches.match(request).then(cached => {
+      const networkFetch = fetch(request).then(response => {
+        if (response.ok && response.type !== 'opaque') {
+          const clone = response.clone();
+          caches.open(CACHE_STATIC).then(c => c.put(request, clone));
+        }
+        return response;
+      }).catch(() => cached);
+      return cached || networkFetch;
+    })
   );
 });
 
-// ── Push Notifications ─────────────────────────────────────
+// Message handler
+self.addEventListener('message', e => {
+  if (e.data?.type === 'SKIP_WAITING') self.skipWaiting();
+});
+
+// Push notifications
 self.addEventListener('push', e => {
-  let data = { title: 'TaxPulse NG', body: 'You have an upcoming tax deadline.', url: '/' };
+  let data = { title: 'TaxPulse NG', body: 'You have an upcoming tax deadline.', url: '/app' };
   try { if (e.data) data = { ...data, ...e.data.json() }; } catch {}
   e.waitUntil(
     self.registration.showNotification(data.title, {
@@ -46,12 +97,29 @@ self.addEventListener('push', e => {
       tag: 'taxpulse-deadline',
       data: { url: data.url },
       requireInteraction: true,
+      actions: [
+        { action: 'view', title: 'View Obligations' },
+        { action: 'dismiss', title: 'Dismiss' },
+      ],
+      vibrate: [200, 100, 200],
     })
   );
 });
 
 self.addEventListener('notificationclick', e => {
   e.notification.close();
-  const url = e.notification.data?.url || '/';
-  e.waitUntil(clients.openWindow(url));
+  if (e.action === 'dismiss') return;
+  const url = e.notification.data?.url || '/app';
+  e.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
+      for (const client of clientList) {
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          client.focus();
+          client.postMessage({ type: 'NAVIGATE', url });
+          return;
+        }
+      }
+      if (self.clients.openWindow) return self.clients.openWindow(url);
+    })
+  );
 });

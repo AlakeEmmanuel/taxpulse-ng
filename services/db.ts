@@ -407,3 +407,85 @@ export async function deleteEvidence(id: string, storagePath: string): Promise<v
   const { error } = await supabase.from('evidence_files').delete().eq('id', id);
   if (error) throw error;
 }
+
+// ─── Accountant Share Tokens ──────────────────────────────────────────────────
+// Creates a read-only token that gives an accountant access to one company's data
+
+export async function createShareToken(companyId: string, expiryDays = 30): Promise<string> {
+  const token = Array.from(crypto.getRandomValues(new Uint8Array(24)))
+    .map(b => b.toString(16).padStart(2, '0')).join('');
+  
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + expiryDays);
+
+  const { error } = await supabase
+    .from('share_tokens')
+    .upsert({
+      token,
+      company_id:  companyId,
+      expires_at:  expiresAt.toISOString(),
+      created_at:  new Date().toISOString(),
+    }, { onConflict: 'company_id' });
+
+  if (error) throw error;
+  return token;
+}
+
+export async function getShareToken(companyId: string): Promise<string | null> {
+  const { data, error } = await supabase
+    .from('share_tokens')
+    .select('token, expires_at')
+    .eq('company_id', companyId)
+    .single();
+  
+  if (error || !data) return null;
+  // Return null if expired
+  if (new Date(data.expires_at) < new Date()) return null;
+  return data.token;
+}
+
+export async function revokeShareToken(companyId: string): Promise<void> {
+  await supabase.from('share_tokens').delete().eq('company_id', companyId);
+}
+
+export async function getCompanyByToken(token: string): Promise<Company | null> {
+  // Get the company_id from the token
+  const { data: tokenData, error: tokenError } = await supabase
+    .from('share_tokens')
+    .select('company_id, expires_at')
+    .eq('token', token)
+    .single();
+  
+  if (tokenError || !tokenData) return null;
+  if (new Date(tokenData.expires_at) < new Date()) return null;
+
+  const { data, error } = await supabase
+    .from('companies')
+    .select('*')
+    .eq('id', tokenData.company_id)
+    .single();
+  
+  if (error || !data) return null;
+  return toCompany(data);
+}
+
+export async function getDataByToken(token: string): Promise<{
+  company:     Company;
+  obligations: TaxObligation[];
+  ledger:      LedgerEntry[];
+} | null> {
+  const company = await getCompanyByToken(token);
+  if (!company) return null;
+
+  const [obsResult, ledResult] = await Promise.all([
+    supabase.from('tax_obligations').select('*').eq('company_id', company.id).order('due_date'),
+    supabase.from('ledger_entries').select('*').eq('company_id', company.id).order('date', { ascending: false }),
+  ]);
+
+  return {
+    company,
+    obligations: (obsResult.data || []).map(toObligation),
+    ledger:      (ledResult.data  || []).map(toLedger),
+  };
+}
+
