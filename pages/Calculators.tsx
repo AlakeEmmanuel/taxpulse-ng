@@ -21,7 +21,7 @@ const VATCalculator: React.FC = () => {
         <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center font-black text-sm">V</span>
         <div>
           <h3 className="font-bold text-slate-800">VAT Calculator</h3>
-          <p className="text-xs text-slate-400">7.5% — NTA 2025 (unchanged)</p>
+          <p className="text-xs text-slate-400">7.5% -- NTA 2025 (unchanged)</p>
         </div>
       </div>
 
@@ -90,7 +90,7 @@ const WHTCalculator: React.FC = () => {
         <span className="w-8 h-8 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center font-black text-sm">W</span>
         <div>
           <h3 className="font-bold text-slate-800">WHT Calculator</h3>
-          <p className="text-xs text-slate-400">5% / 10% — NTA 2025 + small biz exemption</p>
+          <p className="text-xs text-slate-400">5% / 10% -- NTA 2025 + small biz exemption</p>
         </div>
       </div>
 
@@ -99,7 +99,7 @@ const WHTCalculator: React.FC = () => {
         <select value={category} onChange={e => setCategory(e.target.value)}
           className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-cac-green bg-white">
           {Object.entries(WHT_RATES).map(([k, v]) => (
-            <option key={k} value={k}>{k} — {(v.rate * 100).toFixed(0)}%{v.note ? ' 🆕' : ''}</option>
+            <option key={k} value={k}>{k} -- {(v.rate * 100).toFixed(0)}%{v.note ? ' 🆕' : ''}</option>
           ))}
         </select>
       </div>
@@ -119,13 +119,13 @@ const WHTCalculator: React.FC = () => {
           value={monthlyTxn} onChange={e => setMonthlyTxn(e.target.value)}
           placeholder={`Auto: using ${fmt(val)} if blank`} />
         {hasTIN && monthly <= 2_000_000 && monthly > 0 && (
-          <p className="text-xs text-green-700 font-bold">✅ WHT exempt — vendor qualifies (TIN + ≤₦2M/month)</p>
+          <p className="text-xs text-green-700 font-bold">✅ WHT exempt -- vendor qualifies (TIN + ≤₦2M/month)</p>
         )}
         {hasTIN && monthly > 2_000_000 && (
-          <p className="text-xs text-amber-700">⚠️ Exceeds ₦2M threshold — WHT applies</p>
+          <p className="text-xs text-amber-700">⚠️ Exceeds ₦2M threshold -- WHT applies</p>
         )}
         {!hasTIN && (
-          <p className="text-xs text-red-600">❌ No TIN — WHT must be deducted regardless of amount</p>
+          <p className="text-xs text-red-600">❌ No TIN -- WHT must be deducted regardless of amount</p>
         )}
       </div>
 
@@ -133,7 +133,7 @@ const WHTCalculator: React.FC = () => {
         <div className={`rounded-xl p-4 space-y-2 ${exempt ? 'bg-green-50 border border-green-200' : 'bg-slate-50'}`}>
           {[
             { label: 'Gross Amount',   val: fmt(val),        color: 'text-slate-700' },
-            { label: `WHT (${exempt ? '0% — exempt' : (whtInfo.rate * 100).toFixed(0) + '%'})`, val: fmt(wht), color: exempt ? 'text-green-600 font-bold' : 'text-purple-600' },
+            { label: `WHT (${exempt ? '0% -- exempt' : (whtInfo.rate * 100).toFixed(0) + '%'})`, val: fmt(wht), color: exempt ? 'text-green-600 font-bold' : 'text-purple-600' },
             { label: 'Net to Vendor',  val: fmt(netPayable), color: 'text-slate-900 font-extrabold' },
           ].map(r => (
             <div key={r.label} className="flex justify-between text-sm">
@@ -168,14 +168,14 @@ const CITCalculator: React.FC = () => {
         <span className="w-8 h-8 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center font-black text-sm">C</span>
         <div>
           <h3 className="font-bold text-slate-800">CIT + Dev Levy Calculator</h3>
-          <p className="text-xs text-slate-400">NTA 2025 — small ≤₦50M exempt, 30% + 4% Dev Levy</p>
+          <p className="text-xs text-slate-400">NTA 2025 -- small ≤₦50M exempt, 30% + 4% Dev Levy</p>
         </div>
       </div>
 
       {/* NTA 2025 change notice */}
       <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 text-xs text-orange-700">
         <p className="font-bold mb-1">🆕 NTA 2025 changes:</p>
-        <p>• <strong>Medium company category removed</strong> — now Small (exempt) or Standard (30%)</p>
+        <p>• <strong>Medium company category removed</strong> -- now Small (exempt) or Standard (30%)</p>
         <p>• <strong>Small threshold raised</strong>: ₦25M → ₦50M turnover</p>
         <p>• <strong>4% Development Levy</strong> on profits (replaces TET, IT Levy, NASENI, Police Trust Fund)</p>
       </div>
@@ -360,7 +360,7 @@ const StateLeviesViewer: React.FC = () => {
         <span className="w-8 h-8 bg-teal-100 text-teal-600 rounded-xl flex items-center justify-center font-black text-sm">S</span>
         <div>
           <h3 className="font-bold text-slate-800">State-Specific Levies</h3>
-          <p className="text-xs text-slate-400">Beyond federal taxes — what your state charges</p>
+          <p className="text-xs text-slate-400">Beyond federal taxes -- what your state charges</p>
         </div>
       </div>
 
@@ -373,7 +373,7 @@ const StateLeviesViewer: React.FC = () => {
           <option value="Other">Other states (generic)</option>
         </select>
         {!availableStates.includes(selectedState) && (
-          <p className="text-xs text-slate-400 mt-1">Showing typical rates — contact your State IRS for exact figures.</p>
+          <p className="text-xs text-slate-400 mt-1">Showing typical rates -- contact your State IRS for exact figures.</p>
         )}
       </div>
 

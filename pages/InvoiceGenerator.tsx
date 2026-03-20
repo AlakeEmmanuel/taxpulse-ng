@@ -74,7 +74,7 @@ export const InvoiceGenerator: React.FC<InvoiceGeneratorProps> = ({ company }) =
       doc.setFontSize(20); doc.setFont('helvetica', 'bold');
       doc.text('TAX INVOICE', 14, 16);
       doc.setFontSize(9); doc.setFont('helvetica', 'normal');
-      doc.text('Value Added Tax Invoice — NTA 2025 Compliant', 14, 24);
+      doc.text('Value Added Tax Invoice -- NTA 2025 Compliant', 14, 24);
 
       // NTA badge
       doc.setFillColor(255, 255, 255);
@@ -185,7 +185,7 @@ export const InvoiceGenerator: React.FC<InvoiceGeneratorProps> = ({ company }) =
         doc.setFillColor(240, 253, 244);
         doc.roundedRect(14, y, W - 28, 16, 2, 2, 'F');
         doc.setTextColor(0, 100, 40); doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
-        doc.text('✓ VAT REGISTERED INVOICE — This invoice complies with the Nigeria Tax Act 2025.', 18, y + 6);
+        doc.text('✓ VAT REGISTERED INVOICE -- This invoice complies with the Nigeria Tax Act 2025.', 18, y + 6);
         doc.text(`Supplier VAT No: ${company.vatNumber || 'Pending'}  ·  Supplier TIN: ${company.tin || 'N/A'}  ·  VAT Rate: 7.5%  ·  Filing Authority: Nigeria Revenue Service (NRS)`, 18, y + 12);
         y += 20;
       }
@@ -381,7 +381,7 @@ export const InvoiceGenerator: React.FC<InvoiceGeneratorProps> = ({ company }) =
 
       {generated && (
         <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-sm text-cac-green font-bold flex items-center gap-2">
-          ✅ Invoice downloaded! Share with your client — they can use it to claim input VAT.
+          ✅ Invoice downloaded! Share with your client -- they can use it to claim input VAT.
         </div>
       )}
 
@@ -392,7 +392,7 @@ export const InvoiceGenerator: React.FC<InvoiceGeneratorProps> = ({ company }) =
             Generating invoice...
           </span>
         ) : (
-          `🧾 Generate Tax Invoice — ${fmt(computed.total)}`
+          `🧾 Generate Tax Invoice -- ${fmt(computed.total)}`
         )}
       </Button>
 

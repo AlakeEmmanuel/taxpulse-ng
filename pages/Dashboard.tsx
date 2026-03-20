@@ -60,7 +60,7 @@ const AddSaleModal: React.FC<{ company: Company; onClose: () => void; onSaved?: 
         </div>
       ) : (
         <div className="space-y-4">
-          <Input label="Description" value={desc} onChange={e => setDesc(e.target.value)} placeholder="e.g., Consulting services — April" />
+          <Input label="Description" value={desc} onChange={e => setDesc(e.target.value)} placeholder="e.g., Consulting services -- April" />
           <Input label="Amount (₦)" type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0" />
 
           <div className="flex flex-col gap-2">
@@ -70,15 +70,15 @@ const AddSaleModal: React.FC<{ company: Company; onClose: () => void; onSaved?: 
             </label>
             <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
               <input type="checkbox" className="accent-cac-green" checked={zeroRated} onChange={e => setZeroRated(e.target.checked)} />
-              Zero-rated supply (NTA 2025 — food/medical/education/electricity)
+              Zero-rated supply (NTA 2025 -- food/medical/education/electricity)
             </label>
           </div>
 
           {raw > 0 && (
             <div className="bg-cac-light rounded-xl p-4 space-y-2 text-sm border border-cac-green/10">
-              <p className="font-bold text-cac-green text-xs uppercase tracking-wider">VAT Breakdown (NTA 2025 — 7.5%)</p>
+              <p className="font-bold text-cac-green text-xs uppercase tracking-wider">VAT Breakdown (NTA 2025 -- 7.5%)</p>
               <div className="flex justify-between"><span className="text-slate-600">Net Amount</span><span className="font-bold">{fmt(net)}</span></div>
-              <div className="flex justify-between"><span className="text-slate-600">VAT {zeroRated ? '(0% — zero-rated)' : '(7.5%)'}</span><span className={`font-bold ${zeroRated ? 'text-slate-400' : 'text-cac-green'}`}>{fmt(vat)}</span></div>
+              <div className="flex justify-between"><span className="text-slate-600">VAT {zeroRated ? '(0% -- zero-rated)' : '(7.5%)'}</span><span className={`font-bold ${zeroRated ? 'text-slate-400' : 'text-cac-green'}`}>{fmt(vat)}</span></div>
               <div className="flex justify-between border-t pt-2"><span className="font-bold text-slate-800">Total</span><span className="font-extrabold text-cac-green">{fmt(total)}</span></div>
             </div>
           )}
@@ -112,7 +112,7 @@ const AddExpenseModal: React.FC<{ company: Company; onClose: () => void; onSaved
       companyId: company.id,
       date: new Date().toISOString().split('T')[0],
       type: 'expense',
-      description: `${vendor} — ${category}`,
+      description: `${vendor} -- ${category}`,
       amount: raw,
       taxAmount: wht,
     };
@@ -190,7 +190,7 @@ const PayrollModal: React.FC<{ company: Company; onClose: () => void }> = ({ com
     setEmployees(prev => prev.map((e, idx) => idx === i ? { ...e, [field]: val } : e));
   };
 
-  // NTA 2025 PAYE — no CRA, use calcPAYE from taxEngine
+  // NTA 2025 PAYE -- no CRA, use calcPAYE from taxEngine
   const payeResults = employees.map(emp => {
     const grossAnnual = (parseFloat(emp.grossMonthly) || 0) * 12;
     const result = calcPAYE({
@@ -225,11 +225,11 @@ const PayrollModal: React.FC<{ company: Company; onClose: () => void }> = ({ com
         <div className="space-y-4">
           {/* NTA 2025 notice */}
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-800">
-            <strong>NTA 2025:</strong> CRA abolished. New bands: 0% on first ₦800k, then 15%–25%. Pension 8% employee / 10% employer. NHIS 5% / 10%.
+            <strong>NTA 2025:</strong> CRA abolished. New bands: 0% on first ₦800k, then 15%-25%. Pension 8% employee / 10% employer. NHIS 5% / 10%.
           </div>
 
           <Input
-            label="Annual Rent Paid per Employee (₦) — for Rent Relief"
+            label="Annual Rent Paid per Employee (₦) -- for Rent Relief"
             type="number"
             value={annualRent}
             onChange={e => setAnnualRent(e.target.value)}
@@ -287,7 +287,7 @@ const PayrollModal: React.FC<{ company: Company; onClose: () => void }> = ({ com
         <div className="space-y-4">
           {/* NTA 2025 CIT notice */}
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-800">
-            <strong>NTA 2025 changes:</strong> Small company threshold raised to <strong>₦50M turnover</strong> (was ₦25M). Medium category removed — it's now Small (0%) or Standard (30%). New <strong>4% Development Levy</strong> on profits for non-small companies.
+            <strong>NTA 2025 changes:</strong> Small company threshold raised to <strong>₦50M turnover</strong> (was ₦25M). Medium category removed -- it's now Small (0%) or Standard (30%). New <strong>4% Development Levy</strong> on profits for non-small companies.
           </div>
 
           <Input label="Annual Turnover (₦)" type="number" value={annualTurnover} onChange={e => setAnnualTurnover(e.target.value)} placeholder="Total annual revenue" />
@@ -295,7 +295,7 @@ const PayrollModal: React.FC<{ company: Company; onClose: () => void }> = ({ com
 
           <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
             <input type="checkbox" className="accent-cac-green" checked={isProSvc} onChange={e => setIsProSvc(e.target.checked)} />
-            Professional services firm (law, accounting, consulting — cannot be small co.)
+            Professional services firm (law, accounting, consulting -- cannot be small co.)
           </label>
 
           {turnover > 0 && profit >= 0 && (
@@ -332,7 +332,7 @@ const MarkFiledModal: React.FC<{ company: Company; onClose: () => void; onSaved?
       o.status === TaxStatus.DUE || o.status === TaxStatus.OVERDUE || o.status === TaxStatus.UPCOMING
     ))).catch(() => {});
   }, [company.id]);
-  // Default to first unfiled item once loaded — avoids silent no-op on Confirm
+  // Default to first unfiled item once loaded -- avoids silent no-op on Confirm
   const [selectedId, setSelectedId] = useState('');
   const [actualAmount, setActualAmount] = useState('');
   const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split('T')[0]);
@@ -354,7 +354,7 @@ const MarkFiledModal: React.FC<{ company: Company; onClose: () => void; onSaved?
         paymentDate,
         proofUrl: receiptRef || undefined,
       });
-      // Send confirmation email (fire-and-forget — never blocks filing)
+      // Send confirmation email (fire-and-forget -- never blocks filing)
       if (ob) {
         // Get user email from Supabase auth
         import('../services/supabaseClient').then(({ supabase }) => {
@@ -374,7 +374,7 @@ const MarkFiledModal: React.FC<{ company: Company; onClose: () => void; onSaved?
                 paymentDate,
                 receiptRef:   receiptRef || undefined,
               }),
-            }).catch(() => {}); // silent — email failure must never affect filing
+            }).catch(() => {}); // silent -- email failure must never affect filing
           });
         });
       }
@@ -415,7 +415,7 @@ const MarkFiledModal: React.FC<{ company: Company; onClose: () => void; onSaved?
               className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cac-green bg-white"
             >
               {unfiled.map(o => (
-                <option key={o.id} value={o.id}>{o.type} — {o.period} (due {o.dueDate})</option>
+                <option key={o.id} value={o.id}>{o.type} -- {o.period} (due {o.dueDate})</option>
               ))}
             </select>
           </div>
@@ -576,7 +576,7 @@ const Dashboard: React.FC<DashboardProps> = ({ company, onNavigate }) => {
         <p className="text-slate-500 text-sm">{company.entityType} · {company.state} · {company.industry}</p>
       </header>
 
-      {/* Empty Obligations Banner — shown to existing users who have no schedule yet */}
+      {/* Empty Obligations Banner -- shown to existing users who have no schedule yet */}
       {!loading && obligations.length === 0 && !seeding && (
         <div className="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl p-6 space-y-4">
           <div className="flex items-start gap-4">
@@ -584,16 +584,16 @@ const Dashboard: React.FC<DashboardProps> = ({ company, onNavigate }) => {
             <div>
               <h2 className="font-extrabold text-slate-900">Your tax schedule is empty</h2>
               <p className="text-sm text-slate-600 mt-1">
-                TaxPulse needs to generate your 12-month tax obligation calendar based on your company profile — VAT, PAYE, WHT, and CIT deadlines.
+                TaxPulse needs to generate your 12-month tax obligation calendar based on your company profile -- VAT, PAYE, WHT, and CIT deadlines.
               </p>
             </div>
           </div>
           <div className="bg-white/70 rounded-xl p-4 text-xs text-slate-600 space-y-1">
             <p className="font-bold text-slate-800 mb-2">Based on your profile, you need:</p>
-            {company.collectsVat  && <p>✅ <strong>VAT</strong> — Monthly returns, due 21st of each month → NRS</p>}
-            {company.hasEmployees && <p>✅ <strong>PAYE</strong> — Monthly payroll tax, due 10th of each month → State IRS</p>}
-            {company.paysVendors  && <p>✅ <strong>WHT</strong> — Monthly withholding, due 21st of each month → NRS</p>}
-            <p>✅ <strong>CIT</strong> — Annual filing, 6 months after your {company.yearEnd} year-end</p>
+            {company.collectsVat  && <p>✅ <strong>VAT</strong> -- Monthly returns, due 21st of each month → NRS</p>}
+            {company.hasEmployees && <p>✅ <strong>PAYE</strong> -- Monthly payroll tax, due 10th of each month → State IRS</p>}
+            {company.paysVendors  && <p>✅ <strong>WHT</strong> -- Monthly withholding, due 21st of each month → NRS</p>}
+            <p>✅ <strong>CIT</strong> -- Annual filing, 6 months after your {company.yearEnd} year-end</p>
           </div>
           <button
             onClick={async () => {
@@ -628,7 +628,7 @@ const Dashboard: React.FC<DashboardProps> = ({ company, onNavigate }) => {
         </div>
       )}
 
-      {/* Getting Started Checklist — shown until all done */}
+      {/* Getting Started Checklist -- shown until all done */}
       {showChecklist && (
         <div className="bg-gradient-to-br from-cac-green/5 to-emerald-50 border border-cac-green/20 rounded-2xl p-5 space-y-4">
           <div className="flex items-center justify-between">
@@ -672,8 +672,8 @@ const Dashboard: React.FC<DashboardProps> = ({ company, onNavigate }) => {
       <div className="bg-gradient-to-r from-cac-green to-emerald-600 rounded-2xl p-4 text-white flex items-center gap-4">
         <span className="text-3xl shrink-0">📋</span>
         <div>
-          <p className="font-bold text-sm">Nigeria Tax Act 2025 — Active from 1 Jan 2026</p>
-          <p className="text-xs text-green-200 mt-0.5">All calculations use new PAYE bands (0%–25%), CIT ≤₦50M exempt, 4% Dev Levy. Now: Nigeria Revenue Service (NRS).</p>
+          <p className="font-bold text-sm">Nigeria Tax Act 2025 -- Active from 1 Jan 2026</p>
+          <p className="text-xs text-green-200 mt-0.5">All calculations use new PAYE bands (0%-25%), CIT ≤₦50M exempt, 4% Dev Levy. Now: Nigeria Revenue Service (NRS).</p>
         </div>
       </div>
 

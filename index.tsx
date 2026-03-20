@@ -8,7 +8,7 @@ if (!rootElement) throw new Error('Could not find root element to mount to');
 
 const root = ReactDOM.createRoot(rootElement);
 
-// Intercept /admin at the entry point — before App mounts at all
+// Intercept /admin at the entry point -- before App mounts at all
 const isAdminRoute = window.location.pathname.startsWith('/admin');
 
 root.render(

@@ -1,5 +1,5 @@
 // api/admin-data.ts
-// Protected Vercel serverless function — admin only
+// Protected Vercel serverless function -- admin only
 // Requires ADMIN_SECRET header to match ADMIN_SECRET env var
 // Uses SUPABASE_SERVICE_ROLE_KEY to bypass RLS and read all data
 
@@ -65,7 +65,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           u.plan === 'pro' && (!u.plan_expires_at || new Date(u.plan_expires_at) > now)
         ).length;
 
-        const MRR = proMonthly * 5000; // ₦5,000/mo — some may be annual but rough MRR
+        const MRR = proMonthly * 5000; // ₦5,000/mo -- some may be annual but rough MRR
 
         // Signups last 30 days
         const last30 = new Date(now.getTime() - 30 * 86400000).toISOString();
@@ -176,11 +176,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(200).json({ ok: true });
       }
 
-      // Send announcement (stores in a simple key-value config table — optional)
+      // Send announcement (stores in a simple key-value config table -- optional)
       if (action === 'set-announcement') {
         const { message } = body;
         // Store in promo_codes table as a special record for simplicity
-        // Or just return 200 — frontend reads from env/hardcoded for now
+        // Or just return 200 -- frontend reads from env/hardcoded for now
         return res.status(200).json({ ok: true, message: 'Announcement noted' });
       }
 

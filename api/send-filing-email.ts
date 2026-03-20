@@ -1,6 +1,6 @@
 // api/send-filing-email.ts
-// Vercel serverless function — sends confirmation email when user marks obligation as filed
-// Uses Resend API (https://resend.com) — set RESEND_API_KEY in Vercel env vars
+// Vercel serverless function -- sends confirmation email when user marks obligation as filed
+// Uses Resend API (https://resend.com) -- set RESEND_API_KEY in Vercel env vars
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
@@ -97,7 +97,7 @@ function buildEmailHtml(p: FilingEmailPayload): string {
         <!-- Footer -->
         <tr><td style="background:#0d0d0d;padding:20px 32px;">
           <p style="margin:0;color:#666;font-size:12px;">TaxPulse NG · NTA 2025 Compliant · taxpulse-ng.vercel.app</p>
-          <p style="margin:4px 0 0;color:#444;font-size:11px;">Built for Nigerian SMEs. Not financial advice — consult a tax professional for complex situations.</p>
+          <p style="margin:4px 0 0;color:#444;font-size:11px;">Built for Nigerian SMEs. Not financial advice -- consult a tax professional for complex situations.</p>
         </td></tr>
 
       </table>
@@ -113,8 +113,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   if (!RESEND_API_KEY) {
-    // Silently succeed if key not set — don't break the filing flow
-    console.warn('RESEND_API_KEY not set — email skipped');
+    // Silently succeed if key not set -- don't break the filing flow
+    console.warn('RESEND_API_KEY not set -- email skipped');
     return res.status(200).json({ ok: true, skipped: true });
   }
 
@@ -134,7 +134,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       body: JSON.stringify({
         from:    'TaxPulse NG <noreply@taxpulse.ng>',
         to:      [payload.to],
-        subject: `✅ ${payload.taxType} filed — ${payload.companyName} (${payload.period})`,
+        subject: `✅ ${payload.taxType} filed -- ${payload.companyName} (${payload.period})`,
         html:    buildEmailHtml(payload),
       }),
     });
@@ -150,7 +150,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json({ ok: true, id: result.id });
   } catch (e: any) {
     console.error('Email send failed:', e.message);
-    // Always return 200 — email failure must never break filing
+    // Always return 200 -- email failure must never break filing
     return res.status(200).json({ ok: false, error: e.message });
   }
 }

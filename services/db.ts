@@ -1,5 +1,5 @@
 /**
- * TaxPulse NG — Supabase Database Layer
+ * TaxPulse NG -- Supabase Database Layer
  * Replaces mockDb.ts with real persistent storage.
  * Drop this file at: services/db.ts
  */
@@ -130,7 +130,7 @@ const toEvidence = (r: any): EvidenceFile => ({
   name:           r.name,
   mimeType:       r.mime_type,
   sizeBytes:      r.size_bytes,
-  data:           '',  // not stored in DB — fetched from Storage on demand
+  data:           '',  // not stored in DB -- fetched from Storage on demand
   uploadDate:     r.upload_date,
   category:       r.category,
   notes:          r.notes,
@@ -281,7 +281,7 @@ export async function addEvidence(file: EvidenceFile): Promise<EvidenceFile> {
   return toEvidence(data);
 }
 
-// Upload a raw File object directly — used by BankImport to avoid base64 on large PDFs
+// Upload a raw File object directly -- used by BankImport to avoid base64 on large PDFs
 export async function addEvidenceFile(rawFile: File, meta: Omit<EvidenceFile, 'data' | 'sizeBytes' | 'mimeType' | 'name'>): Promise<EvidenceFile> {
   const storagePath = `${meta.companyId}/${meta.id}_${rawFile.name}`;
 
@@ -350,7 +350,7 @@ export async function bankStatementExists(companyId: string, monthYear: string):
 
 // ─── Obligation Status Refresh ────────────────────────────────────────────────
 // Compares each obligation's due date to today and corrects stale statuses.
-// Call this on every dashboard load — silent, only writes when something changed.
+// Call this on every dashboard load -- silent, only writes when something changed.
 export async function refreshObligationStatuses(companyId: string): Promise<void> {
   const { data, error } = await supabase
     .from('tax_obligations')

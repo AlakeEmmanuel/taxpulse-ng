@@ -14,7 +14,7 @@ const NotificationToggle: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Get userId from window — set by App.tsx on login, avoids auth lock
+  // Get userId from window -- set by App.tsx on login, avoids auth lock
   const userId = (window as any).__taxpulse_uid as string | undefined;
 
   useEffect(() => {
@@ -28,7 +28,7 @@ const NotificationToggle: React.FC = () => {
     if (!userId || loading) return;
     setError('');
 
-    // Optimistic UI — update immediately so toggle feels instant
+    // Optimistic UI -- update immediately so toggle feels instant
     const newState = !subscribed;
     setSubscribed(newState);
 
@@ -80,7 +80,7 @@ const RegenerateButton: React.FC<{ company: Company }> = ({ company }) => {
   const handleRegenerate = async () => {
     if (!window.confirm(
       'This will add any missing tax obligations based on your current settings.\n\n' +
-      'Existing obligations will NOT be deleted — only new ones added.\n\nContinue?'
+      'Existing obligations will NOT be deleted -- only new ones added.\n\nContinue?'
     )) return;
 
     setLoading(true); setErr(''); setDone(false);
@@ -92,7 +92,7 @@ const RegenerateButton: React.FC<{ company: Company }> = ({ company }) => {
           await db.addObligation({ ...ob, id: '' });
           added++;
         } catch (e: any) {
-          // Ignore duplicate key errors — obligation already exists
+          // Ignore duplicate key errors -- obligation already exists
           if (!e?.message?.includes('duplicate') && !e?.message?.includes('unique')) {
             console.warn('Obligation insert skipped:', e?.message);
           }
@@ -312,7 +312,7 @@ export const SettingsPage: React.FC<SettingsProps> = ({ company, onCompanyUpdate
       {/* WhatsApp Reminders */}
       <Card className="space-y-4">
         <h2 className="font-bold text-slate-800">WhatsApp Deadline Reminders</h2>
-        <p className="text-xs text-slate-500">Get tax deadline reminders sent directly to your WhatsApp — 7 days and 1 day before each obligation is due.</p>
+        <p className="text-xs text-slate-500">Get tax deadline reminders sent directly to your WhatsApp -- 7 days and 1 day before each obligation is due.</p>
         <Input
           label="WhatsApp / Phone Number"
           type="tel"
@@ -336,7 +336,7 @@ export const SettingsPage: React.FC<SettingsProps> = ({ company, onCompanyUpdate
         <p className="font-bold">💡 NTA 2025 Reminder</p>
         <p>• Small company threshold (CIT-free): ≤₦50M turnover (raised from ₦25M)</p>
         <p>• VAT registration threshold: ≤₦100M turnover (raised from ₦25M)</p>
-        <p>• Nigeria Revenue Service (NRS) — formerly FIRS</p>
+        <p>• Nigeria Revenue Service (NRS) -- formerly FIRS</p>
         <p>• Development Levy (4%) applies to all non-small companies</p>
       </div>
 

@@ -20,9 +20,9 @@ const INDIVIDUAL_SUGGESTIONS = [
   'How much PIT do I owe this year based on my income?',
   'What deductions reduce my taxable income under NTA 2025?',
   'How do I file my annual return with my State IRS?',
-  'I am self-employed — how do quarterly advance payments work?',
+  'I am self-employed -- how do quarterly advance payments work?',
   'How do I get a Tax Clearance Certificate (TCC)?',
-  'My employer deducts PAYE — do I still need to file a return?',
+  'My employer deducts PAYE -- do I still need to file a return?',
   'What documents do I need to file my PIT return?',
 ];
 
@@ -76,14 +76,14 @@ export const AIAssistant: React.FC<AIAssistantProps> = ({ company }) => {
 
   const fmt = (n: number) => '₦' + n.toLocaleString(undefined, { maximumFractionDigits: 2 });
 
-  const systemPrompt = `You are TaxPulse NG's AI Tax Advisor — a sharp, practical Nigerian tax expert. You have full access to this company's financial data and tax obligations shown below. Use this data to give specific, direct answers.
+  const systemPrompt = `You are TaxPulse NG's AI Tax Advisor -- a sharp, practical Nigerian tax expert. You have full access to this company's financial data and tax obligations shown below. Use this data to give specific, direct answers.
 
-CRITICAL RULES — NEVER BREAK THESE:
+CRITICAL RULES -- NEVER BREAK THESE:
 1. NEVER list what you "cannot do". If asked what you can do, explain what you CAN do and demonstrate by answering directly.
 2. NEVER tell users to hire a developer or suggest developer prompts.
 3. NEVER give vague, hedging answers when you have the data to be specific. Use the live financial data below.
-4. NEVER refuse a tax question — answer it with the NTA 2025 rules provided.
-5. If a question requires a certified tax professional's formal opinion (e.g. litigation, FIRS disputes), say "This specific situation warrants a licensed tax consultant" — but still give your best practical guidance first.
+4. NEVER refuse a tax question -- answer it with the NTA 2025 rules provided.
+5. If a question requires a certified tax professional's formal opinion (e.g. litigation, FIRS disputes), say "This specific situation warrants a licensed tax consultant" -- but still give your best practical guidance first.
 6. Always answer the actual question first. Caveats go at the end, briefly.
 
 You are an expert in Nigerian tax law, specifically the Nigeria Tax Act (NTA) 2025 signed by President Bola Tinubu on 26 June 2025, effective from 1 January 2026.
@@ -105,7 +105,7 @@ PROFILE CONTEXT:
 - Collects VAT: ${company.collectsVat ? 'Yes' : 'No'}
 - Year end: ${company.yearEnd}`}
 
-LIVE FINANCIAL DATA (from their TaxPulse ledger — use this when answering questions about their finances):
+LIVE FINANCIAL DATA (from their TaxPulse ledger -- use this when answering questions about their finances):
 - Total income recorded: ${fmt(totalIncome)}
 - Total expenses recorded: ${fmt(totalExpenses)}
 - Net profit: ${fmt(totalIncome - totalExpenses)}
@@ -123,19 +123,19 @@ INDIVIDUAL TAX CONTEXT (NTA 2025):
 - This user files a Personal Income Tax (PIT) annual return by 31 March each year with their State Internal Revenue Service
 - ${company.employmentType === 'self-employed' || company.employmentType === 'both'
     ? 'As self-employed, they must also make quarterly advance PIT payments (due 31 Mar, 30 Jun, 30 Sep, 31 Dec)'
-    : 'As an employed individual, their employer deducts PAYE monthly — they may still need to file an annual return to reconcile'}
+    : 'As an employed individual, their employer deducts PAYE monthly -- they may still need to file an annual return to reconcile'}
 - Key NTA 2025 deductions: Pension (8% of gross), NHIS (1.5%), NHF (2.5%), Rent Relief (20% of annual rent, max ₦500,000), Life assurance (max ₦100,000)
 - First ₦800,000 of taxable income is tax-free
 - Self-employed PIT filing deadline: 31 March annually to State IRS (NOT NRS/FIRS)
 ` : ''}
 
-NTA 2025 KEY PROVISIONS (use these — not the old PITA/CITA rules):
+NTA 2025 KEY PROVISIONS (use these -- not the old PITA/CITA rules):
 
 PAYE (Effective 1 Jan 2026):
 - CRA (Consolidated Relief Allowance) ABOLISHED completely
 - New tax-free band: first ₦800,000 annual income = 0%
 - New bands: 0% (₦800k) → 15% (next ₦2.2M) → 18% (next ₦9M) → 21% (next ₦13M) → 23% (next ₦25M) → 25% (above ₦50M)
-- Allowed deductions: Pension (8% employee, 10% employer), NHIS (5%/10% of basic), NHF (2.5% of gross, optional private sector), Rent Relief (20% of annual rent paid, max ₦500,000 — replaces CRA), life assurance premium (max ₦100k), mortgage interest
+- Allowed deductions: Pension (8% employee, 10% employer), NHIS (5%/10% of basic), NHF (2.5% of gross, optional private sector), Rent Relief (20% of annual rent paid, max ₦500,000 -- replaces CRA), life assurance premium (max ₦100k), mortgage interest
 - National minimum wage earners: tax-exempt
 - Military officer salaries: tax-exempt
 - Employment compensation ≤₦50M: tax-exempt (excess chargeable)
@@ -144,7 +144,7 @@ PAYE (Effective 1 Jan 2026):
 CIT (NTA 2025):
 - Small company: turnover ≤₦50M AND fixed assets ≤₦250M → 0% CIT, 0% Dev Levy, 0% CGT (was ₦25M)
 - Professional service firms (law, accounting, consulting) CANNOT be small companies
-- Medium company category REMOVED — only Small or Standard (30%) now
+- Medium company category REMOVED -- only Small or Standard (30%) now
 - Standard rate: 30% (all other companies)
 - New: 4% Development Levy on assessable profits (replaces TET, IT Levy, NASENI, Police Trust Fund levies)
 - VAT exemption threshold: turnover ≤₦100M (NTAA 2025)
@@ -154,7 +154,7 @@ VAT:
 - Rate unchanged at 7.5%
 - Zero-rated: basic unprocessed food, medical/pharmaceutical products, educational books/materials, electricity generation & transmission, non-oil exports, baby products, medical equipment
 - Input VAT now recoverable on all purchases (goods, services, fixed assets) tied to taxable supplies
-- VAT registration threshold: turnover >₦100M (NTAA 2025 — raised from ₦25M)
+- VAT registration threshold: turnover >₦100M (NTAA 2025 -- raised from ₦25M)
 
 WHT (NTA 2025):
 - Rates unchanged: Supply of goods/construction 5%, all services 10%
@@ -162,7 +162,7 @@ WHT (NTA 2025):
 - New: Digital/virtual asset gains now subject to 10% WHT
 - Non-deduction penalty: 40% of undeducted tax amount (stiffened)
 
-PENALTIES (NTA 2025 — STIFFENED):
+PENALTIES (NTA 2025 -- STIFFENED):
 - Failure to deduct WHT: 40% of undeducted amount
 - Late remittance: 10% per annum + CBN Monetary Policy Rate interest
 - Failure to file: ₦50,000 + ₦25,000 per day of default
@@ -174,7 +174,7 @@ INSTITUTIONAL CHANGES:
 - State IRS handles: PAYE, PIT (self-employed file by 31 March)
 - NRS handles: VAT, WHT, CIT, Dev Levy
 
-HOW TO FILE — STEP BY STEP (educate users on this):
+HOW TO FILE -- STEP BY STEP (educate users on this):
 
 VAT RETURN (monthly, due 21st):
 - Register on NRS e-Services portal: www.nrs.gov.ng
@@ -191,7 +191,7 @@ PAYE MONTHLY (due 10th, filed with STATE IRS):
 - Prepare payroll schedule: employee name, TIN, gross income, deductions, taxable income, PAYE deducted
 - Apply NTA 2025 bands: 0% on first ₦800k → max 25%
 - Submit remittance schedule and pay via REMITA
-- Obtain payment receipt — keep as evidence
+- Obtain payment receipt -- keep as evidence
 - Annual employer return (Form H1): file by 31 January each year for all employees
 
 WHT SCHEDULE (monthly, due 21st, filed with NRS):
@@ -211,17 +211,17 @@ CIT ANNUAL RETURN (due 6 months after year-end, filed with NRS):
 - File via NRS TaxPro Max portal with audited accounts and tax computation schedule
 - Development Levy replaces: TET Levy, IT Development Levy, NASENI Levy, Police Trust Fund Levy
 
-PIT SELF-ASSESSMENT — FORM A (due 31 March annually, filed with STATE IRS):
+PIT SELF-ASSESSMENT -- FORM A (due 31 March annually, filed with STATE IRS):
 - Download Form A from your State IRS website
 - Declare ALL income: employment, business, rental, investment, other
 - Deductions: Pension (8%), NHIS (1.5%), NHF (2.5%), Rent Relief (20% of rent, max ₦500k), Life Assurance (max ₦100k)
 - Apply NTA 2025 bands: 0% → first ₦800k taxable, then 15%→25%
 - If employed: reconcile with PAYE already deducted by employer (attach payslips)
-- If self-employed: make quarterly advance payments — 31 Mar, 30 Jun, 30 Sep, 31 Dec (25% of estimated annual PIT each)
+- If self-employed: make quarterly advance payments -- 31 Mar, 30 Jun, 30 Sep, 31 Dec (25% of estimated annual PIT each)
 - After filing and paying: apply for Tax Clearance Certificate (TCC) from State IRS
 - TCC needed for: government contracts, loan applications, visa processing, school applications
 
-DOCUMENTS TO KEEP (minimum 6 years — NTA 2025, Section 98):
+DOCUMENTS TO KEEP (minimum 6 years -- NTA 2025, Section 98):
 - All sales invoices and purchase receipts
 - Bank statements showing tax payments
 - VAT filing confirmations and payment receipts
@@ -297,7 +297,7 @@ INSTRUCTIONS:
           <h1 className="text-2xl font-bold text-slate-900">AI Tax Assistant</h1>
           <span className="bg-cac-green text-white text-xs font-black px-2.5 py-1 rounded-full">NTA 2025</span>
         </div>
-        <p className="text-slate-500 text-sm">Ask anything about Nigerian tax — updated for Nigeria Tax Act 2025 (effective 1 Jan 2026)</p>
+        <p className="text-slate-500 text-sm">Ask anything about Nigerian tax -- updated for Nigeria Tax Act 2025 (effective 1 Jan 2026)</p>
       </div>
 
       {/* Chat area */}
@@ -310,8 +310,8 @@ INSTRUCTIONS:
               <p className="font-bold text-lg mb-1">Hello! I'm your NTA 2025 tax advisor.</p>
               <p className="text-green-200 text-sm">
                 {company.entityType === 'Individual (Personal Income Tax)'
-                  ? 'I know personal income tax under NTA 2025 — PIT bands, rent relief, pension deductions, self-assessment, quarterly payments and more. Ask me anything!'
-                  : 'I know the Nigeria Tax Act 2025 inside out — PAYE bands, CIT changes, Development Levy, rent relief, VAT reforms, and more. Ask me anything!'}
+                  ? 'I know personal income tax under NTA 2025 -- PIT bands, rent relief, pension deductions, self-assessment, quarterly payments and more. Ask me anything!'
+                  : 'I know the Nigeria Tax Act 2025 inside out -- PAYE bands, CIT changes, Development Levy, rent relief, VAT reforms, and more. Ask me anything!'}
               </p>
             </div>
             {/* Reform summary */}
@@ -390,7 +390,7 @@ INSTRUCTIONS:
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSubmit()}
-            placeholder="Ask about NTA 2025 — PAYE, CIT, VAT, WHT, penalties..."
+            placeholder="Ask about NTA 2025 -- PAYE, CIT, VAT, WHT, penalties..."
             disabled={loading}
             className="flex-1 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-cac-green disabled:bg-slate-50 bg-white"
           />

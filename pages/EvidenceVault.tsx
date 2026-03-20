@@ -35,7 +35,7 @@ const UploadModal: React.FC<{
 
   const handleFile = (f: File) => setFile(f);
 
-  // FIXED: async function — previously used await inside non-async reader.onload callback
+  // FIXED: async function -- previously used await inside non-async reader.onload callback
   const handleUpload = async () => {
     if (!file) return;
     setUploading(true);
@@ -131,9 +131,9 @@ const UploadModal: React.FC<{
                     onChange={e => setObligationId(e.target.value)}
                     className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cac-green bg-white"
                   >
-                    <option value="">— Not linked —</option>
+                    <option value="">-- Not linked --</option>
                     {obligations.map(o => (
-                      <option key={o.id} value={o.id}>{o.type} — {o.period}</option>
+                      <option key={o.id} value={o.id}>{o.type} -- {o.period}</option>
                     ))}
                   </select>
                 </div>
@@ -180,7 +180,7 @@ const FileCard: React.FC<{
   const linkedOb = obligations.find(o => o.id === file.obligationId);
   const [downloading, setDownloading] = useState(false);
 
-  // FIXED: fetch from Supabase Storage — file.data is always '' in DB records
+  // FIXED: fetch from Supabase Storage -- file.data is always '' in DB records
   const handleDownload = async () => {
     setDownloading(true);
     try {
@@ -214,7 +214,7 @@ const FileCard: React.FC<{
             <span className="text-[10px] text-slate-400">{file.uploadDate}</span>
           </div>
           {linkedOb && (
-            <p className="text-[10px] text-cac-green font-semibold mt-1">🔗 {linkedOb.type} — {linkedOb.period}</p>
+            <p className="text-[10px] text-cac-green font-semibold mt-1">🔗 {linkedOb.type} -- {linkedOb.period}</p>
           )}
           {file.notes && (
             <p className="text-xs text-slate-500 mt-1 italic">{file.notes}</p>
@@ -332,7 +332,7 @@ export const EvidenceVault: React.FC<EvidenceVaultProps> = ({ company }) => {
       <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex gap-3">
         <span className="text-xl shrink-0">💡</span>
         <div className="text-xs text-amber-800 space-y-1">
-          <p className="font-bold">NTA 2025 — Document Retention Requirements</p>
+          <p className="font-bold">NTA 2025 -- Document Retention Requirements</p>
           <p>The Nigeria Tax Administration Act 2025 requires businesses to keep records for a minimum of <strong>6 years</strong>. NRS (formerly FIRS) can request documents during audit. Failure to produce records is a criminal offence under Section 83 of the NTAA 2025.</p>
         </div>
       </div>

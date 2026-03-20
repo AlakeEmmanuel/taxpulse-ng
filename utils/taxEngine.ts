@@ -1,5 +1,5 @@
 /**
- * TaxPulse NG — Tax Engine
+ * TaxPulse NG -- Tax Engine
  * Based on Nigeria Tax Act (NTA) 2025, effective 1 January 2026
  * Signed by President Bola Tinubu, 26 June 2025
  */
@@ -7,7 +7,7 @@
 import { Company, TaxObligation, TaxType, TaxStatus, EntityType, PayslipEmployee } from '../types';
 
 // ─── VAT ─────────────────────────────────────────────────────────────────────
-// VAT Act (consolidated under NTA 2025) — rate unchanged at 7.5%
+// VAT Act (consolidated under NTA 2025) -- rate unchanged at 7.5%
 export const VAT_RATE = 0.075;
 
 export const ZERO_RATED_CATEGORIES = [
@@ -27,21 +27,21 @@ export const calcVAT = (net: number) => ({
 });
 
 // ─── PAYE / PERSONAL INCOME TAX ───────────────────────────────────────────────
-// NTA 2025 Fourth Schedule — new progressive bands effective 1 Jan 2026
+// NTA 2025 Fourth Schedule -- new progressive bands effective 1 Jan 2026
 // CRA (Consolidated Relief Allowance) is ABOLISHED
 // Replaced by: Rent Relief (20% of annual rent, max ₦500,000)
 export const NTA_2026_BANDS = [
   { limit: 800_000,    rate: 0.00, label: 'First ₦800,000 (tax-free)' },
-  { limit: 2_200_000,  rate: 0.15, label: 'Next ₦2,200,000' },       // ₦800k – ₦3M
-  { limit: 9_000_000,  rate: 0.18, label: 'Next ₦9,000,000' },       // ₦3M – ₦12M
-  { limit: 13_000_000, rate: 0.21, label: 'Next ₦13,000,000' },      // ₦12M – ₦25M
-  { limit: 25_000_000, rate: 0.23, label: 'Next ₦25,000,000' },      // ₦25M – ₦50M
+  { limit: 2_200_000,  rate: 0.15, label: 'Next ₦2,200,000' },       // ₦800k - ₦3M
+  { limit: 9_000_000,  rate: 0.18, label: 'Next ₦9,000,000' },       // ₦3M - ₦12M
+  { limit: 13_000_000, rate: 0.21, label: 'Next ₦13,000,000' },      // ₦12M - ₦25M
+  { limit: 25_000_000, rate: 0.23, label: 'Next ₦25,000,000' },      // ₦25M - ₦50M
   { limit: Infinity,   rate: 0.25, label: 'Above ₦50,000,000' },
 ];
 
 export interface PAYEInputs {
   grossAnnual: number;
-  annualRent?: number;       // For rent relief (20% of rent, max ₦500k) — replaces CRA
+  annualRent?: number;       // For rent relief (20% of rent, max ₦500k) -- replaces CRA
   nhf?: number;              // National Housing Fund contribution
   lifeAssurance?: number;    // Life assurance premium (up to ₦100,000)
 }
@@ -94,7 +94,7 @@ export const calcPAYE = (inputs: PAYEInputs) => {
 };
 
 // ─── COMPANY INCOME TAX (CIT) ─────────────────────────────────────────────────
-// NTA 2025 — Medium company category REMOVED. Now: Small (exempt) or Standard (30%)
+// NTA 2025 -- Medium company category REMOVED. Now: Small (exempt) or Standard (30%)
 // Small company: turnover ≤ ₦50M AND fixed assets ≤ ₦250M (NTA definition for CIT)
 // NOTE: Professional service companies cannot be classified as small companies
 // VAT exemption threshold (NTAA 2025): turnover ≤ ₦100M
@@ -107,20 +107,20 @@ export const calcCIT = (profit: number, turnover: number, isProService = false) 
   if (isSmall) {
     return {
       rate: 0, tax: 0, devLevy: 0, total: 0,
-      label: 'Small Company — CIT Exempt (≤₦50M turnover)',
+      label: 'Small Company -- CIT Exempt (≤₦50M turnover)',
       vatExempt: true,
       note: 'Also exempt from Capital Gains Tax and Development Levy under NTA 2025',
     };
   }
 
-  const citRate = 0.30; // Standard rate (30%) — medium category removed under NTA 2025
+  const citRate = 0.30; // Standard rate (30%) -- medium category removed under NTA 2025
   const tax = profit * citRate;
   const devLevy = profit * 0.04; // 4% development levy (replaces TET, NASENI, etc.)
   const total = tax + devLevy;
 
   return {
     rate: citRate, tax, devLevy, total,
-    label: turnover <= 100_000_000 ? 'Standard Company (₦50M–₦100M turnover) — 30% CIT' : 'Standard Company (>₦100M turnover) — 30% CIT',
+    label: turnover <= 100_000_000 ? 'Standard Company (₦50M-₦100M turnover) -- 30% CIT' : 'Standard Company (>₦100M turnover) -- 30% CIT',
     vatExempt: isVatSmall,
     note: isVatSmall
       ? 'VAT exempt under NTAA 2025 (turnover ≤₦100M) but subject to 30% CIT + 4% Dev Levy'
@@ -149,7 +149,7 @@ export const WHT_RATES: Record<string, { rate: number; note?: string }> = {
 export const isWHTExempt = (monthlyTransactionValue: number, hasTIN: boolean) =>
   hasTIN && monthlyTransactionValue <= 2_000_000;
 
-// ─── PENALTIES (NTA 2025 — STIFFENED) ────────────────────────────────────────
+// ─── PENALTIES (NTA 2025 -- STIFFENED) ────────────────────────────────────────
 export const PENALTIES = {
   failureToDeduct:    { rate: 0.40, label: '40% of undeducted tax amount' },
   lateRemittance:     { rate: 0.10, label: '10% per annum + CBN MPR interest' },
@@ -169,7 +169,7 @@ export const FILING_DEADLINES = [
 ];
 
 // ─── AUTO-GENERATE TAX OBLIGATIONS ───────────────────────────────────────────
-// Called after onboarding — seeds a full 12-month schedule based on company profile
+// Called after onboarding -- seeds a full 12-month schedule based on company profile
 
 
 const MONTHS = ['January','February','March','April','May','June',
@@ -218,7 +218,7 @@ export function calcPayslip(grossSalary: number, annualRent = 0): PayslipEmploye
 }
 
 
-// ─── CAPITAL GAINS TAX (CGT) — NTA 2025 ────────────────────────────────────
+// ─── CAPITAL GAINS TAX (CGT) -- NTA 2025 ────────────────────────────────────
 // Rate: 10% on chargeable gains. Small companies (≤₦50M turnover): 0% CGT.
 // Applies to: property, shares, business assets, goodwill, debts, IP, foreign currency.
 
@@ -250,7 +250,7 @@ export const calcCGT = (inputs: CGTInputs) => {
     return {
       chargeableGain, loss, tax: 0, effectiveRate: 0,
       exempt: true,
-      exemptionReason: 'Small Company Exemption — CGT 0% (turnover ≤₦50M, NTA 2025)',
+      exemptionReason: 'Small Company Exemption -- CGT 0% (turnover ≤₦50M, NTA 2025)',
     };
   }
 
@@ -289,36 +289,36 @@ export interface StateLevyItem {
 
 export const STATE_LEVIES: Record<string, StateLevyItem[]> = {
   'Lagos': [
-    { name: 'Business Premises Levy', rate: '₦10,000–₦100,000/yr', basis: 'Business premises area and type', frequency: 'Annual', authority: 'LIRS', notes: 'Due 31 March annually' },
-    { name: 'Development Levy (Individual)', rate: '₦1,000–₦5,000/yr', basis: 'Per adult employee', frequency: 'Annual', authority: 'LIRS' },
-    { name: 'Tenement Rate', rate: '2–5% of rateable value', basis: 'Property annual value', frequency: 'Annual', authority: 'Lagos State Land Use Charge' },
+    { name: 'Business Premises Levy', rate: '₦10,000-₦100,000/yr', basis: 'Business premises area and type', frequency: 'Annual', authority: 'LIRS', notes: 'Due 31 March annually' },
+    { name: 'Development Levy (Individual)', rate: '₦1,000-₦5,000/yr', basis: 'Per adult employee', frequency: 'Annual', authority: 'LIRS' },
+    { name: 'Tenement Rate', rate: '2-5% of rateable value', basis: 'Property annual value', frequency: 'Annual', authority: 'Lagos State Land Use Charge' },
     { name: 'Hotel Occupancy Tax', rate: '5% of room revenue', basis: 'Hotel/short-let income', frequency: 'Monthly', authority: 'LIRS', notes: 'Applies to hospitality businesses' },
     { name: 'Signage & Advertisement Levy', rate: 'Varies by size/location', basis: 'Physical advertising boards', frequency: 'Annual', authority: 'LASAA' },
   ],
   'FCT - Abuja': [
-    { name: 'Business Premises Levy', rate: '₦5,000–₦50,000/yr', basis: 'Business type and size', frequency: 'Annual', authority: 'FCT-IRS' },
+    { name: 'Business Premises Levy', rate: '₦5,000-₦50,000/yr', basis: 'Business type and size', frequency: 'Annual', authority: 'FCT-IRS' },
     { name: 'Development Levy', rate: '₦2,000/employee/yr', basis: 'Per employee', frequency: 'Annual', authority: 'FCT-IRS' },
     { name: 'Ground Rent', rate: 'Varies by plot size', basis: 'Land area', frequency: 'Annual', authority: 'AGIS (Abuja Geographic Information Service)' },
   ],
   'Rivers': [
-    { name: 'Business Premises Levy', rate: '₦5,000–₦80,000/yr', basis: 'Business premises', frequency: 'Annual', authority: 'Rivers IRS' },
+    { name: 'Business Premises Levy', rate: '₦5,000-₦80,000/yr', basis: 'Business premises', frequency: 'Annual', authority: 'Rivers IRS' },
     { name: 'Development Levy', rate: '₦2,500/employee/yr', basis: 'Per employee', frequency: 'Annual', authority: 'Rivers IRS' },
     { name: 'Hotel/Tourism Levy', rate: '5% of turnover', basis: 'Tourism/hospitality revenue', frequency: 'Monthly', authority: 'Rivers IRS' },
   ],
   'Kano': [
-    { name: 'Business Premises Levy', rate: '₦5,000–₦40,000/yr', basis: 'Business category', frequency: 'Annual', authority: 'Kano SIRS' },
+    { name: 'Business Premises Levy', rate: '₦5,000-₦40,000/yr', basis: 'Business category', frequency: 'Annual', authority: 'Kano SIRS' },
     { name: 'Development Levy', rate: '₦1,500/employee/yr', basis: 'Per employee', frequency: 'Annual', authority: 'Kano SIRS' },
   ],
   'Ogun': [
-    { name: 'Business Premises Levy', rate: '₦5,000–₦50,000/yr', basis: 'Business type', frequency: 'Annual', authority: 'Ogun SIRS' },
+    { name: 'Business Premises Levy', rate: '₦5,000-₦50,000/yr', basis: 'Business type', frequency: 'Annual', authority: 'Ogun SIRS' },
     { name: 'Development Levy', rate: '₦1,000/employee/yr', basis: 'Per employee', frequency: 'Annual', authority: 'Ogun SIRS' },
   ],
   'Delta': [
-    { name: 'Business Premises Levy', rate: '₦5,000–₦60,000/yr', basis: 'Business type and size', frequency: 'Annual', authority: 'Delta SIRS' },
+    { name: 'Business Premises Levy', rate: '₦5,000-₦60,000/yr', basis: 'Business type and size', frequency: 'Annual', authority: 'Delta SIRS' },
     { name: 'Development Levy', rate: '₦2,000/employee/yr', basis: 'Per employee', frequency: 'Annual', authority: 'Delta SIRS' },
   ],
   'Anambra': [
-    { name: 'Business Premises Levy', rate: '₦5,000–₦40,000/yr', basis: 'Business premises', frequency: 'Annual', authority: 'Anambra SIRS' },
+    { name: 'Business Premises Levy', rate: '₦5,000-₦40,000/yr', basis: 'Business premises', frequency: 'Annual', authority: 'Anambra SIRS' },
     { name: 'Development Levy', rate: '₦1,500/employee/yr', basis: 'Per employee', frequency: 'Annual', authority: 'Anambra SIRS' },
   ],
 };
@@ -475,7 +475,7 @@ export function generateObligations(company: Company): Omit<TaxObligation, 'id'>
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth(); // 0-based
 
-  // ── VAT — monthly, due 21st of following month ─────────────────────────────
+  // ── VAT -- monthly, due 21st of following month ─────────────────────────────
   if (company.collectsVat) {
     for (let i = 0; i < 12; i++) {
       const month = (currentMonth + i) % 12;
@@ -509,7 +509,7 @@ export function generateObligations(company: Company): Omit<TaxObligation, 'id'>
     }
   }
 
-  // ── PAYE — monthly, due 10th of following month ────────────────────────────
+  // ── PAYE -- monthly, due 10th of following month ────────────────────────────
   if (company.hasEmployees) {
     for (let i = 0; i < 12; i++) {
       const month = (currentMonth + i) % 12;
@@ -543,7 +543,7 @@ export function generateObligations(company: Company): Omit<TaxObligation, 'id'>
     }
   }
 
-  // ── WHT — monthly, due 21st of following month ─────────────────────────────
+  // ── WHT -- monthly, due 21st of following month ─────────────────────────────
   if (company.paysVendors) {
     for (let i = 0; i < 12; i++) {
       const month = (currentMonth + i) % 12;
@@ -577,7 +577,7 @@ export function generateObligations(company: Company): Omit<TaxObligation, 'id'>
     }
   }
 
-  // ── CIT — once, due 6 months after financial year end ─────────────────────
+  // ── CIT -- once, due 6 months after financial year end ─────────────────────
   {
     const yearEndMonth = parseYearEndMonth(company.yearEnd);
     // Find next year-end date
@@ -613,7 +613,7 @@ export function generateObligations(company: Company): Omit<TaxObligation, 'id'>
   }
 
 
-  // ── PIT — Personal Income Tax (INDIVIDUAL entity type only) ───────────────
+  // ── PIT -- Personal Income Tax (INDIVIDUAL entity type only) ───────────────
   // Annual self-assessment: due 31 March for employed & self-employed
   // Quarterly advance payment: due 31 March, 30 June, 30 Sept, 31 Dec (self-employed)
   if (company.entityType === EntityType.INDIVIDUAL) {
@@ -678,7 +678,7 @@ export function generateObligations(company: Company): Omit<TaxObligation, 'id'>
   }
 
 
-  // ── CAC Annual Returns — due 30 June each year ─────────────────────────────
+  // ── CAC Annual Returns -- due 30 June each year ─────────────────────────────
   if (company.cacAnnualReturns !== false && company.entityType !== EntityType.INDIVIDUAL &&
       (company.cacStatus === 'Registered' || company.rcNumber)) {
     const cacDueYear = currentMonth >= 5 ? currentYear + 1 : currentYear; // after June, plan for next year
@@ -701,12 +701,12 @@ export function generateObligations(company: Company): Omit<TaxObligation, 'id'>
         { label: 'Attach list of shareholders/directors (current)', completed: false },
         { label: 'Pay annual returns filing fee on CAC portal', completed: false },
         { label: 'Submit online and download filing confirmation', completed: false },
-        { label: 'Keep confirmation — needed for CAC Certificate of Compliance', completed: false },
+        { label: 'Keep confirmation -- needed for CAC Certificate of Compliance', completed: false },
       ],
     });
   }
 
-  // ── NSITF — 1% of payroll, due 16th of following month ────────────────────
+  // ── NSITF -- 1% of payroll, due 16th of following month ────────────────────
   if (company.hasNSITF && company.hasEmployees) {
     for (let i = 0; i < 12; i++) {
       const month    = (currentMonth + i) % 12;
@@ -736,12 +736,12 @@ export function generateObligations(company: Company): Omit<TaxObligation, 'id'>
     }
   }
 
-  // ── Pension — 18% total (8% emp + 10% employer), due 7 days after payday ──
+  // ── Pension -- 18% total (8% emp + 10% employer), due 7 days after payday ──
   if (company.hasPension && company.hasEmployees) {
     for (let i = 0; i < 12; i++) {
       const month    = (currentMonth + i) % 12;
       const year     = currentYear + Math.floor((currentMonth + i) / 12);
-      // Due 7 days after salary payment — we approximate as 7th of current month
+      // Due 7 days after salary payment -- we approximate as 7th of current month
       const dueDate  = `${year}-${pad(month + 1)}-07`;
       const status   = new Date(dueDate) < now ? TaxStatus.OVERDUE
         : new Date(dueDate) <= new Date(now.getTime() + 30 * 86400000) ? TaxStatus.DUE
@@ -765,7 +765,7 @@ export function generateObligations(company: Company): Omit<TaxObligation, 'id'>
     }
   }
 
-  // ── ITF — 1% of payroll annually, due 1 April ─────────────────────────────
+  // ── ITF -- 1% of payroll annually, due 1 April ─────────────────────────────
   if (company.hasITF && company.hasEmployees) {
     const itfDueYear = currentMonth >= 2 ? currentYear + 1 : currentYear;
     const itfDueDate = `${itfDueYear}-04-01`;
@@ -791,7 +791,7 @@ export function generateObligations(company: Company): Omit<TaxObligation, 'id'>
     });
   }
 
-  // ── NHF — 2.5% employee basic salary, monthly, due 1st of following month ─
+  // ── NHF -- 2.5% employee basic salary, monthly, due 1st of following month ─
   if (company.hasNHF && company.hasEmployees) {
     for (let i = 0; i < 12; i++) {
       const month    = (currentMonth + i) % 12;
@@ -815,7 +815,7 @@ export function generateObligations(company: Company): Omit<TaxObligation, 'id'>
           { label: 'Log in to FMBN portal: www.fmbn.gov.ng', completed: false },
           { label: 'Submit NHF remittance schedule for all employees', completed: false },
           { label: 'Remit via REMITA to Federal Mortgage Bank of Nigeria (FMBN)', completed: false },
-          { label: 'Keep remittance confirmation — employees need it for mortgage access', completed: false },
+          { label: 'Keep remittance confirmation -- employees need it for mortgage access', completed: false },
         ],
       });
     }

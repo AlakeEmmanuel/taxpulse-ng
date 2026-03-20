@@ -1,5 +1,5 @@
 /**
- * TaxPulse NG — Paystack Webhook Handler
+ * TaxPulse NG -- Paystack Webhook Handler
  * Vercel Serverless Function  →  api/paystack-webhook.ts
  *
  * SETUP CHECKLIST:
@@ -78,7 +78,7 @@ async function activatePro(userId: string, customerCode: string, subCode: string
     })
     .eq('id', userId);
   if (error) throw new Error(`DB update failed: ${error.message}`);
-  console.log(`[webhook] ✅ Pro activated — user:${userId} plan:${plan}`);
+  console.log(`[webhook] ✅ Pro activated -- user:${userId} plan:${plan}`);
 }
 
 async function deactivatePro(subscriptionCode: string) {
@@ -88,7 +88,7 @@ async function deactivatePro(subscriptionCode: string) {
     .eq('paystack_subscription_code', subscriptionCode)
     .select('id').single();
   if (error) { console.error('[webhook] deactivate failed:', error.message); return; }
-  console.log(`[webhook] ⚠️ Cancelled — user:${data?.id}`);
+  console.log(`[webhook] ⚠️ Cancelled -- user:${data?.id}`);
 }
 
 function readBody(req: Req): Promise<string> {
@@ -165,7 +165,7 @@ export default async function handler(req: Req, res: Res) {
     }
 
     if (eventType === 'invoice.payment_failed') {
-      console.warn('[webhook] ⚠️ Payment failed — Paystack will retry');
+      console.warn('[webhook] ⚠️ Payment failed -- Paystack will retry');
       return send(res, 200, { received: true, event: eventType });
     }
 

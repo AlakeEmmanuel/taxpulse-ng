@@ -104,7 +104,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                 style={{ background: '#00843D', color: '#ffffff', border: 'none', padding: '14px 28px', borderRadius: 12, fontSize: 15, fontWeight: 700, cursor: 'pointer', letterSpacing: '-0.01em', boxShadow: '0 4px 20px rgba(0,132,61,0.25)' }}
                 onMouseEnter={e => (e.currentTarget.style.background = '#006B32')}
                 onMouseLeave={e => (e.currentTarget.style.background = '#00843D')}
-              >Start Free — No Card Needed</button>
+              >Start Free -- No Card Needed</button>
               <a href="#how-it-works"
                 style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#fff', color: '#222', border: '1.5px solid #ddd', padding: '14px 22px', borderRadius: 12, fontSize: 15, fontWeight: 600, cursor: 'pointer', textDecoration: 'none', letterSpacing: '-0.01em' }}
               >See how it works →</a>
@@ -236,7 +236,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
             {[
               { icon: '📅', title: 'Auto Tax Calendar', desc: 'Sign up once. Get 12 months of VAT, PAYE, WHT and CIT deadlines generated based on your company profile.', tag: 'Core' },
               { icon: '🏦', title: 'Bank Statement Import', desc: 'Upload your PDF, Excel or CSV. AI reads every transaction, categorises it and fills your ledger in seconds.', tag: 'Pro' },
-              { icon: '🤖', title: 'AI Tax Assistant', desc: 'Ask "How much VAT do I owe this month?" Get an answer based on your actual ledger — not generic advice.', tag: 'Pro' },
+              { icon: '🤖', title: 'AI Tax Assistant', desc: 'Ask "How much VAT do I owe this month?" Get an answer based on your actual ledger -- not generic advice.', tag: 'Pro' },
               { icon: '🗄️', title: 'Evidence Vault', desc: 'Store receipts and invoices securely. NTA 2025 requires 6-year retention. Be audit-ready in minutes.', tag: 'Pro' },
               { icon: '📄', title: 'PDF Tax Reports', desc: 'Generate professional reports ready to send your accountant or submit to the Nigeria Revenue Service.', tag: 'Pro' },
               { icon: '🔔', title: 'Deadline Reminders', desc: 'Push notifications 7 days and 1 day before every obligation. Never miss a VAT return or PAYE filing again.', tag: 'Core' },
@@ -283,7 +283,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               <h2 style={{ fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: 800, color: '#fff', letterSpacing: '-0.03em', lineHeight: 1.15 }}>
                 Your tax dashboard, always up to date.
               </h2>
-              <p style={{ color: '#888', fontSize: 16, marginTop: 12 }}>Know exactly what's due, when — before it becomes a problem.</p>
+              <p style={{ color: '#888', fontSize: 16, marginTop: 12 }}>Know exactly what's due, when -- before it becomes a problem.</p>
             </div>
           </FadeIn>
 
@@ -354,7 +354,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
               {[
                 { n: '01', title: 'Create your company profile', desc: 'Tell us your business type, state, and whether you collect VAT or have employees. Takes under 2 minutes.' },
-                { n: '02', title: 'Get your 12-month tax calendar', desc: 'VAT, PAYE, WHT, CIT — all generated instantly with exact NRS due dates based on your profile.' },
+                { n: '02', title: 'Get your 12-month tax calendar', desc: 'VAT, PAYE, WHT, CIT -- all generated instantly with exact NRS due dates based on your profile.' },
                 { n: '03', title: 'Import your bank statement', desc: 'Upload last month's statement. AI extracts transactions, calculates taxes owed, and fills your ledger.' },
                 { n: '04', title: 'Stay compliant automatically', desc: 'Mark obligations as filed, track your compliance score, and get push reminders before every deadline.' },
               ].map((s, i) => (
@@ -403,7 +403,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                   ))}
                   {['AI Tax Assistant', 'PDF Export', 'Evidence Vault', 'Bank Import'].map(f => (
                     <div key={f} style={{ display: 'flex', gap: 10, alignItems: 'center', fontSize: 14, color: '#bbb' }}>
-                      <span style={{ fontSize: 14 }}>—</span> {f}
+                      <span style={{ fontSize: 14 }}>--</span> {f}
                     </div>
                   ))}
                 </div>
@@ -425,7 +425,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                   <span style={{ fontSize: 40, fontWeight: 800, letterSpacing: '-0.04em', color: '#fff' }}>₦5,000</span>
                   <span style={{ fontSize: 15, color: 'rgba(255,255,255,0.7)' }}>/month</span>
                 </div>
-                <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', marginBottom: 4 }}>or <strong style={{ color: '#fff' }}>₦50,000/year</strong> — save 2 months</p>
+                <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', marginBottom: 4 }}>or <strong style={{ color: '#fff' }}>₦50,000/year</strong> -- save 2 months</p>
                 <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', marginBottom: 28 }}>Cheaper than one late-filing penalty</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 28 }}>
                   {['Everything in Free', 'Unlimited companies', '🤖 AI Tax Assistant', '🏦 Bank Statement Import', '📄 PDF Export & Reports', '🗄️ Evidence Vault', 'Push deadline reminders', 'Priority support'].map(f => (

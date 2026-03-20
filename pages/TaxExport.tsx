@@ -106,7 +106,7 @@ function infoBox(doc: any, rows: [string, string][], startX: number, startY: num
     doc.setTextColor(100, 116, 139); doc.setFontSize(8); doc.setFont('helvetica', 'normal');
     doc.text(label, startX + 2, y);
     doc.setTextColor(...DARK); doc.setFont('helvetica', 'bold');
-    doc.text(value || '—', startX + colWidth, y);
+    doc.text(value || '--', startX + colWidth, y);
     y += 9;
   });
   return y + 4;
@@ -114,7 +114,7 @@ function infoBox(doc: any, rows: [string, string][], startX: number, startY: num
 
 // ─── VAT Return PDF ──────────────────────────────────────────────────────────
 async function generateVATReturn(doc: any, company: Company, period: string, ledger: LedgerEntry[], obligations: TaxObligation[]) {
-  drawHeader(doc, 'VAT Return — Form 002', `Period: ${period}  ·  Due: 21st of following month  ·  File with: Nigeria Revenue Service (NRS)`, company);
+  drawHeader(doc, 'VAT Return -- Form 002', `Period: ${period}  ·  Due: 21st of following month  ·  File with: Nigeria Revenue Service (NRS)`, company);
   let y = 72;
 
   y = sectionTitle(doc, 'TAXPAYER DETAILS', y);
@@ -173,7 +173,7 @@ async function generateVATReturn(doc: any, company: Company, period: string, led
   });
   y = (doc as any).lastAutoTable.finalY + 10;
 
-  y = sectionTitle(doc, 'TRANSACTION DETAIL — SALES (Output VAT)', y);
+  y = sectionTitle(doc, 'TRANSACTION DETAIL -- SALES (Output VAT)', y);
   const salesRows = periodLedger.filter(l => l.type === 'sale');
   if (salesRows.length > 0) {
     (doc as any).autoTable({
@@ -195,7 +195,7 @@ async function generateVATReturn(doc: any, company: Company, period: string, led
   }
 
   if (y > 220) { doc.addPage(); y = 20; }
-  y = sectionTitle(doc, 'TRANSACTION DETAIL — PURCHASES (Input VAT)', y);
+  y = sectionTitle(doc, 'TRANSACTION DETAIL -- PURCHASES (Input VAT)', y);
   const expRows = periodLedger.filter(l => l.type === 'expense');
   if (expRows.length > 0) {
     (doc as any).autoTable({
@@ -287,11 +287,11 @@ async function generatePAYESchedule(doc: any, company: Company, period: string, 
     startY: y,
     head: [['Annual Income Band', 'Rate', 'Note']],
     body: [
-      ['First ₦800,000', '0%', 'Tax-free band — replaces CRA'],
-      ['Next ₦2,200,000 (₦800k–₦3M)', '15%', ''],
-      ['Next ₦9,000,000 (₦3M–₦12M)', '18%', ''],
-      ['Next ₦13,000,000 (₦12M–₦25M)', '21%', ''],
-      ['Next ₦25,000,000 (₦25M–₦50M)', '23%', ''],
+      ['First ₦800,000', '0%', 'Tax-free band -- replaces CRA'],
+      ['Next ₦2,200,000 (₦800k-₦3M)', '15%', ''],
+      ['Next ₦9,000,000 (₦3M-₦12M)', '18%', ''],
+      ['Next ₦13,000,000 (₦12M-₦25M)', '21%', ''],
+      ['Next ₦25,000,000 (₦25M-₦50M)', '23%', ''],
       ['Above ₦50,000,000', '25%', 'Maximum rate'],
     ],
     theme: 'grid',
@@ -386,7 +386,7 @@ async function generateWHTSchedule(doc: any, company: Company, period: string, l
       startY: y,
       head: [['Date', 'Vendor / Description', 'Payment Amount (₦)', 'WHT Rate', 'WHT Deducted (₦)', 'Net Paid (₦)']],
       body: periodExpenses.map(l => {
-        const rate = l.taxAmount > 0 ? ((l.taxAmount / l.amount) * 100).toFixed(0) + '%' : '—';
+        const rate = l.taxAmount > 0 ? ((l.taxAmount / l.amount) * 100).toFixed(0) + '%' : '--';
         return [l.date, l.description.slice(0, 40), fmt(l.amount), rate, fmt(l.taxAmount), fmt(l.amount - l.taxAmount)];
       }),
       theme: 'grid',
@@ -421,7 +421,7 @@ async function generateWHTSchedule(doc: any, company: Company, period: string, l
     '2. Remit total WHT via REMITA to the NRS WHT collection account.',
     '3. Issue WHT credit notes to all vendors within 30 days of deduction.',
     '4. Small businesses with valid TIN are exempt from WHT on transactions ≤₦2M/month (NTA 2025).',
-    '5. Penalty for failure to deduct: 40% of undeducted WHT amount — a significant increase under NTA 2025.',
+    '5. Penalty for failure to deduct: 40% of undeducted WHT amount -- a significant increase under NTA 2025.',
     '6. Digital asset transactions: 10% WHT now applies (new under NTA 2025).',
   ].forEach(line => { doc.text(line, 14, y); y += 7; });
 }
@@ -440,7 +440,7 @@ async function generateCITReturn(doc: any, company: Company, period: string, led
     ['Industry', company.industry],
     ['State', company.state],
     ['CIT Period', period],
-    ['Filing Authority', 'Nigeria Revenue Service (NRS) — TaxPro Max Portal'],
+    ['Filing Authority', 'Nigeria Revenue Service (NRS) -- TaxPro Max Portal'],
   ], 14, y);
 
   y = sectionTitle(doc, 'INCOME STATEMENT SUMMARY', y);
@@ -484,7 +484,7 @@ async function generateCITReturn(doc: any, company: Company, period: string, led
   doc.roundedRect(14, y, doc.internal.pageSize.getWidth() - 28, 22, 3, 3, 'F');
   doc.setTextColor(isSmallCompany ? 0 : 180, isSmallCompany ? 100 : 50, isSmallCompany ? 0 : 0);
   doc.setFontSize(9); doc.setFont('helvetica', 'bold');
-  doc.text(isSmallCompany ? '✓ SMALL COMPANY EXEMPTION APPLIES' : '⚠ STANDARD COMPANY — CIT APPLIES', 20, y + 8);
+  doc.text(isSmallCompany ? '✓ SMALL COMPANY EXEMPTION APPLIES' : '⚠ STANDARD COMPANY -- CIT APPLIES', 20, y + 8);
   doc.setFontSize(8); doc.setFont('helvetica', 'normal');
   doc.text(isSmallCompany
     ? `Turnover ≤₦50M: 0% CIT, 0% Dev Levy, 0% CGT under NTA 2025. Professional service firms do not qualify.`
@@ -524,7 +524,7 @@ async function generateCITReturn(doc: any, company: Company, period: string, led
 
 // ─── PIT Return PDF (Individual) ─────────────────────────────────────────────
 async function generatePITReturn(doc: any, company: Company, period: string, ledger: LedgerEntry[], obligations: TaxObligation[]) {
-  drawHeader(doc, 'Personal Income Tax — Self-Assessment Return (Form A)', `Tax Year: ${period}  ·  Due: 31 March annually  ·  File with: ${company.state} State IRS`, company);
+  drawHeader(doc, 'Personal Income Tax -- Self-Assessment Return (Form A)', `Tax Year: ${period}  ·  Due: 31 March annually  ·  File with: ${company.state} State IRS`, company);
   let y = 72;
 
   y = sectionTitle(doc, 'TAXPAYER DETAILS', y);
@@ -571,7 +571,7 @@ async function generatePITReturn(doc: any, company: Company, period: string, led
       ['7', 'Pension Contribution (8% of gross)', `(${fmt(pension)})`],
       ['8', 'NHIS Contribution (1.5% of gross)', `(${fmt(nhis)})`],
       ['9', 'NHF Contribution (2.5% of gross)', `(${fmt(nhf)})`],
-      ['10', 'Rent Relief (20% of annual rent paid, max ₦500k) — NEW NTA 2025', `(${fmt(rentRelief)})`],
+      ['10', 'Rent Relief (20% of annual rent paid, max ₦500k) -- NEW NTA 2025', `(${fmt(rentRelief)})`],
       ['11', 'Life Assurance Premium (max ₦100,000)', '(0.00)'],
       ['12', 'TOTAL DEDUCTIONS', `(${fmt(pension + nhis + nhf + rentRelief)})`],
       ['13', 'TAXABLE INCOME (Line 6 minus Line 12)', fmt(taxableIncome)],
@@ -596,11 +596,11 @@ async function generatePITReturn(doc: any, company: Company, period: string, led
     startY: y,
     head: [['Band', 'Annual Income Range', 'Rate', 'Max Tax on Band']],
     body: [
-      ['1', '₦0 — ₦800,000', '0%', '₦0'],
-      ['2', '₦800,001 — ₦3,000,000', '15%', '₦330,000'],
-      ['3', '₦3,000,001 — ₦12,000,000', '18%', '₦1,620,000'],
-      ['4', '₦12,000,001 — ₦25,000,000', '21%', '₦2,730,000'],
-      ['5', '₦25,000,001 — ₦50,000,000', '23%', '₦5,750,000'],
+      ['1', '₦0 -- ₦800,000', '0%', '₦0'],
+      ['2', '₦800,001 -- ₦3,000,000', '15%', '₦330,000'],
+      ['3', '₦3,000,001 -- ₦12,000,000', '18%', '₦1,620,000'],
+      ['4', '₦12,000,001 -- ₦25,000,000', '21%', '₦2,730,000'],
+      ['5', '₦25,000,001 -- ₦50,000,000', '23%', '₦5,750,000'],
       ['6', 'Above ₦50,000,000', '25%', 'No cap'],
     ],
     theme: 'grid',
@@ -619,9 +619,9 @@ async function generatePITReturn(doc: any, company: Company, period: string, led
     '2. If employed, attach all P60 / payslips showing PAYE deducted. Reconcile with Line 16 above.',
     '3. If self-employed, attach business income statement and expense receipts.',
     '4. Attach proof of pension contributions, NHF payments, and annual rent receipts.',
-    '5. Rent Relief: 20% of actual rent paid during the year, maximum ₦500,000 (NTA 2025 — replaces CRA).',
+    '5. Rent Relief: 20% of actual rent paid during the year, maximum ₦500,000 (NTA 2025 -- replaces CRA).',
     '6. After filing and payment, apply for your Tax Clearance Certificate (TCC) from your State IRS.',
-    '7. Self-employed: make quarterly advance payments — due 31 Mar, 30 Jun, 30 Sep, 31 Dec.',
+    '7. Self-employed: make quarterly advance payments -- due 31 Mar, 30 Jun, 30 Sep, 31 Dec.',
     '8. Penalty for late filing: ₦50,000 + ₦25,000 per day. Late payment: 10% p.a. + MPR interest.',
   ].forEach(line => { doc.text(line, 14, y); y += 7; });
 }
@@ -670,7 +670,7 @@ async function generateComplianceSummary(doc: any, company: Company, period: str
       o.type, o.period, o.dueDate,
       fmt(o.actualAmount || o.estimatedAmount),
       o.status,
-      o.paymentDate || '—',
+      o.paymentDate || '--',
     ]),
     theme: 'grid',
     headStyles: { fillColor: GREEN, textColor: WHITE, fontStyle: 'bold', fontSize: 8 },
@@ -709,11 +709,11 @@ async function generateComplianceSummary(doc: any, company: Company, period: str
     head: [['Tax', 'Rate', 'Filing Deadline', 'Authority', 'Key Change (NTA 2025)']],
     body: [
       ['VAT', '7.5%', '21st of next month', 'NRS', 'E-invoicing mandatory (phased)'],
-      ['PAYE', '0–25%', '10th of next month', 'State IRS', 'CRA abolished → Rent Relief ₦500k cap'],
+      ['PAYE', '0-25%', '10th of next month', 'State IRS', 'CRA abolished → Rent Relief ₦500k cap'],
       ['WHT', '5% / 10%', '21st of next month', 'NRS', 'Non-deduction penalty now 40%'],
       ['CIT', '0% or 30%', '6 months after year-end', 'NRS', 'Small company threshold: ₦25M → ₦50M'],
       ['Dev Levy', '4%', 'With CIT return', 'NRS', 'Replaces TET, IT, NASENI, Police levies'],
-      ['PIT', '0–25%', '31 March annually', 'State IRS', 'Same bands as PAYE. Self-employed: quarterly advance'],
+      ['PIT', '0-25%', '31 March annually', 'State IRS', 'Same bands as PAYE. Self-employed: quarterly advance'],
     ],
     theme: 'grid',
     headStyles: { fillColor: GREEN, textColor: WHITE, fontStyle: 'bold', fontSize: 8 },
@@ -726,7 +726,7 @@ async function generateComplianceSummary(doc: any, company: Company, period: str
 
 // ─── Report type definitions ──────────────────────────────────────────────────
 const REPORT_TYPES = [
-  { id: 'compliance', label: 'Tax Compliance Summary', desc: 'Full overview — all obligations, financial summary, compliance score', icon: '📊', color: 'bg-slate-50 border-slate-200', always: true },
+  { id: 'compliance', label: 'Tax Compliance Summary', desc: 'Full overview -- all obligations, financial summary, compliance score', icon: '📊', color: 'bg-slate-50 border-slate-200', always: true },
   { id: 'vat', label: 'VAT Return (Form 002)', desc: 'Monthly VAT return with output/input VAT computation. File with NRS by 21st.', icon: '🧾', color: 'bg-blue-50 border-blue-200', requires: 'vat' },
   { id: 'paye', label: 'PAYE Monthly Schedule', desc: 'Employee payroll PAYE schedule with NTA 2025 bands. File with State IRS by 10th.', icon: '👥', color: 'bg-purple-50 border-purple-200', requires: 'paye' },
   { id: 'wht', label: 'WHT Schedule', desc: 'Withholding tax deduction schedule with vendor breakdown. File with NRS by 21st.', icon: '🤝', color: 'bg-amber-50 border-amber-200', requires: 'wht' },
@@ -838,9 +838,9 @@ export const TaxExport: React.FC<TaxExportProps> = ({ company, onNavigate }) => 
         <div className="grid md:grid-cols-2 gap-2 text-xs text-blue-700">
           {isIndividual ? <>
             <p>• <strong>PIT Return (Form A):</strong> File with your State IRS by 31 March each year</p>
-            <p>• <strong>Employed:</strong> Employer deducts PAYE monthly — still file annual Form A to reconcile</p>
+            <p>• <strong>Employed:</strong> Employer deducts PAYE monthly -- still file annual Form A to reconcile</p>
             <p>• <strong>Self-employed:</strong> Make quarterly advance payments + annual return by 31 March</p>
-            <p>• <strong>Tax Clearance Certificate (TCC):</strong> Apply after filing — needed for contracts, travel</p>
+            <p>• <strong>Tax Clearance Certificate (TCC):</strong> Apply after filing -- needed for contracts, travel</p>
           </> : <>
             <p>• <strong>VAT:</strong> File Form 002 with NRS by 21st of each month (if VAT-registered)</p>
             <p>• <strong>PAYE:</strong> File schedule with State IRS by 10th of each month (if you have staff)</p>
@@ -951,7 +951,7 @@ export const TaxExport: React.FC<TaxExportProps> = ({ company, onNavigate }) => 
       </Button>
 
       <p className="text-xs text-slate-400 text-center">
-        PDFs are generated entirely in your browser — no data leaves your device. All returns are based on NTA 2025 rules effective 1 January 2026.
+        PDFs are generated entirely in your browser -- no data leaves your device. All returns are based on NTA 2025 rules effective 1 January 2026.
       </p>
     </div>
   );

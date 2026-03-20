@@ -1,6 +1,6 @@
 // pages/AdminDashboard.tsx
-// Standalone admin panel — rendered directly from index.tsx when path is /admin
-// Has its own password gate — no email matching needed
+// Standalone admin panel -- rendered directly from index.tsx when path is /admin
+// Has its own password gate -- no email matching needed
 // Password = ADMIN_SECRET (same value set in Vercel env vars)
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -9,7 +9,7 @@ const SESSION_KEY = 'taxpulse_admin_auth';
 
 const fmt       = (n: number) => '₦' + n.toLocaleString('en-NG');
 const fmtNum    = (n: number) => n.toLocaleString('en-NG');
-const fmtDate   = (d: string) => d ? new Date(d).toLocaleDateString('en-NG', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
+const fmtDate   = (d: string) => d ? new Date(d).toLocaleDateString('en-NG', { day: '2-digit', month: 'short', year: 'numeric' }) : '--';
 
 // ── Password Gate ─────────────────────────────────────────────────────────────
 const PasswordGate: React.FC<{ onUnlock: (secret: string) => void }> = ({ onUnlock }) => {
@@ -30,7 +30,7 @@ const PasswordGate: React.FC<{ onUnlock: (secret: string) => void }> = ({ onUnlo
         return;
       }
       if (!res.ok) {
-        setError(`Server error ${res.status} — check Vercel function logs.`);
+        setError(`Server error ${res.status} -- check Vercel function logs.`);
         setLoading(false);
         return;
       }
@@ -182,7 +182,7 @@ export const AdminDashboard: React.FC = () => {
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-cac-green rounded-lg flex items-center justify-center font-black text-sm">A</div>
             <div>
-              <p className="font-bold text-sm">TaxPulse NG — Admin Panel</p>
+              <p className="font-bold text-sm">TaxPulse NG -- Admin Panel</p>
               <p className="text-xs text-slate-400">Internal · Confidential</p>
             </div>
           </div>
@@ -307,7 +307,7 @@ export const AdminDashboard: React.FC = () => {
                         <td className="px-4 py-3 font-medium text-slate-800 max-w-[200px]">
                           <button onClick={()=>{setManualUserId(u.id);setTab('manual');}}
                             className="hover:text-cac-green hover:underline text-left truncate block max-w-full" title={`ID: ${u.id}`}>
-                            {u.email||'—'}
+                            {u.email||'--'}
                           </button>
                         </td>
                         <td className="px-4 py-3">
@@ -320,9 +320,9 @@ export const AdminDashboard: React.FC = () => {
                             {u.status||'inactive'}
                           </span>
                         </td>
-                        <td className={`px-4 py-3 text-xs whitespace-nowrap ${expired?'text-red-500 font-bold':'text-slate-400'}`}>{u.expires?fmtDate(u.expires):'—'}</td>
+                        <td className={`px-4 py-3 text-xs whitespace-nowrap ${expired?'text-red-500 font-bold':'text-slate-400'}`}>{u.expires?fmtDate(u.expires):'--'}</td>
                         <td className="px-4 py-3 text-center font-bold text-slate-600">{u.companies}</td>
-                        <td className="px-4 py-3 text-xs text-slate-400">{u.promoUsed||'—'}</td>
+                        <td className="px-4 py-3 text-xs text-slate-400">{u.promoUsed||'--'}</td>
                         <td className="px-4 py-3 text-xs text-slate-400 whitespace-nowrap">{fmtDate(u.joined)}</td>
                       </tr>
                     );

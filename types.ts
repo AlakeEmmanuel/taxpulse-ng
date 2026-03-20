@@ -22,11 +22,11 @@ export enum TaxType {
   PAYE    = 'PAYE',
   CIT     = 'CIT',
   PIT     = 'PIT',
-  NSITF   = 'NSITF',       // 1% payroll — National Social Insurance Trust Fund
-  PENSION = 'Pension',     // 18% total (8% employee + 10% employer) — Pension Fund Admin
-  ITF     = 'ITF',         // 1% payroll — Industrial Training Fund
-  NHF     = 'NHF',         // 2.5% employee salary — National Housing Fund
-  CAC     = 'CAC',         // Annual returns — Corporate Affairs Commission
+  NSITF   = 'NSITF',       // 1% payroll -- National Social Insurance Trust Fund
+  PENSION = 'Pension',     // 18% total (8% employee + 10% employer) -- Pension Fund Admin
+  ITF     = 'ITF',         // 1% payroll -- Industrial Training Fund
+  NHF     = 'NHF',         // 2.5% employee salary -- National Housing Fund
+  CAC     = 'CAC',         // Annual returns -- Corporate Affairs Commission
 }
 
 export interface Company {
@@ -96,7 +96,7 @@ export interface PayslipEmployee {
   tin?:          string;
   department?:   string;
   grossSalary:   number;
-  basicSalary:   number;    // usually 50–70% of gross
+  basicSalary:   number;    // usually 50-70% of gross
   housing?:      number;    // typically 20%
   transport?:    number;    // typically 10%
   // Deductions
@@ -126,10 +126,10 @@ export interface EvidenceFile {
   name:           string;
   mimeType:       string;
   sizeBytes:      number;
-  data:           string;       // base64 or empty — fetched from Storage on demand
+  data:           string;       // base64 or empty -- fetched from Storage on demand
   uploadDate:     string;
   category:       EvidenceCategory;
   notes?:         string;
   storagePath?:   string;       // Supabase Storage path
-  monthYear?:     string;       // e.g. "March 2026" — for bank statements
+  monthYear?:     string;       // e.g. "March 2026" -- for bank statements
 }

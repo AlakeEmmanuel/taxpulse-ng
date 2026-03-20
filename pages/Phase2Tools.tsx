@@ -154,7 +154,7 @@ export const AnnualTaxPlanner: React.FC<AnnualPlannerProps> = ({ company }) => {
       </div>
 
       <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-700">
-        Estimates only — based on monthly averages. Actual amounts depend on real transactions.
+        Estimates only -- based on monthly averages. Actual amounts depend on real transactions.
       </div>
 
       <div className="grid grid-cols-3 gap-3">
@@ -258,7 +258,7 @@ export const TCCTracker: React.FC<{ company: Company }> = ({ company }) => {
     type: 'federal', issuedDate: '', expiryDate: '', tccNumber: '', authority: '', notes: ''
   });
 
-  // Load from localStorage (no DB table needed — simple client-side storage)
+  // Load from localStorage (no DB table needed -- simple client-side storage)
   useEffect(() => {
     try {
       const stored = localStorage.getItem(`taxpulse_tcc_${company.id}`);
@@ -302,7 +302,7 @@ export const TCCTracker: React.FC<{ company: Company }> = ({ company }) => {
           <span className="w-8 h-8 bg-teal-100 text-teal-600 rounded-xl flex items-center justify-center font-black text-sm">T</span>
           <div>
             <h3 className="font-bold text-slate-800">Tax Clearance Certificate (TCC) Tracker</h3>
-            <p className="text-xs text-slate-400">Monitor expiry dates — TCC needed for contracts, tenders, and travel</p>
+            <p className="text-xs text-slate-400">Monitor expiry dates -- TCC needed for contracts, tenders, and travel</p>
           </div>
         </div>
         <button
@@ -505,7 +505,7 @@ export const PayrollCSVExport: React.FC<{ company: Company }> = ({ company }) =>
       {exported && <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-sm text-cac-green font-bold">✅ CSV downloaded! Upload to your State IRS payroll portal.</div>}
 
       <Button onClick={exportCSV} disabled={!employees.some(e=>e.name&&e.gross)} className="w-full">
-        📊 Export Payroll CSV — {period}
+        📊 Export Payroll CSV -- {period}
       </Button>
       <p className="text-xs text-slate-400 text-center">CSV contains all statutory deductions per NTA 2025 + PRA 2014. Submit to State IRS by the 10th of the following month.</p>
     </Card>

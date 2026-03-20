@@ -146,7 +146,7 @@ export const PenaltyCalculator: React.FC = () => {
       <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex gap-3">
         <span className="text-xl shrink-0">⚠️</span>
         <div className="text-xs text-red-800 space-y-1">
-          <p className="font-bold">NTA 2025 — Significantly Stiffened Penalties (effective 1 Jan 2026)</p>
+          <p className="font-bold">NTA 2025 -- Significantly Stiffened Penalties (effective 1 Jan 2026)</p>
           <p>• Failure to file: ₦50,000 fixed + <strong>₦25,000 per day of default</strong></p>
           <p>• Late remittance: <strong>10% per annum + CBN MPR ({(CBN_MPR * 100).toFixed(2)}%)</strong> = {(LATE_REMITTANCE_RATE * 100).toFixed(2)}% total p.a.</p>
           <p>• Failure to deduct WHT: <strong>40%</strong> of undeducted amount (increased from 10%)</p>
@@ -217,7 +217,7 @@ export const PenaltyCalculator: React.FC = () => {
               ) : (
                 <>
                   <p className="text-2xl font-extrabold text-cac-green">✓ On time</p>
-                  <p className="text-xs text-cac-green mt-0.5">Filed on or before due date — no penalties</p>
+                  <p className="text-xs text-cac-green mt-0.5">Filed on or before due date -- no penalties</p>
                 </>
               )}
             </div>
@@ -287,12 +287,12 @@ export const PenaltyCalculator: React.FC = () => {
         <h2 className="font-bold text-slate-800 text-sm">How to Avoid Penalties (NTA 2025)</h2>
         <div className="grid md:grid-cols-2 gap-3 text-xs text-slate-600">
           {[
-            { icon: '📅', tip: 'Set calendar reminders — VAT & WHT due 21st monthly, PAYE due 10th monthly' },
+            { icon: '📅', tip: 'Set calendar reminders -- VAT & WHT due 21st monthly, PAYE due 10th monthly' },
             { icon: '🏦', tip: 'Always deduct WHT before paying vendors. Non-deduction = 40% penalty, no exceptions' },
-            { icon: '📝', tip: 'File a nil return if you have no transactions for the period — late nil returns still attract ₦50k + ₦25k/day' },
-            { icon: '🤝', tip: 'NTA 2025 allows voluntary disclosure — come forward before NRS discovers underpayment to reduce penalties' },
+            { icon: '📝', tip: 'File a nil return if you have no transactions for the period -- late nil returns still attract ₦50k + ₦25k/day' },
+            { icon: '🤝', tip: 'NTA 2025 allows voluntary disclosure -- come forward before NRS discovers underpayment to reduce penalties' },
             { icon: '📁', tip: 'Keep all records for 6 years. NRS audits can go back 6 years under NTAA 2025' },
-            { icon: '✅', tip: 'Small businesses (TIN holders, ≤₦2M/month transactions) are exempt from WHT — register your TIN now' },
+            { icon: '✅', tip: 'Small businesses (TIN holders, ≤₦2M/month transactions) are exempt from WHT -- register your TIN now' },
           ].map(({ icon, tip }) => (
             <div key={tip} className="flex gap-2 p-3 bg-slate-50 rounded-xl">
               <span className="shrink-0">{icon}</span>

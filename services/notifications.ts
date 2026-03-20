@@ -78,7 +78,7 @@ export async function unsubscribeFromPush(userId: string): Promise<void> {
 }
 
 // ─── WhatsApp Reminders via Termii ───────────────────────────────────────────
-// Termii is a Nigerian messaging API — www.termii.com
+// Termii is a Nigerian messaging API -- www.termii.com
 // Set VITE_TERMII_API_KEY in your Vercel environment variables
 // IMPORTANT: This is a client-side call for demo purposes.
 // For production, move this to a Vercel serverless function to protect your API key.
@@ -97,11 +97,11 @@ export interface WhatsAppReminder {
 
 export async function sendWhatsAppReminder(reminder: WhatsAppReminder): Promise<boolean> {
   if (!TERMII_API_KEY) {
-    console.warn('VITE_TERMII_API_KEY not set — WhatsApp reminders disabled');
+    console.warn('VITE_TERMII_API_KEY not set -- WhatsApp reminders disabled');
     return false;
   }
 
-  // Sanitize phone number — ensure it starts with 234
+  // Sanitize phone number -- ensure it starts with 234
   const phone = reminder.phone.replace(/^0/, '234').replace(/[^0-9]/g, '');
 
   const urgency = reminder.daysLeft <= 1 ? '🚨 URGENT' : reminder.daysLeft <= 3 ? '⚠️ DUE SOON' : '📅 REMINDER';
@@ -110,7 +110,7 @@ export async function sendWhatsAppReminder(reminder: WhatsAppReminder): Promise<
 Estimated amount: ₦${reminder.amount.toLocaleString('en-NG')}`
     : '';
 
-  const message = `${urgency} — TaxPulse NG
+  const message = `${urgency} -- TaxPulse NG
 
 Hi, this is a tax filing reminder for ${reminder.companyName}.
 
@@ -177,7 +177,7 @@ export async function sendSMSReminder(reminder: WhatsAppReminder): Promise<boole
   }
 }
 
-// Called from the dashboard — checks all overdue/due-soon obligations
+// Called from the dashboard -- checks all overdue/due-soon obligations
 // and sends WhatsApp if user has opted in
 export async function sendDueReminders(
   obligations: Array<{ type: string; period: string; dueDate: string; estimatedAmount?: number; status: string }>,

@@ -395,7 +395,7 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
     setStatementId(stmtId);
     let count = 0;
 
-    // 1. Save ledger entries — tag each with statementId for future deletion
+    // 1. Save ledger entries -- tag each with statementId for future deletion
     for (const t of selected) {
       try {
         const entry: LedgerEntry = {
@@ -453,7 +453,7 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
       {/* Header */}
       <header>
         <h1 className="text-2xl font-bold text-slate-900">Bank Statement Import</h1>
-        <p className="text-slate-500 text-sm mt-1">Upload monthly statements — AI extracts transactions and calculates tax obligations automatically.</p>
+        <p className="text-slate-500 text-sm mt-1">Upload monthly statements -- AI extracts transactions and calculates tax obligations automatically.</p>
       </header>
 
       {/* Tabs */}
@@ -568,7 +568,7 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
               <div className="w-48 h-2 bg-slate-100 rounded-full overflow-hidden">
                 <div className="h-full bg-cac-green rounded-full animate-pulse w-3/4" />
               </div>
-              <p className="text-xs text-slate-400">This usually takes 5–15 seconds</p>
+              <p className="text-xs text-slate-400">This usually takes 5-15 seconds</p>
             </div>
           )}
 
@@ -577,7 +577,7 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
             <div className="space-y-5">
               <header className="flex items-start justify-between flex-wrap gap-3">
                 <div>
-                  <h1 className="text-xl font-bold text-slate-900">Review — {monthYearLabel(monthYear)}</h1>
+                  <h1 className="text-xl font-bold text-slate-900">Review -- {monthYearLabel(monthYear)}</h1>
                   <p className="text-slate-500 text-sm mt-1">{transactions.length} transactions found. Select which to import.</p>
                 </div>
                 <div className="flex gap-2">
@@ -646,7 +646,7 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
                               <option value="expense">Expense</option>
                             </select>
                           </td>
-                          <td className="px-4 py-3 text-right text-xs text-slate-500 whitespace-nowrap">{t.taxAmount > 0 ? fmt(t.taxAmount) : '—'}</td>
+                          <td className="px-4 py-3 text-right text-xs text-slate-500 whitespace-nowrap">{t.taxAmount > 0 ? fmt(t.taxAmount) : '--'}</td>
                         </tr>
                       ))}
                     </tbody>

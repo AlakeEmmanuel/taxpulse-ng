@@ -95,7 +95,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
     setSubmitting(true);
     const company: Company = {
       ...form,
-      id: Date.now().toString(), // Temp ID — DB will assign real UUID in App.tsx
+      id: Date.now().toString(), // Temp ID -- DB will assign real UUID in App.tsx
       complianceScore: 50,
     };
     onComplete(company);
@@ -115,7 +115,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             <span>🇳🇬</span> TaxPulse NG
           </div>
           <h1 className="text-3xl font-bold text-slate-900">Set Up Your Tax Profile</h1>
-          <p className="text-slate-500 mt-1">For businesses and individuals — ready in minutes</p>
+          <p className="text-slate-500 mt-1">For businesses and individuals -- ready in minutes</p>
         </div>
 
         {/* Step indicators */}
@@ -323,8 +323,8 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                       <label className="block text-sm font-semibold text-slate-700 mb-2">Employment Type *</label>
                       <div className="grid grid-cols-1 gap-2">
                         {([
-                          { val: 'employed', label: 'Employed', desc: 'Salary earner — PAYE deducted by employer' },
-                          { val: 'self-employed', label: 'Self-Employed / Freelancer', desc: 'Runs own business — must file & pay PIT directly' },
+                          { val: 'employed', label: 'Employed', desc: 'Salary earner -- PAYE deducted by employer' },
+                          { val: 'self-employed', label: 'Self-Employed / Freelancer', desc: 'Runs own business -- must file & pay PIT directly' },
                           { val: 'both', label: 'Both (Salary + Business Income)', desc: 'Employed and has other income sources' },
                         ] as const).map(opt => (
                           <button
@@ -415,7 +415,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                       onChange={v => update('paysVendors', v)}
                     />
 
-                    {/* Payroll statutory contributions — shown when has employees */}
+                    {/* Payroll statutory contributions -- shown when has employees */}
                     {form.hasEmployees && (
                       <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 space-y-3">
                         <p className="text-xs font-bold text-purple-800">👥 Payroll Statutory Contributions</p>
@@ -467,7 +467,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
               {/* WhatsApp reminder opt-in */}
               <div className="bg-green-50 border border-green-200 rounded-xl p-4 space-y-3">
                 <p className="text-xs font-bold text-green-800">📱 WhatsApp Deadline Reminders</p>
-                <p className="text-xs text-green-600">Get tax deadline reminders directly on WhatsApp — 7 days and 1 day before each obligation is due.</p>
+                <p className="text-xs text-green-600">Get tax deadline reminders directly on WhatsApp -- 7 days and 1 day before each obligation is due.</p>
                 <input
                   type="tel"
                   value={form.phone || ''}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { UserProfile, redeemPromoCode, activateSubscription } from '../services/auth';
 
-// Your Paystack public key — replace with yours from dashboard.paystack.com
+// Your Paystack public key -- replace with yours from dashboard.paystack.com
 const PAYSTACK_PUBLIC_KEY  = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY       || '';
 const MONTHLY_PLAN_CODE    = import.meta.env.VITE_PAYSTACK_PLAN_MONTHLY  || '';
 const ANNUAL_PLAN_CODE     = import.meta.env.VITE_PAYSTACK_PLAN_ANNUAL   || '';
@@ -192,7 +192,7 @@ export const Paywall: React.FC<PaywallProps> = ({ profile, onUpgraded, onContinu
             {payLoading ? (
               <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Processing...</>
             ) : (
-  <>💳 Subscribe — {selectedPlan === 'monthly' ? '₦5,000/month' : '₦50,000/year'}</>
+  <>💳 Subscribe -- {selectedPlan === 'monthly' ? '₦5,000/month' : '₦50,000/year'}</>
             )}
           </button>
           <p className="text-[10px] text-slate-400 text-center">Powered by Paystack · 100% secure · NGN payments</p>

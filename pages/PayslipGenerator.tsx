@@ -78,7 +78,7 @@ export const PayslipGenerator: React.FC<PayslipGeneratorProps> = ({ company }) =
         doc.text('EMPLOYEE PAYSLIP', 14, 20);
         doc.text(`Period: ${period}`, 14, 27);
         doc.setFontSize(7);
-        doc.text('NTA 2025 COMPLIANT — Deductions per Nigeria Tax Act 2025 & PRA 2014', 14, 34);
+        doc.text('NTA 2025 COMPLIANT -- Deductions per Nigeria Tax Act 2025 & PRA 2014', 14, 34);
 
         // ── Employee details box ──
         doc.setFillColor(...LGRAY);
@@ -90,8 +90,8 @@ export const PayslipGenerator: React.FC<PayslipGeneratorProps> = ({ company }) =
         const empInfo = [
           emp.department ? `Dept: ${emp.department}` : '',
           emp.tin ? `TIN: ${emp.tin}` : '',
-          `Employer TIN: ${company.tin || '—'}`,
-          `RC No: ${company.rcNumber || '—'}`,
+          `Employer TIN: ${company.tin || '--'}`,
+          `RC No: ${company.rcNumber || '--'}`,
         ].filter(Boolean).join('   ·   ');
         doc.text(empInfo, 14, 54);
         doc.text(`Page 1 of 1`, W - 14, 54, { align: 'right' });
@@ -194,7 +194,7 @@ export const PayslipGenerator: React.FC<PayslipGeneratorProps> = ({ company }) =
         doc.roundedRect(14, y, W - 28, 30, 3, 3, 'F');
         doc.setTextColor(...DARK); doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
         doc.text('PAYE computed per NTA 2025 bands (effective 1 Jan 2026): 0% on first ₦800k · 15% next ₦2.2M · 18% next ₦9M · 21% next ₦13M · 23% next ₦25M · 25% above ₦50M annual.', 18, y + 7, { maxWidth: W - 36 });
-        doc.text(`CRA abolished — replaced by Rent Relief: 20% of annual rent paid, max ₦500,000/year.  Pension per PRA 2014.  NHF per NHFRS Act.`, 18, y + 16, { maxWidth: W - 36 });
+        doc.text(`CRA abolished -- replaced by Rent Relief: 20% of annual rent paid, max ₦500,000/year.  Pension per PRA 2014.  NHF per NHFRS Act.`, 18, y + 16, { maxWidth: W - 36 });
         doc.text(`${company.name}  ·  TIN: ${company.tin || 'N/A'}  ·  RC: ${company.rcNumber || 'N/A'}  ·  Generated: ${new Date().toLocaleDateString('en-NG')}`, 18, y + 24, { maxWidth: W - 36 });
         y += 38;
 
@@ -287,8 +287,8 @@ export const PayslipGenerator: React.FC<PayslipGeneratorProps> = ({ company }) =
                 <Input label="TIN (if available)" value={emp.tin} onChange={e => updateEmployee(i, 'tin', e.target.value)} placeholder="e.g. 12345678-0001" />
                 <Input label="Gross Monthly Salary (₦) *" type="number" value={emp.grossSalary} onChange={e => updateEmployee(i, 'grossSalary', e.target.value)} placeholder="e.g. 500000" />
                 <div className="col-span-2">
-                  <Input label="Annual Rent Paid (₦) — for rent relief calculation" type="number" value={emp.annualRent} onChange={e => updateEmployee(i, 'annualRent', e.target.value)} placeholder="e.g. 600000 (optional)" />
-                  <p className="text-xs text-slate-400 mt-1">Rent relief = 20% of annual rent, max ₦500k — reduces PAYE liability</p>
+                  <Input label="Annual Rent Paid (₦) -- for rent relief calculation" type="number" value={emp.annualRent} onChange={e => updateEmployee(i, 'annualRent', e.target.value)} placeholder="e.g. 600000 (optional)" />
+                  <p className="text-xs text-slate-400 mt-1">Rent relief = 20% of annual rent, max ₦500k -- reduces PAYE liability</p>
                 </div>
               </div>
 
@@ -351,12 +351,12 @@ export const PayslipGenerator: React.FC<PayslipGeneratorProps> = ({ company }) =
           <Card className="space-y-2 text-xs text-slate-500">
             <p className="font-bold text-slate-700 text-sm">Statutory rates (NTA 2025)</p>
             {[
-              ['Pension — employee', '8% of gross'],
-              ['Pension — employer', '10% of gross (info only)'],
+              ['Pension -- employee', '8% of gross'],
+              ['Pension -- employer', '10% of gross (info only)'],
               ['NHIS', '1.5% of gross'],
               ['NHF', '2.5% of basic salary'],
               ['NSITF', '1% of gross (employer)'],
-              ['PAYE', '0%–25% (NTA 2025 bands)'],
+              ['PAYE', '0%-25% (NTA 2025 bands)'],
             ].map(([label, val]) => (
               <div key={label} className="flex justify-between">
                 <span>{label}</span>
@@ -395,7 +395,7 @@ export const PayslipGenerator: React.FC<PayslipGeneratorProps> = ({ company }) =
             Generating payslips...
           </span>
         ) : (
-          `📄 Generate ${employees.filter(e => e.name && e.grossSalary).length || 0} Payslip${employees.length > 1 ? 's' : ''} — ${period}`
+          `📄 Generate ${employees.filter(e => e.name && e.grossSalary).length || 0} Payslip${employees.length > 1 ? 's' : ''} -- ${period}`
         )}
       </Button>
 

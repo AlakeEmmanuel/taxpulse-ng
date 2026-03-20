@@ -40,7 +40,7 @@ const LockedFeature: React.FC<{ name: string; onUpgrade: () => void }> = ({ name
       <p className="text-slate-500 text-sm mt-2 max-w-sm">Upgrade to TaxPulse Pro to unlock AI assistance, PDF exports, Evidence Vault and unlimited companies.</p>
     </div>
     <button onClick={onUpgrade} className="bg-cac-green text-white px-8 py-3.5 rounded-xl font-bold text-sm hover:bg-cac-dark transition-colors">
-      Upgrade to Pro — ₦5,000/month
+      Upgrade to Pro -- ₦5,000/month
     </button>
   </div>
 );
@@ -54,7 +54,7 @@ const Spinner = ({ msg = 'Loading...' }: { msg?: string }) => (
   </div>
 );
 
-// Three possible states — loading hides everything until we know what to show
+// Three possible states -- loading hides everything until we know what to show
 type AppState = 'loading' | 'unauthenticated' | 'ready';
 
 const App: React.FC = () => {
@@ -86,14 +86,14 @@ const App: React.FC = () => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        // IMPORTANT: Do NOT await inside this callback — it holds Supabase auth lock
+        // IMPORTANT: Do NOT await inside this callback -- it holds Supabase auth lock
         // Use setTimeout(..., 0) to run async work after lock is released
         if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') {
           clearTimeout(fallback);
           handled = true;
           if (session?.user) {
             const uid = session.user.id;
-            // TOKEN_REFRESHED fires SIGNED_IN again — only load if not already ready
+            // TOKEN_REFRESHED fires SIGNED_IN again -- only load if not already ready
             setTimeout(() => {
               setAppState(prev => {
                 if (prev !== 'ready') { loadUserData(uid); }
@@ -148,7 +148,7 @@ const App: React.FC = () => {
   const handleCompanyAdded = async (company: Company) => {
     if (companies.length >= 1 && !isPro(profile)) { setShowPaywall(true); return; }
     try {
-      // 1. Save company first — DB returns real UUID
+      // 1. Save company first -- DB returns real UUID
       const saved = await db.addCompany(company);
       // 2. Show seeding overlay, seed obligations with real company ID
       setSeedingSchedule(true);
@@ -211,7 +211,7 @@ const App: React.FC = () => {
     <Paywall profile={profile!} onUpgraded={handleUpgraded} onContinueFree={() => setShowPaywall(false)} />
   );
 
-  // No company yet — show onboarding with header
+  // No company yet -- show onboarding with header
   if (companies.length === 0) return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <header className="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between">
