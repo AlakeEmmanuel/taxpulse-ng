@@ -53,6 +53,14 @@ export const InvoiceGenerator: React.FC<InvoiceGeneratorProps> = ({ company }) =
     setGenerating(true); setError('');
     try {
             const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  let logoB64 = '';
+  try {
+    const resp = await fetch('/logo-full.png');
+    const blob = await resp.blob();
+    logoB64 = await new Promise<string>(res => {
+      const r = new FileReader(); r.onload = () => res((r.result as string).split(',')[1]); r.readAsDataURL(blob);
+    });
+  } catch {}
       const W   = doc.internal.pageSize.getWidth();
       const H   = doc.internal.pageSize.getHeight();
 
@@ -180,7 +188,7 @@ export const InvoiceGenerator: React.FC<InvoiceGeneratorProps> = ({ company }) =
         doc.setFillColor(240, 253, 244);
         doc.roundedRect(14, y, W - 28, 16, 2, 2, 'F');
         doc.setTextColor(0, 100, 40); doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
-        doc.text('<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> VAT REGISTERED INVOICE -- This invoice complies with the Nigeria Tax Act 2025.', 18, y + 6);
+        doc.text('VAT REGISTERED INVOICE -- This invoice complies with the Nigeria Tax Act 2025.', 18, y + 6);
         doc.text(`Supplier VAT No: ${company.vatNumber || 'Pending'}  ·  Supplier TIN: ${company.tin || 'N/A'}  ·  VAT Rate: 7.5%  ·  Filing Authority: Nigeria Revenue Service (NRS)`, 18, y + 12);
         y += 20;
       }
@@ -235,7 +243,7 @@ export const InvoiceGenerator: React.FC<InvoiceGeneratorProps> = ({ company }) =
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-xs text-blue-800 space-y-1">
         <p className="font-bold"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></span> What an NTA 2025-compliant VAT invoice must contain</p>
         <div className="grid md:grid-cols-2 gap-1 mt-1">
-          <p>• "TAX INVOICE' title (not just 'Invoice")</p>
+          <p>• "TAX INVOICE'title (not just'Invoice")</p>
           <p>• Supplier TIN and VAT Registration Number</p>
           <p>• Client name, address and TIN (for B2B)</p>
           <p>• Invoice number and date</p>

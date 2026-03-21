@@ -32,13 +32,17 @@ const RED:   [number,number,number] = [220, 38, 38];
 const AMBER: [number,number,number] = [180, 100, 0];
 
 // ─── PDF helpers ─────────────────────────────────────────────────────────────
-function drawHeader(doc: any, title: string, subtitle: string, company: Company) {
+function drawHeader(doc: any, title: string, subtitle: string, company: Company, logoB64?: string) {
   const W = doc.internal.pageSize.getWidth();
   doc.setFillColor(...GREEN);
   doc.rect(0, 0, W, 36, 'F');
   doc.setTextColor(...WHITE);
-  doc.setFontSize(18); doc.setFont('helvetica', 'bold');
-  doc.text('TaxPulse NG', 14, 14);
+  if (logoB64) {
+    try { doc.addImage(logoB64, 'PNG', 14, 6, 40, 12); } catch {}
+  } else {
+    doc.setFontSize(18); doc.setFont('helvetica', 'bold');
+    doc.text('TaxPulse NG', 14, 14);
+  }
   doc.setFontSize(10); doc.setFont('helvetica', 'normal');
   doc.text(title, 14, 22);
   doc.text(subtitle, 14, 29);
@@ -116,7 +120,7 @@ function infoBox(doc: any, rows: [string, string][], startX: number, startY: num
 
 // ─── VAT Return PDF ──────────────────────────────────────────────────────────
 async function generateVATReturn(doc: any, company: Company, period: string, ledger: LedgerEntry[], obligations: TaxObligation[]) {
-  drawHeader(doc, 'VAT Return -- Form 002', `Period: ${period}  ·  Due: 21st of following month  ·  File with: Nigeria Revenue Service (NRS)`, company);
+  drawHeader(doc, 'VAT Return -- Form 002', `Period: ${period}  ·  Due: 21st of following month  ·  File with: Nigeria Revenue Service (NRS)`, company, logoB64);
   let y = 72;
 
   y = sectionTitle(doc, 'TAXPAYER DETAILS', y);
@@ -240,7 +244,7 @@ async function generateVATReturn(doc: any, company: Company, period: string, led
 
 // ─── PAYE Monthly Schedule PDF ───────────────────────────────────────────────
 async function generatePAYESchedule(doc: any, company: Company, period: string, ledger: LedgerEntry[], obligations: TaxObligation[]) {
-  drawHeader(doc, 'PAYE Monthly Remittance Schedule', `Period: ${period}  ·  Due: 10th of following month  ·  File with: ${company.state} State Internal Revenue Service`, company);
+  drawHeader(doc, 'PAYE Monthly Remittance Schedule', `Period: ${period}  ·  Due: 10th of following month  ·  File with: ${company.state} State Internal Revenue Service`, company, logoB64);
   let y = 72;
 
   y = sectionTitle(doc, 'EMPLOYER DETAILS', y);
@@ -341,7 +345,7 @@ async function generatePAYESchedule(doc: any, company: Company, period: string, 
 
 // ─── WHT Schedule PDF ────────────────────────────────────────────────────────
 async function generateWHTSchedule(doc: any, company: Company, period: string, ledger: LedgerEntry[], obligations: TaxObligation[]) {
-  drawHeader(doc, 'Withholding Tax (WHT) Schedule', `Period: ${period}  ·  Due: 21st of following month  ·  File with: Nigeria Revenue Service (NRS)`, company);
+  drawHeader(doc, 'Withholding Tax (WHT) Schedule', `Period: ${period}  ·  Due: 21st of following month  ·  File with: Nigeria Revenue Service (NRS)`, company, logoB64);
   let y = 72;
 
   y = sectionTitle(doc, 'AGENT DETAILS', y);
@@ -430,7 +434,7 @@ async function generateWHTSchedule(doc: any, company: Company, period: string, l
 
 // ─── CIT Computation PDF ─────────────────────────────────────────────────────
 async function generateCITReturn(doc: any, company: Company, period: string, ledger: LedgerEntry[], obligations: TaxObligation[]) {
-  drawHeader(doc, 'Company Income Tax (CIT) Computation', `Period: ${period}  ·  Due: 6 months after year-end  ·  File with: Nigeria Revenue Service (NRS)`, company);
+  drawHeader(doc, 'Company Income Tax (CIT) Computation', `Period: ${period}  ·  Due: 6 months after year-end  ·  File with: Nigeria Revenue Service (NRS)`, company, logoB64);
   let y = 72;
 
   y = sectionTitle(doc, 'COMPANY DETAILS', y);
@@ -526,7 +530,7 @@ async function generateCITReturn(doc: any, company: Company, period: string, led
 
 // ─── PIT Return PDF (Individual) ─────────────────────────────────────────────
 async function generatePITReturn(doc: any, company: Company, period: string, ledger: LedgerEntry[], obligations: TaxObligation[]) {
-  drawHeader(doc, 'Personal Income Tax -- Self-Assessment Return (Form A)', `Tax Year: ${period}  ·  Due: 31 March annually  ·  File with: ${company.state} State IRS`, company);
+  drawHeader(doc, 'Personal Income Tax -- Self-Assessment Return (Form A)', `Tax Year: ${period}  ·  Due: 31 March annually  ·  File with: ${company.state} State IRS`, company, logoB64);
   let y = 72;
 
   y = sectionTitle(doc, 'TAXPAYER DETAILS', y);
@@ -630,7 +634,7 @@ async function generatePITReturn(doc: any, company: Company, period: string, led
 
 // ─── Tax Compliance Summary PDF ───────────────────────────────────────────────
 async function generateComplianceSummary(doc: any, company: Company, period: string, ledger: LedgerEntry[], obligations: TaxObligation[]) {
-  drawHeader(doc, 'Tax Compliance Summary Report', `Period: ${period}  ·  All obligations  ·  Nigeria Tax Act 2025`, company);
+  drawHeader(doc, 'Tax Compliance Summary Report', `Period: ${period}  ·  All obligations  ·  Nigeria Tax Act 2025`, company, logoB64);
   let y = 72;
 
   const totalSales = ledger.filter(l => l.type === 'sale').reduce((s, l) => s + l.amount, 0);
@@ -782,6 +786,16 @@ export const TaxExport: React.FC<TaxExportProps> = ({ company, onNavigate }) => 
     setGenerating(true); setError('');
     try {
             const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  let logoB64 = '';
+  try {
+    const resp = await fetch('/logo-full.png');
+    const blob = await resp.blob();
+    logoB64 = await new Promise<string>(res => {
+      const r = new FileReader();
+      r.onload = () => res((r.result as string).split(',')[1]);
+      r.readAsDataURL(blob);
+    });
+  } catch {}
 
       switch (reportType) {
         case 'vat':      await generateVATReturn(doc, company, period, ledgerEntries, obligations); break;

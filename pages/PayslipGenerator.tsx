@@ -54,6 +54,14 @@ export const PayslipGenerator: React.FC<PayslipGeneratorProps> = ({ company }) =
       const RED:   [number,number,number] = [220, 38, 38];
 
       const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  let logoB64 = '';
+  try {
+    const resp = await fetch('/logo-full.png');
+    const blob = await resp.blob();
+    logoB64 = await new Promise<string>(res => {
+      const r = new FileReader(); r.onload = () => res((r.result as string).split(',')[1]); r.readAsDataURL(blob);
+    });
+  } catch {}
       const W = doc.internal.pageSize.getWidth();
 
       validEmps.forEach((emp, idx) => {
@@ -87,7 +95,7 @@ export const PayslipGenerator: React.FC<PayslipGeneratorProps> = ({ company }) =
           emp.tin ? `TIN: ${emp.tin}` : '',
           `Employer TIN: ${company.tin || '--'}`,
           `RC No: ${company.rcNumber || '--'}`,
-        ].filter(Boolean).join('   ·   ');
+        ].filter(Boolean).join('·');
         doc.text(empInfo, 14, 54);
         doc.text(`Page 1 of 1`, W - 14, 54, { align: 'right' });
 
@@ -104,10 +112,10 @@ export const PayslipGenerator: React.FC<PayslipGeneratorProps> = ({ company }) =
           startY: y,
           head: [['Component', 'Calculation', 'Amount (₦)']],
           body: [
-            ['Basic Salary (60% of gross)',      '60% × ' + fmtM(gross), fmtM(calc.basicSalary)],
-            ['Housing Allowance (20%)',           '20% × ' + fmtM(gross), fmtM(calc.housing || 0)],
-            ['Transport Allowance (10%)',         '10% × ' + fmtM(gross), fmtM(calc.transport || 0)],
-            ['Other Allowances (10%)',            '10% × ' + fmtM(gross), fmtM(gross * 0.10)],
+            ['Basic Salary (60% of gross)',      '60% ×' + fmtM(gross), fmtM(calc.basicSalary)],
+            ['Housing Allowance (20%)',           '20% ×' + fmtM(gross), fmtM(calc.housing || 0)],
+            ['Transport Allowance (10%)',         '10% ×' + fmtM(gross), fmtM(calc.transport || 0)],
+            ['Other Allowances (10%)',            '10% ×' + fmtM(gross), fmtM(gross * 0.10)],
             ['GROSS SALARY',                      '',                      fmtM(gross)],
           ],
           theme: 'grid',
