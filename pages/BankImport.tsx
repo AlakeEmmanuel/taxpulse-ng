@@ -81,7 +81,7 @@ function detectMonthYear(filename: string): string {
 function monthYearLabel(my: string): string {
   const [y, m] = my.split('-');
   const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  return (months[parseInt(m) - 1] || m) + ' ' + y;
+  return (months[parseInt(m) - 1] || m) + '' + y;
 }
 
 const MONTH_OPTIONS = (() => {
@@ -124,7 +124,7 @@ async function extractTextFromFile(file: File, password?: string): Promise<strin
       for (let i = 1; i <= Math.min(pdf.numPages, 20); i++) {
         const page = await pdf.getPage(i);
         const tc = await page.getTextContent();
-        lines.push(tc.items.map((item: any) => item.str).join(' '));
+        lines.push(tc.items.map((item: any) => item.str).join(''));
       }
       const fullText = lines.join('\n');
       if (fullText.trim().length > 50) return fullText;
@@ -185,7 +185,7 @@ Return ONLY a JSON array, no markdown, no explanation:
 
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer' + apiKey },
     body: JSON.stringify({
       model: isImage ? 'llama-3.2-90b-vision-preview' : 'llama-3.3-70b-versatile',
       max_tokens: 4000,
@@ -236,8 +236,8 @@ const StatementsTab: React.FC<{ company: Company; onNavigate: (v: AppView) => vo
 
   const handleDelete = async (stmt: any) => {
     if (!window.confirm(
-      'Delete ' + monthYearLabel(stmt.monthYear) + ' statement?\n\nThis will permanently remove the statement AND all ' +
-      (stmt.notes?.match(/\d+/)?.[0] || 'associated') + ' ledger entries imported from it. This cannot be undone.'
+      'Delete' + monthYearLabel(stmt.monthYear) + 'statement?\n\nThis will permanently remove the statement AND all' +
+      (stmt.notes?.match(/\d+/)?.[0] || 'associated') + 'ledger entries imported from it. This cannot be undone.'
     )) return;
 
     setDeleting(stmt.id);
@@ -248,7 +248,7 @@ const StatementsTab: React.FC<{ company: Company; onNavigate: (v: AppView) => vo
       if (stmt.storagePath) await db.deleteEvidence(stmt.id, stmt.storagePath);
       setStatements(prev => prev.filter(s => s.id !== stmt.id));
     } catch (e: any) {
-      alert('Delete failed: ' + (e?.message || 'Unknown error'));
+      alert('Delete failed:' + (e?.message || 'Unknown error'));
     } finally {
       setDeleting(null);
     }
@@ -291,7 +291,7 @@ const StatementsTab: React.FC<{ company: Company; onNavigate: (v: AppView) => vo
                   <div className="flex items-center gap-3 mt-1">
                     <span className="text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full">{txCount} transactions</span>
                     <span className="text-[10px] text-slate-400">Uploaded {stmt.uploadDate}</span>
-                    <span className="text-[10px] text-slate-400">{stmt.sizeBytes ? (stmt.sizeBytes / 1024).toFixed(1) + ' KB' : ''}</span>
+                    <span className="text-[10px] text-slate-400">{stmt.sizeBytes ? (stmt.sizeBytes / 1024).toFixed(1) + 'KB' : ''}</span>
                   </div>
                 </div>
               </div>
@@ -300,7 +300,7 @@ const StatementsTab: React.FC<{ company: Company; onNavigate: (v: AppView) => vo
                 disabled={deleting === stmt.id}
                 className="shrink-0 text-xs font-bold text-red-400 hover:text-red-600 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-xl transition-colors disabled:opacity-50"
               >
-                {deleting === stmt.id ? 'Deleting...' : '<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></span> Delete'}
+                {deleting === stmt.id ? 'Deleting...' : 'Delete'}
               </button>
             </div>
           </div>
@@ -349,7 +349,7 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
     // Duplicate check
     const exists = await db.bankStatementExists(company.id, monthYear);
     if (exists) {
-      setError(monthYearLabel(monthYear) + ' statement already imported. Delete it first from the Statements tab if you need to re-import.');
+      setError(monthYearLabel(monthYear) + 'statement already imported. Delete it first from the Statements tab if you need to re-import.');
       return;
     }
 
@@ -403,7 +403,7 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
           companyId: company.id,
           date: t.date,
           type: t.type,
-          description: '[' + monthYearLabel(monthYear) + '] ' + t.description,
+          description: '[' + monthYearLabel(monthYear) + ']' + t.description,
           amount: t.amount,
           taxAmount: t.taxAmount,
           sourceId: stmtId,
@@ -421,7 +421,7 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
           companyId: company.id,
           uploadDate: new Date().toISOString().split('T')[0],
           category: 'bank_statement',
-          notes: count + ' transactions imported to ledger on ' + new Date().toLocaleDateString('en-NG'),
+          notes: count + 'transactions imported to ledger on' + new Date().toLocaleDateString('en-NG'),
           monthYear,
         } as any);
         setVaultSaved(true);
@@ -458,7 +458,7 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
 
       {/* Tabs */}
       <div className="flex gap-1 bg-slate-100 p-1 rounded-xl w-fit">
-          {([['import', '<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span> Import Statement'], ['statements', 'My Statements']] as [Tab, string][]).map(([t, label]) => (
+          {([['import', 'Import Statement'], ['statements', 'My Statements']] as [Tab, string][]).map(([t, label]) => (
           <button key={t} onClick={() => { setTab(t); if (t === 'import') reset(); }}
             className={`px-5 py-2 rounded-lg text-sm font-bold transition-all ${tab === t ? 'bg-white text-cac-green shadow' : 'text-slate-500 hover:text-slate-700'}`}>
             {label}
@@ -546,11 +546,16 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
               <div className="bg-blue-50 rounded-2xl p-5 space-y-3">
                 <p className="font-bold text-blue-900 text-sm">How it works</p>
                 <div className="grid grid-cols-4 gap-3">
-                  {[[(<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>),'Upload statement'],[(<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg></span>),'AI extracts transactions'],[(<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>),'Review & edit'],[(<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>),'Saves to Ledger']].map(([icon, label], i) => (
-                    <div key={i} className="text-center">
-                      <div className="text-2xl mb-1">{icon}</div>
-                      <p className="text-xs text-blue-800 font-semibold">{label}</p>
-                    </div>
+                    {[
+                      ['Upload statement', 'Select your PDF or Excel bank statement'],
+                      ['AI extracts transactions', 'AI reads and categorises each row'],
+                      ['Review and edit', 'Correct any misclassified entries'],
+                      ['Saves to Ledger', 'All transactions added automatically'],
+                    ].map(([title, desc], i) => (
+                      <div key={i} className="text-center p-3 bg-white rounded-xl border border-blue-100">
+                        <p className="text-xs font-bold text-blue-900 mb-1">{i + 1}. {title}</p>
+                        <p className="text-[10px] text-blue-600">{desc}</p>
+                      </div>
                   ))}
                 </div>
               </div>
@@ -584,7 +589,7 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
                   <button onClick={() => setStep('upload')} className="text-sm text-slate-500 border border-slate-200 px-4 py-2 rounded-xl hover:bg-slate-50">← Re-upload</button>
                   <button onClick={importToLedger} disabled={saving || selected.length === 0}
                     className="bg-cac-green text-white px-5 py-2 rounded-xl font-bold text-sm hover:bg-cac-dark disabled:opacity-50">
-                    {saving ? 'Importing...' : 'Import ' + selected.length + ' to Ledger'}
+                    {saving ? 'Importing...' : 'Import' + selected.length + 'to Ledger'}
                   </button>
                 </div>
               </header>
@@ -598,7 +603,7 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
                   { label: "VAT to Remit",   value: fmt(totalVAT),      color: 'text-amber-700',  bg: 'bg-amber-50'  },
                   { label: "WHT to Deduct",  value: fmt(totalWHT),      color: 'text-purple-700', bg: 'bg-purple-50' },
                 ].map(s => (
-                  <div key={s.label} className={s.bg + ' rounded-2xl p-4'}>
+                  <div key={s.label} className={s.bg + 'rounded-2xl p-4'}>
                     <p className="text-xs text-slate-500 font-semibold">{s.label}</p>
                     <p className={`text-lg font-extrabold mt-1 ${s.color}`}>{s.value}</p>
                   </div>
@@ -686,4 +691,3 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
     </div>
   );
 };
-
