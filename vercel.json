@@ -1,36 +1,16 @@
 {
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/app/(.*)",
-      "dest": "/index.html"
-    },
-    {
-      "src": "/app",
-      "dest": "/index.html"
-    },
-    {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1"
-    },
-    {
-      "src": "/(.*\\.(?:js|css|png|jpg|svg|ico|woff|woff2|mjs|webp|json))$",
-      "dest": "/$1"
-    },
-    {
-      "src": "/",
-      "dest": "/landing.html"
-    },
-    {
-      "src": "/admin",
-      "dest": "/index.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+  "functions": {
+    "api/*.ts": {
+      "runtime": "@vercel/node@5.1.9"
     }
+  },
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/app/(.*)", "dest": "/index.html" },
+    { "src": "/app", "dest": "/index.html" },
+    { "src": "/assets/(.*)", "dest": "/assets/$1" },
+    { "src": "/(.*\\.(?:js|css|png|jpg|svg|ico|woff|woff2|mjs|webp|json))$", "dest": "/$1" },
+    { "src": "/admin", "dest": "/index.html" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
