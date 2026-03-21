@@ -119,7 +119,7 @@ function infoBox(doc: any, rows: [string, string][], startX: number, startY: num
 }
 
 // ─── VAT Return PDF ──────────────────────────────────────────────────────────
-async function generateVATReturn(doc: any, company: Company, period: string, ledger: LedgerEntry[], obligations: TaxObligation[]) {
+async function generateVATReturn(doc: any, company: Company, period: string, ledger: LedgerEntry[], obligations: TaxObligation[], logoB64 = "") {
   drawHeader(doc, 'VAT Return -- Form 002', `Period: ${period}  ·  Due: 21st of following month  ·  File with: Nigeria Revenue Service (NRS)`, company, logoB64);
   let y = 72;
 
@@ -243,7 +243,7 @@ async function generateVATReturn(doc: any, company: Company, period: string, led
 }
 
 // ─── PAYE Monthly Schedule PDF ───────────────────────────────────────────────
-async function generatePAYESchedule(doc: any, company: Company, period: string, ledger: LedgerEntry[], obligations: TaxObligation[]) {
+async function generatePAYESchedule(doc: any, company: Company, period: string, ledger: LedgerEntry[], obligations: TaxObligation[], logoB64 = "") {
   drawHeader(doc, 'PAYE Monthly Remittance Schedule', `Period: ${period}  ·  Due: 10th of following month  ·  File with: ${company.state} State Internal Revenue Service`, company, logoB64);
   let y = 72;
 
@@ -344,7 +344,7 @@ async function generatePAYESchedule(doc: any, company: Company, period: string, 
 }
 
 // ─── WHT Schedule PDF ────────────────────────────────────────────────────────
-async function generateWHTSchedule(doc: any, company: Company, period: string, ledger: LedgerEntry[], obligations: TaxObligation[]) {
+async function generateWHTSchedule(doc: any, company: Company, period: string, ledger: LedgerEntry[], obligations: TaxObligation[], logoB64 = "") {
   drawHeader(doc, 'Withholding Tax (WHT) Schedule', `Period: ${period}  ·  Due: 21st of following month  ·  File with: Nigeria Revenue Service (NRS)`, company, logoB64);
   let y = 72;
 
@@ -433,7 +433,7 @@ async function generateWHTSchedule(doc: any, company: Company, period: string, l
 }
 
 // ─── CIT Computation PDF ─────────────────────────────────────────────────────
-async function generateCITReturn(doc: any, company: Company, period: string, ledger: LedgerEntry[], obligations: TaxObligation[]) {
+async function generateCITReturn(doc: any, company: Company, period: string, ledger: LedgerEntry[], obligations: TaxObligation[], logoB64 = "") {
   drawHeader(doc, 'Company Income Tax (CIT) Computation', `Period: ${period}  ·  Due: 6 months after year-end  ·  File with: Nigeria Revenue Service (NRS)`, company, logoB64);
   let y = 72;
 
@@ -529,7 +529,7 @@ async function generateCITReturn(doc: any, company: Company, period: string, led
 }
 
 // ─── PIT Return PDF (Individual) ─────────────────────────────────────────────
-async function generatePITReturn(doc: any, company: Company, period: string, ledger: LedgerEntry[], obligations: TaxObligation[]) {
+async function generatePITReturn(doc: any, company: Company, period: string, ledger: LedgerEntry[], obligations: TaxObligation[], logoB64 = "") {
   drawHeader(doc, 'Personal Income Tax -- Self-Assessment Return (Form A)', `Tax Year: ${period}  ·  Due: 31 March annually  ·  File with: ${company.state} State IRS`, company, logoB64);
   let y = 72;
 
@@ -633,7 +633,7 @@ async function generatePITReturn(doc: any, company: Company, period: string, led
 }
 
 // ─── Tax Compliance Summary PDF ───────────────────────────────────────────────
-async function generateComplianceSummary(doc: any, company: Company, period: string, ledger: LedgerEntry[], obligations: TaxObligation[]) {
+async function generateComplianceSummary(doc: any, company: Company, period: string, ledger: LedgerEntry[], obligations: TaxObligation[], logoB64 = "") {
   drawHeader(doc, 'Tax Compliance Summary Report', `Period: ${period}  ·  All obligations  ·  Nigeria Tax Act 2025`, company, logoB64);
   let y = 72;
 
@@ -798,12 +798,12 @@ export const TaxExport: React.FC<TaxExportProps> = ({ company, onNavigate }) => 
   } catch {}
 
       switch (reportType) {
-        case 'vat':      await generateVATReturn(doc, company, period, ledgerEntries, obligations); break;
-        case 'paye':     await generatePAYESchedule(doc, company, period, ledgerEntries, obligations); break;
-        case 'wht':      await generateWHTSchedule(doc, company, period, ledgerEntries, obligations); break;
-        case 'cit':      await generateCITReturn(doc, company, period, ledgerEntries, obligations); break;
-        case 'pit':      await generatePITReturn(doc, company, period, ledgerEntries, obligations); break;
-        default:         await generateComplianceSummary(doc, company, period, ledgerEntries, obligations); break;
+        case 'vat':      await generateVATReturn(doc, company, period, ledgerEntries, obligations, logoB64); break;
+        case 'paye':     await generatePAYESchedule(doc, company, period, ledgerEntries, obligations, logoB64); break;
+        case 'wht':      await generateWHTSchedule(doc, company, period, ledgerEntries, obligations, logoB64); break;
+        case 'cit':      await generateCITReturn(doc, company, period, ledgerEntries, obligations, logoB64); break;
+        case 'pit':      await generatePITReturn(doc, company, period, ledgerEntries, obligations, logoB64); break;
+        default:         await generateComplianceSummary(doc, company, period, ledgerEntries, obligations, logoB64); break;
       }
 
       addFooters(doc);
