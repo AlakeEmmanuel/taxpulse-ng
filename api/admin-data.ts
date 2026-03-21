@@ -38,6 +38,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method === 'GET') {
 
       if (action === 'stats') {
+        // Verify env vars are set
+        if (!SUPABASE_URL || !SERVICE_KEY) {
+          return res.status(500).json({ error: 'Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY env vars on Vercel' });
+        }
         const [profiles, companies, obligations, promoCodes] = await Promise.all([
           db.from('profiles').select('id, email, plan, subscription_status, plan_expires_at, created_at, promo_code_used'),
           db.from('companies').select('id, user_id, name, entity_type, state, created_at'),
@@ -191,6 +195,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   } catch (e: any) {
     console.error('Admin API error:', e);
-    return res.status(500).json({ error: e.message });
+    return res.status(500).json({ 
+      error: e.message || 'Unknown error',
+      hint: 'Check SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are set in Vercel environment variables'
+    });
   }
 }
