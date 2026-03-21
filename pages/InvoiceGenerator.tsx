@@ -1,3 +1,5 @@
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import React, { useState } from 'react';
 import { Company } from '../types';
 import { computeInvoice, VAT_RATE, InvoiceLineItem } from '../utils/taxEngine';
@@ -50,14 +52,7 @@ export const InvoiceGenerator: React.FC<InvoiceGeneratorProps> = ({ company }) =
     }
     setGenerating(true); setError('');
     try {
-      const jsPDFModule      = await import('jspdf').catch(() => null);
-      const autoTableModule  = await import('jspdf-autotable').catch(() => null);
-      if (!jsPDFModule || !autoTableModule) {
-        setError('PDF library not installed. Run: npm install jspdf jspdf-autotable');
-        return;
-      }
-      const { jsPDF } = jsPDFModule;
-      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
       const W   = doc.internal.pageSize.getWidth();
       const H   = doc.internal.pageSize.getHeight();
 
@@ -131,7 +126,7 @@ export const InvoiceGenerator: React.FC<InvoiceGeneratorProps> = ({ company }) =
 
       // ── Line items table ──
       const validLines = lines.filter(l => l.description.trim());
-      (doc as any).autoTable({
+      autoTable(doc, {
         startY: y,
         head: [['#', 'Description', 'Qty', 'Unit Price (₦)', 'VAT', 'Line Total (₦)', 'VAT Amount (₦)']],
         body: computed.lines.map((l, i) => [

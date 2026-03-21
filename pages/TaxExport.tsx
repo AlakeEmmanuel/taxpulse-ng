@@ -1,3 +1,5 @@
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import React, { useState, useEffect } from 'react';
 import { Company, TaxStatus, TaxType, EntityType, LedgerEntry, TaxObligation } from '../types';
 import { Card, Button } from '../components/Shared';
@@ -147,7 +149,7 @@ async function generateVATReturn(doc: any, company: Company, period: string, led
 
   const obligation = obligations.find(o => o.type === TaxType.VAT && o.period === period);
 
-  (doc as any).autoTable({
+  autoTable(doc, {
     startY: y,
     head: [['Line', 'Description', 'Amount (NGN)']],
     body: [
@@ -176,7 +178,7 @@ async function generateVATReturn(doc: any, company: Company, period: string, led
   y = sectionTitle(doc, 'TRANSACTION DETAIL -- SALES (Output VAT)', y);
   const salesRows = periodLedger.filter(l => l.type === 'sale');
   if (salesRows.length > 0) {
-    (doc as any).autoTable({
+    autoTable(doc, {
       startY: y,
       head: [['Date', 'Description', 'Sale Amount', 'VAT @ 7.5%']],
       body: salesRows.map(l => [l.date, l.description.slice(0, 50), fmt(l.amount), fmt(l.taxAmount)]),
@@ -198,7 +200,7 @@ async function generateVATReturn(doc: any, company: Company, period: string, led
   y = sectionTitle(doc, 'TRANSACTION DETAIL -- PURCHASES (Input VAT)', y);
   const expRows = periodLedger.filter(l => l.type === 'expense');
   if (expRows.length > 0) {
-    (doc as any).autoTable({
+    autoTable(doc, {
       startY: y,
       head: [['Date', 'Description', 'Purchase Amount', 'Input VAT @ 7.5%']],
       body: expRows.map(l => [l.date, l.description.slice(0, 50), fmt(l.amount), fmt(l.taxAmount)]),
@@ -261,7 +263,7 @@ async function generatePAYESchedule(doc: any, company: Company, period: string, 
   const totalPayroll = periodLedger.filter(l => l.type === 'expense' && l.description.toLowerCase().includes('salary')).reduce((s,l) => s + l.amount, 0);
   const payeDeducted = periodLedger.filter(l => l.type === 'expense' && l.description.toLowerCase().includes('salary')).reduce((s,l) => s + l.taxAmount, 0);
 
-  (doc as any).autoTable({
+  autoTable(doc, {
     startY: y,
     head: [['Item', 'Description', 'Amount (NGN)']],
     body: [
@@ -283,7 +285,7 @@ async function generatePAYESchedule(doc: any, company: Company, period: string, 
   y = (doc as any).lastAutoTable.finalY + 10;
 
   y = sectionTitle(doc, 'NTA 2025 PAYE BANDS (EFFECTIVE 1 JAN 2026)', y);
-  (doc as any).autoTable({
+  autoTable(doc, {
     startY: y,
     head: [['Annual Income Band', 'Rate', 'Note']],
     body: [
@@ -312,7 +314,7 @@ async function generatePAYESchedule(doc: any, company: Company, period: string, 
   for (let i = 1; i <= Math.max(5, company.employeeCount || 5); i++) {
     empRows.push([i.toString(), '', '', '', '', '', '']);
   }
-  (doc as any).autoTable({
+  autoTable(doc, {
     startY: y,
     head: [['#', 'Employee Name', 'TIN / NSITF No.', 'Gross Salary (₦)', 'Deductions (₦)', 'Taxable Income (₦)', 'PAYE Deducted (₦)']],
     body: empRows,
@@ -362,7 +364,7 @@ async function generateWHTSchedule(doc: any, company: Company, period: string, l
   const totalWHT = periodExpenses.reduce((s, l) => s + l.taxAmount, 0);
   const totalPayments = periodExpenses.reduce((s, l) => s + l.amount, 0);
 
-  (doc as any).autoTable({
+  autoTable(doc, {
     startY: y,
     head: [['Item', 'Category', 'Gross Payments (₦)', 'WHT Rate', 'WHT Amount (₦)']],
     body: [
@@ -382,7 +384,7 @@ async function generateWHTSchedule(doc: any, company: Company, period: string, l
 
   y = sectionTitle(doc, 'VENDOR PAYMENT DETAIL', y);
   if (periodExpenses.length > 0) {
-    (doc as any).autoTable({
+    autoTable(doc, {
       startY: y,
       head: [['Date', 'Vendor / Description', 'Payment Amount (₦)', 'WHT Rate', 'WHT Deducted (₦)', 'Net Paid (₦)']],
       body: periodExpenses.map(l => {
@@ -403,7 +405,7 @@ async function generateWHTSchedule(doc: any, company: Company, period: string, l
   y = sectionTitle(doc, 'WHT CREDIT NOTE ISSUANCE', y);
   doc.setFontSize(8); doc.setTextColor(100, 116, 139); doc.setFont('helvetica', 'italic');
   doc.text('After remitting WHT to NRS, issue credit notes to each vendor. Fill below:', 14, y); y += 8;
-  (doc as any).autoTable({
+  autoTable(doc, {
     startY: y,
     head: [['Vendor Name', 'Vendor TIN', 'Amount Paid (₦)', 'WHT Deducted (₦)', 'Credit Note No.', 'Date Issued']],
     body: Array(Math.max(3, periodExpenses.length)).fill(['', '', '', '', '', '']),
@@ -456,7 +458,7 @@ async function generateCITReturn(doc: any, company: Company, period: string, led
   const devLevy = taxableProfit * devLevyRate;
   const totalTax = citLiability + devLevy;
 
-  (doc as any).autoTable({
+  autoTable(doc, {
     startY: y,
     head: [['Line', 'Description', 'Amount (NGN)']],
     body: [
@@ -494,7 +496,7 @@ async function generateCITReturn(doc: any, company: Company, period: string, led
 
   if (y > 210) { doc.addPage(); y = 20; }
   y = sectionTitle(doc, 'NTA 2025 CIT RULES', y);
-  (doc as any).autoTable({
+  autoTable(doc, {
     startY: y,
     head: [['Category', 'Threshold', 'CIT Rate', 'Dev Levy', 'CGT']],
     body: [
@@ -557,7 +559,7 @@ async function generatePITReturn(doc: any, company: Company, period: string, led
     : taxableIncome <= 50_000_000 ? 4_680_000 + (taxableIncome - 25_000_000) * 0.23
     : 10_430_000 + (taxableIncome - 50_000_000) * 0.25;
 
-  (doc as any).autoTable({
+  autoTable(doc, {
     startY: y,
     head: [['Line', 'Income / Deduction', 'Amount (NGN)']],
     body: [
@@ -592,7 +594,7 @@ async function generatePITReturn(doc: any, company: Company, period: string, led
 
   if (y > 210) { doc.addPage(); y = 20; }
   y = sectionTitle(doc, 'PIT BAND BREAKDOWN (NTA 2025)', y);
-  (doc as any).autoTable({
+  autoTable(doc, {
     startY: y,
     head: [['Band', 'Annual Income Range', 'Rate', 'Max Tax on Band']],
     body: [
@@ -640,7 +642,7 @@ async function generateComplianceSummary(doc: any, company: Company, period: str
   const totalTaxPaid = filed.reduce((s, o) => s + (o.actualAmount || o.estimatedAmount), 0);
 
   y = sectionTitle(doc, 'FINANCIAL SUMMARY', y);
-  (doc as any).autoTable({
+  autoTable(doc, {
     startY: y,
     head: [['Metric', 'Amount (NGN)']],
     body: [
@@ -663,7 +665,7 @@ async function generateComplianceSummary(doc: any, company: Company, period: str
   y = (doc as any).lastAutoTable.finalY + 10;
 
   y = sectionTitle(doc, 'TAX OBLIGATIONS STATUS', y);
-  (doc as any).autoTable({
+  autoTable(doc, {
     startY: y,
     head: [['Tax', 'Period', 'Due Date', 'Amount (NGN)', 'Status', 'Filed On']],
     body: obligations.map(o => [
@@ -704,7 +706,7 @@ async function generateComplianceSummary(doc: any, company: Company, period: str
 
   if (y > 200) { doc.addPage(); y = 20; }
   y = sectionTitle(doc, 'NTA 2025 TAX CALENDAR REFERENCE', y);
-  (doc as any).autoTable({
+  autoTable(doc, {
     startY: y,
     head: [['Tax', 'Rate', 'Filing Deadline', 'Authority', 'Key Change (NTA 2025)']],
     body: [
@@ -779,14 +781,7 @@ export const TaxExport: React.FC<TaxExportProps> = ({ company, onNavigate }) => 
   const generatePDF = async () => {
     setGenerating(true); setError('');
     try {
-      const jsPDFModule = await import('jspdf').catch(() => null);
-      const autoTableModule = await import('jspdf-autotable').catch(() => null);
-      if (!jsPDFModule || !autoTableModule) {
-        setError('PDF library not installed. Run: npm install jspdf jspdf-autotable');
-        return;
-      }
-      const { jsPDF } = jsPDFModule;
-      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
       switch (reportType) {
         case 'vat':      await generateVATReturn(doc, company, period, ledgerEntries, obligations); break;

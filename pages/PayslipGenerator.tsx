@@ -1,3 +1,5 @@
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import React, { useState } from 'react';
 import { Company } from '../types';
 import { calcPayslip } from '../utils/taxEngine';
@@ -45,14 +47,7 @@ export const PayslipGenerator: React.FC<PayslipGeneratorProps> = ({ company }) =
 
     setGenerating(true); setError('');
     try {
-      const jsPDFModule = await import('jspdf').catch(() => null);
-      const autoTableModule = await import('jspdf-autotable').catch(() => null);
-      if (!jsPDFModule || !autoTableModule) {
-        setError('PDF library not installed. Run: npm install jspdf jspdf-autotable');
-        return;
-      }
-      const { jsPDF } = jsPDFModule;
-      const GREEN: [number,number,number] = [0, 132, 61];
+            const GREEN: [number,number,number] = [0, 132, 61];
       const DARK:  [number,number,number] = [30, 41, 59];
       const LGRAY: [number,number,number] = [241, 245, 249];
       const WHITE: [number,number,number] = [255, 255, 255];
@@ -105,7 +100,7 @@ export const PayslipGenerator: React.FC<PayslipGeneratorProps> = ({ company }) =
         doc.line(14, y + 2, W - 14, y + 2);
         y += 6;
 
-        (doc as any).autoTable({
+        autoTable(doc, {
           startY: y,
           head: [['Component', 'Calculation', 'Amount (₦)']],
           body: [
@@ -138,7 +133,7 @@ export const PayslipGenerator: React.FC<PayslipGeneratorProps> = ({ company }) =
 
         const annualRentRelief = Math.min(rent * 0.20, 500_000);
 
-        (doc as any).autoTable({
+        autoTable(doc, {
           startY: y,
           head: [['Deduction', 'Basis (NTA 2025)', 'Amount (₦)']],
           body: [
@@ -163,7 +158,7 @@ export const PayslipGenerator: React.FC<PayslipGeneratorProps> = ({ company }) =
         doc.setDrawColor(200, 200, 200); doc.line(14, y + 2, W - 14, y + 2);
         y += 6;
 
-        (doc as any).autoTable({
+        autoTable(doc, {
           startY: y,
           head: [['Contribution', 'Rate', 'Amount (₦)']],
           body: [
