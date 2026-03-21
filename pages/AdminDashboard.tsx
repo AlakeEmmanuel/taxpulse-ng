@@ -1,29 +1,16 @@
+// pages/AdminDashboard.tsx
 import React, { useState, useEffect, useCallback } from 'react';
 
 const SESSION_KEY = 'taxpulse_admin_auth';
-const fmt     = (n: number) => 'NGN ' + (n || 0).toLocaleString('en-NG');
+
+const fmt     = (n: number) => '₦' + (n || 0).toLocaleString('en-NG');
 const fmtNum  = (n: number) => (n || 0).toLocaleString('en-NG');
 const fmtDate = (d: string) => d ? new Date(d).toLocaleDateString('en-NG', { day: '2-digit', month: 'short', year: 'numeric' }) : '--';
 
-const Icons = {
-  home:    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
-  users:   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
-  tag:     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>,
-  tool:    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>,
-  refresh: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>,
-  lock:    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>,
-  arrow:   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>,
-  search:  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
-  check:   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
-  x:       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
-  trend:   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>,
-  link:    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>,
-};
-
 const PasswordGate: React.FC<{ onUnlock: (s: string) => void }> = ({ onUnlock }) => {
-  const [pw, setPw]       = useState('');
-  const [err, setErr]     = useState('');
-  const [busy, setBusy]   = useState(false);
+  const [pw, setPw]     = useState('');
+  const [err, setErr]   = useState('');
+  const [busy, setBusy] = useState(false);
 
   const attempt = async () => {
     if (!pw.trim()) return;
@@ -38,61 +25,54 @@ const PasswordGate: React.FC<{ onUnlock: (s: string) => void }> = ({ onUnlock })
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
-      <div style={{ background: '#111', border: '1px solid #222', borderRadius: '16px', padding: '36px', width: '100%', maxWidth: '380px' }}>
-        <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-          <img src="/logo-full.png" alt="TaxPulse NG" style={{ height: '32px', width: 'auto', objectFit: 'contain', marginBottom: '16px', filter: 'brightness(0) invert(1)' }} />
-          <p style={{ color: '#555', fontSize: '13px', margin: 0 }}>Admin access only</p>
+    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
+      <div className="bg-white rounded-2xl p-8 w-full max-w-sm shadow-2xl">
+        <div className="text-center mb-6">
+          <div className="w-14 h-14 bg-cac-green rounded-2xl flex items-center justify-center text-white font-black text-xl mx-auto mb-3">A</div>
+          <h1 className="text-xl font-extrabold text-slate-900">TaxPulse Admin</h1>
+          <p className="text-slate-400 text-sm mt-1">Enter your admin password to continue</p>
         </div>
         <input type="password" value={pw} onChange={e => setPw(e.target.value)} onKeyDown={e => e.key === 'Enter' && attempt()}
-          placeholder="Enter admin password" autoFocus
-          style={{ width: '100%', padding: '12px 16px', background: '#1a1a1a', border: '1px solid #333', borderRadius: '10px', fontSize: '14px', color: 'white', outline: 'none', boxSizing: 'border-box', marginBottom: '12px', fontFamily: 'monospace' }} />
-        {err && <div style={{ background: '#2a0a0a', border: '1px solid #5a1a1a', borderRadius: '8px', padding: '10px 14px', fontSize: '12px', color: '#ff6b6b', marginBottom: '12px' }}>{err}</div>}
+          placeholder="Admin password" autoFocus
+          className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-cac-green/30 focus:border-cac-green mb-3" />
+        {err && <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-xs text-red-700 mb-3">{err}</div>}
         <button onClick={attempt} disabled={busy || !pw.trim()}
-          style={{ width: '100%', padding: '12px', background: busy || !pw.trim() ? '#1a1a1a' : '#00843D', color: busy || !pw.trim() ? '#444' : 'white', border: 'none', borderRadius: '10px', fontWeight: 700, fontSize: '14px', cursor: busy || !pw.trim() ? 'not-allowed' : 'pointer' }}>
-          {busy ? 'Verifying...' : 'Unlock Dashboard'}
+          className="w-full py-3 bg-cac-green text-white rounded-xl font-bold text-sm hover:bg-cac-dark transition-all disabled:opacity-50">
+          {busy ? 'Verifying...' : 'Unlock Admin Panel'}
         </button>
-        <div style={{ textAlign: 'center', marginTop: '16px' }}>
-          <a href="/app" style={{ fontSize: '12px', color: '#444', textDecoration: 'none' }}>Back to app</a>
+        <div className="mt-4 text-center">
+          <a href="/app" className="text-xs text-slate-400 hover:text-cac-green">Back to app</a>
         </div>
       </div>
     </div>
   );
 };
 
-const StatCard: React.FC<{ label: string; value: string | number; sub?: string; color?: string; icon?: React.ReactNode }> =
-  ({ label, value, sub, color = 'white', icon }) => (
-  <div style={{ background: '#111', border: '1px solid #222', borderRadius: '12px', padding: '18px 20px' }}>
-    {icon && <div style={{ color: '#00843D', marginBottom: '10px' }}>{icon}</div>}
-    <p style={{ fontSize: '11px', color: '#555', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.8px', margin: '0 0 6px' }}>{label}</p>
-    <p style={{ fontSize: '22px', fontWeight: 700, color, margin: 0 }}>{typeof value === 'number' ? value.toLocaleString('en-NG') : value}</p>
-    {sub && <p style={{ fontSize: '11px', color: '#444', margin: '4px 0 0' }}>{sub}</p>}
+const StatCard: React.FC<{ label: string; value: string | number; sub?: string; color?: string; icon?: string }> =
+  ({ label, value, sub, color = 'text-slate-900', icon }) => (
+  <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+    {icon && <p className="text-2xl mb-2">{icon}</p>}
+    <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">{label}</p>
+    <p className={`text-2xl font-extrabold ${color}`}>{typeof value === 'number' ? value.toLocaleString('en-NG') : value}</p>
+    {sub && <p className="text-xs text-slate-400 mt-1">{sub}</p>}
   </div>
 );
 
-const TabBtn: React.FC<{ active: boolean; onClick: () => void; icon: React.ReactNode; label: string }> =
-  ({ active, onClick, icon, label }) => (
-  <button onClick={onClick}
-    style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '9px 16px', borderRadius: '9px', border: 'none', background: active ? '#00843D' : 'transparent', color: active ? 'white' : '#555', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}>
-    {icon} {label}
-  </button>
-);
-
 export const AdminDashboard: React.FC = () => {
-  const [secret, setSecret]               = useState<string | null>(null);
-  const [tab, setTab]                     = useState<'overview' | 'users' | 'promos' | 'manual'>('overview');
-  const [data, setData]                   = useState<any>(null);
-  const [loading, setLoading]             = useState(false);
-  const [userSearch, setUserSearch]       = useState('');
-  const [msg, setMsg]                     = useState('');
-  const [promoCode, setPromoCode]         = useState('');
-  const [promoMax, setPromoMax]           = useState('50');
-  const [promoExpiry, setPromoExpiry]     = useState('');
-  const [promoBusy, setPromoBusy]         = useState(false);
-  const [manualId, setManualId]           = useState('');
-  const [manualPlan, setManualPlan]       = useState('pro');
-  const [manualMonths, setManualMonths]   = useState('1');
-  const [manualBusy, setManualBusy]       = useState(false);
+  const [secret, setSecret]             = useState<string | null>(null);
+  const [tab, setTab]                   = useState<'overview' | 'users' | 'promos' | 'manual'>('overview');
+  const [data, setData]                 = useState<any>(null);
+  const [loading, setLoading]           = useState(false);
+  const [userSearch, setUserSearch]     = useState('');
+  const [msg, setMsg]                   = useState('');
+  const [promoCode, setPromoCode]       = useState('');
+  const [promoMax, setPromoMax]         = useState('50');
+  const [promoExpiry, setPromoExpiry]   = useState('');
+  const [promoBusy, setPromoBusy]       = useState(false);
+  const [manualId, setManualId]         = useState('');
+  const [manualPlan, setManualPlan]     = useState('pro');
+  const [manualMonths, setManualMonths] = useState('1');
+  const [manualBusy, setManualBusy]     = useState(false);
 
   useEffect(() => {
     const s = sessionStorage.getItem(SESSION_KEY);
@@ -149,111 +129,100 @@ export const AdminDashboard: React.FC = () => {
   if (!secret) return <PasswordGate onUnlock={s => setSecret(s)} />;
 
   const s = data?.stats || {};
-  const users = (data?.users || []).filter((u: any) => !userSearch || u.email?.toLowerCase().includes(userSearch.toLowerCase()));
-
-  const input: React.CSSProperties = { width: '100%', padding: '10px 14px', background: '#1a1a1a', border: '1px solid #333', borderRadius: '8px', fontSize: '13px', color: 'white', outline: 'none', boxSizing: 'border-box' };
-  const card: React.CSSProperties  = { background: '#111', border: '1px solid #222', borderRadius: '12px', overflow: 'hidden' };
-  const grid4: React.CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px' };
-  const sectionLabel: React.CSSProperties = { fontSize: '11px', color: '#444', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.8px', margin: '0 0 12px' };
+  const users = (data?.users || []).filter((u: any) =>
+    !userSearch || u.email?.toLowerCase().includes(userSearch.toLowerCase())
+  );
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0a0a0a', color: 'white' }}>
-      <div style={{ background: '#0d0d0d', borderBottom: '1px solid #1a1a1a', padding: '0 24px', position: 'sticky', top: 0, zIndex: 40 }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '60px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <img src="/logo-full.png" alt="TaxPulse NG" style={{ height: '26px', width: 'auto', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
-            <span style={{ fontSize: '11px', color: '#444', borderLeft: '1px solid #222', paddingLeft: '12px', fontWeight: 600 }}>ADMIN</span>
+    <div className="min-h-screen bg-slate-50">
+      <div className="bg-slate-900 text-white px-6 py-4 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <img src="/logo-white.png" alt="TaxPulse NG" style={{ height: '28px', width: 'auto', objectFit: 'contain' }} />
+            <span className="text-xs text-slate-500 border-l border-slate-700 pl-3 font-semibold tracking-widest uppercase">Admin</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            {loading && <span style={{ fontSize: '12px', color: '#444' }}>Loading...</span>}
-            <button onClick={load} style={{ background: 'none', border: '1px solid #222', color: '#555', padding: '6px 12px', borderRadius: '8px', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
-              {Icons.refresh} Refresh
-            </button>
+          <div className="flex items-center gap-3">
+            {loading && <span className="text-xs text-slate-400 animate-pulse">Loading...</span>}
+            <button onClick={load} className="text-xs text-slate-400 hover:text-white font-semibold">Refresh</button>
             <button onClick={() => { sessionStorage.removeItem(SESSION_KEY); setSecret(null); setData(null); }}
-              style={{ background: 'none', border: '1px solid #3a1a1a', color: '#ff6b6b', padding: '6px 12px', borderRadius: '8px', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
-              {Icons.lock} Lock
-            </button>
-            <a href="/app" style={{ color: '#444', fontSize: '12px', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
-              {Icons.arrow} App
-            </a>
+              className="text-xs text-red-400 hover:text-red-300 font-semibold">Lock</button>
+            <a href="/app" className="text-xs text-slate-500 hover:text-white">Back to app</a>
           </div>
         </div>
       </div>
 
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '24px' }}>
-        {msg && <div style={{ background: '#0a2a0a', border: '1px solid #00843D', borderRadius: '10px', padding: '12px 16px', fontSize: '13px', color: '#00843D', marginBottom: '16px', fontWeight: 600 }}>{msg}</div>}
+      <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
+        {msg && <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 text-sm font-semibold text-cac-green">{msg}</div>}
 
-        <div style={{ display: 'flex', gap: '4px', background: '#111', border: '1px solid #1a1a1a', borderRadius: '11px', padding: '4px', width: 'fit-content', marginBottom: '24px' }}>
-          <TabBtn active={tab === 'overview'} onClick={() => setTab('overview')} icon={Icons.home}  label="Overview" />
-          <TabBtn active={tab === 'users'}    onClick={() => setTab('users')}    icon={Icons.users} label="Users" />
-          <TabBtn active={tab === 'promos'}   onClick={() => setTab('promos')}   icon={Icons.tag}   label="Promos" />
-          <TabBtn active={tab === 'manual'}   onClick={() => setTab('manual')}   icon={Icons.tool}  label="Manual Override" />
+        <div className="flex gap-1 bg-white border border-slate-200 rounded-xl p-1 w-fit shadow-sm">
+          {([['overview','Overview'],['users','Users'],['promos','Promos'],['manual','Manual Override']] as const).map(([id, label]) => (
+            <button key={id} onClick={() => setTab(id)}
+              className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${tab === id ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>
+              {label}
+            </button>
+          ))}
         </div>
 
         {loading && !data && (
-          <div style={grid4}>
-            {Array(8).fill(0).map((_, i) => <div key={i} style={{ background: '#111', border: '1px solid #222', borderRadius: '12px', height: '90px' }} />)}
+          <div className="grid grid-cols-4 gap-4">
+            {Array(8).fill(0).map((_, i) => <div key={i} className="bg-white rounded-2xl p-5 border border-slate-100 h-24 animate-pulse" />)}
           </div>
         )}
 
         {tab === 'overview' && data && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <div className="space-y-6">
             <div>
-              <p style={sectionLabel}>Revenue</p>
-              <div style={grid4}>
-                <StatCard icon={Icons.trend} label="Monthly MRR" value={fmt(s.MRR || 0)} color="#00843D" sub={(s.proMonthly || 0) + ' paying users'} />
-                <StatCard icon={Icons.trend} label="Annual ARR"  value={fmt(s.ARR || 0)} color="#00843D" sub="MRR x 12" />
-                <StatCard icon={Icons.users} label="Pro Users"   value={s.proUsers || 0} color="#60a5fa" sub={(s.conversionRate || 0) + '% conversion'} />
-                <StatCard icon={Icons.users} label="Free Users"  value={s.freeUsers || 0} sub="Upgrade opportunity" />
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Revenue</p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <StatCard icon="💰" label="Monthly MRR" value={fmt(s.MRR || 0)} color="text-cac-green" sub={(s.proMonthly || 0) + ' paying users'} />
+                <StatCard icon="📈" label="Annual ARR"  value={fmt(s.ARR || 0)} color="text-cac-green" sub="MRR x 12" />
+                <StatCard icon="⭐" label="Pro Users"   value={s.proUsers || 0} color="text-blue-600" sub={(s.conversionRate || 0) + '% conversion'} />
+                <StatCard icon="🆓" label="Free Users"  value={s.freeUsers || 0} sub="Upgrade opportunity" />
               </div>
             </div>
             <div>
-              <p style={sectionLabel}>Users</p>
-              <div style={grid4}>
-                <StatCard icon={Icons.users} label="Total Users"   value={s.totalUsers || 0} />
-                <StatCard icon={Icons.trend} label="New (30 days)" value={s.newUsersLast30 || 0} color="#a78bfa" />
-                <StatCard icon={Icons.tag}   label="Via Promo"     value={s.proPromo || 0} color="#fbbf24" />
-                <StatCard icon={Icons.check} label="Companies"     value={s.totalCompanies || 0} />
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Users</p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <StatCard icon="👤" label="Total Users"   value={s.totalUsers || 0} />
+                <StatCard icon="✨" label="New (30 days)" value={s.newUsersLast30 || 0} color="text-purple-600" />
+                <StatCard icon="🎫" label="Via Promo"     value={s.proPromo || 0} color="text-amber-600" />
+                <StatCard icon="🏢" label="Companies"     value={s.totalCompanies || 0} />
               </div>
             </div>
             <div>
-              <p style={sectionLabel}>Compliance Activity</p>
-              <div style={grid4}>
-                <StatCard icon={Icons.check} label="Total Obligations" value={fmtNum(s.totalObligations || 0)} />
-                <StatCard icon={Icons.check} label="Filed"  value={fmtNum(s.totalFiled || 0)} color="#00843D"
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Compliance</p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <StatCard icon="📋" label="Total Obligations" value={fmtNum(s.totalObligations || 0)} />
+                <StatCard icon="✅" label="Filed"   value={fmtNum(s.totalFiled || 0)} color="text-cac-green"
                   sub={s.totalObligations > 0 ? ((s.totalFiled / s.totalObligations) * 100).toFixed(0) + '% rate' : '0%'} />
-                <StatCard icon={Icons.x}     label="Overdue"     value={fmtNum(s.overdue || 0)} color="#ff6b6b" />
-                <StatCard icon={Icons.check} label="Filed Today" value={s.filedToday || 0} color="#60a5fa" />
+                <StatCard icon="⚠️" label="Overdue"     value={fmtNum(s.overdue || 0)} color="text-red-600" />
+                <StatCard icon="📅" label="Filed Today" value={s.filedToday || 0} color="text-blue-600" />
               </div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-              <div style={card}>
-                <div style={{ padding: '16px 20px', borderBottom: '1px solid #1a1a1a' }}>
-                  <p style={{ fontWeight: 700, fontSize: '13px', margin: 0 }}>Top States</p>
-                </div>
-                <div style={{ padding: '16px 20px' }}>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+                <p className="font-bold text-slate-800 text-sm mb-4">Top States</p>
+                <div className="space-y-3">
                   {(s.topStates || []).map(([state, count]: [string, number]) => (
-                    <div key={state} style={{ marginBottom: '14px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                        <span style={{ fontSize: '13px', color: '#ccc' }}>{state}</span>
-                        <span style={{ fontSize: '12px', color: '#555' }}>{count}</span>
+                    <div key={state}>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span className="font-semibold text-slate-700">{state}</span>
+                        <span className="text-slate-400 text-xs">{count}</span>
                       </div>
-                      <div style={{ height: '3px', background: '#1a1a1a', borderRadius: '2px' }}>
-                        <div style={{ height: '100%', background: '#00843D', borderRadius: '2px', width: Math.min(100, (count / Math.max(1, s.totalCompanies)) * 300) + '%' }} />
+                      <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-cac-green rounded-full" style={{ width: Math.min(100, (count / Math.max(1, s.totalCompanies)) * 300) + '%' }} />
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
-              <div style={card}>
-                <div style={{ padding: '16px 20px', borderBottom: '1px solid #1a1a1a' }}>
-                  <p style={{ fontWeight: 700, fontSize: '13px', margin: 0 }}>Entity Types</p>
-                </div>
-                <div style={{ padding: '16px 20px' }}>
+              <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+                <p className="font-bold text-slate-800 text-sm mb-4">Entity Types</p>
+                <div className="space-y-2">
                   {Object.entries(s.entityCounts || {}).sort((a: any, b: any) => b[1] - a[1]).map(([type, count]: any) => (
-                    <div key={type} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #1a1a1a' }}>
-                      <span style={{ fontSize: '13px', color: '#ccc' }}>{type.split(' (')[0]}</span>
-                      <span style={{ fontSize: '13px', fontWeight: 700 }}>{count}</span>
+                    <div key={type} className="flex justify-between py-1.5 border-b border-slate-50 last:border-0">
+                      <span className="text-sm text-slate-600 truncate mr-3">{type.split(' (')[0]}</span>
+                      <span className="text-sm font-bold text-slate-800 shrink-0">{count}</span>
                     </div>
                   ))}
                 </div>
@@ -263,55 +232,50 @@ export const AdminDashboard: React.FC = () => {
         )}
 
         {tab === 'users' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{ position: 'relative', flex: 1, maxWidth: '360px' }}>
-                <div style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#555' }}>{Icons.search}</div>
-                <input value={userSearch} onChange={e => setUserSearch(e.target.value)} placeholder="Search by email..."
-                  style={{ ...input, paddingLeft: '36px' }} />
-              </div>
-              <span style={{ fontSize: '13px', color: '#555' }}>{users.length} users</span>
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <input value={userSearch} onChange={e => setUserSearch(e.target.value)} placeholder="Search by email..."
+                className="flex-1 max-w-sm px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-cac-green/30" />
+              <span className="text-sm text-slate-400">{users.length} users</span>
             </div>
-            <div style={card}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid #1a1a1a' }}>
-                    {['Email', 'Plan', 'Status', 'Expires', 'Cos', 'Promo', 'Joined'].map(h => (
-                      <th key={h} style={{ padding: '12px 16px', textAlign: 'left', fontSize: '11px', fontWeight: 600, color: '#555', textTransform: 'uppercase' }}>{h}</th>
-                    ))}
-                  </tr>
+            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-slate-50 border-b border-slate-100">
+                  <tr>{['Email','Plan','Status','Expires','Cos','Promo','Joined'].map(h => (
+                    <th key={h} className="px-4 py-3 text-left text-xs font-bold text-slate-400 uppercase whitespace-nowrap">{h}</th>
+                  ))}</tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-slate-50">
                   {users.map((u: any) => {
                     const expired = u.expires && new Date(u.expires) < new Date();
                     return (
-                      <tr key={u.id} style={{ borderBottom: '1px solid #111' }}>
-                        <td style={{ padding: '12px 16px' }}>
+                      <tr key={u.id} className="hover:bg-slate-50/50">
+                        <td className="px-4 py-3 font-medium text-slate-800 max-w-[200px]">
                           <button onClick={() => { setManualId(u.id); setTab('manual'); }}
-                            style={{ background: 'none', border: 'none', color: '#60a5fa', cursor: 'pointer', fontSize: '13px', padding: 0 }} title={'ID: ' + u.id}>
+                            className="hover:text-cac-green hover:underline text-left truncate block max-w-full" title={'ID: ' + u.id}>
                             {u.email || '--'}
                           </button>
                         </td>
-                        <td style={{ padding: '12px 16px' }}>
-                          <span style={{ padding: '3px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, background: u.plan === 'pro' ? '#0a2a0a' : '#1a1a1a', color: u.plan === 'pro' ? '#00843D' : '#555' }}>
+                        <td className="px-4 py-3">
+                          <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${u.plan === 'pro' ? 'bg-cac-green/10 text-cac-green' : 'bg-slate-100 text-slate-500'}`}>
                             {(u.plan || 'free').toUpperCase()}
                           </span>
                         </td>
-                        <td style={{ padding: '12px 16px' }}>
-                          <span style={{ padding: '3px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, background: u.status === 'active' ? '#0a2a0a' : '#1a1a1a', color: u.status === 'active' ? '#00843D' : '#555' }}>
+                        <td className="px-4 py-3">
+                          <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${u.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-400'}`}>
                             {u.status || 'inactive'}
                           </span>
                         </td>
-                        <td style={{ padding: '12px 16px', color: expired ? '#ff6b6b' : '#555', fontSize: '12px', fontWeight: expired ? 700 : 400 }}>
+                        <td className={`px-4 py-3 text-xs whitespace-nowrap ${expired ? 'text-red-500 font-bold' : 'text-slate-400'}`}>
                           {u.expires ? fmtDate(u.expires) : '--'}
                         </td>
-                        <td style={{ padding: '12px 16px', textAlign: 'center', fontWeight: 700 }}>{u.companies}</td>
-                        <td style={{ padding: '12px 16px', color: '#555', fontSize: '12px' }}>{u.promoUsed || '--'}</td>
-                        <td style={{ padding: '12px 16px', color: '#555', fontSize: '12px' }}>{fmtDate(u.joined)}</td>
+                        <td className="px-4 py-3 text-center font-bold text-slate-600">{u.companies}</td>
+                        <td className="px-4 py-3 text-xs text-slate-400">{u.promoUsed || '--'}</td>
+                        <td className="px-4 py-3 text-xs text-slate-400 whitespace-nowrap">{fmtDate(u.joined)}</td>
                       </tr>
                     );
                   })}
-                  {users.length === 0 && <tr><td colSpan={7} style={{ padding: '32px', textAlign: 'center', color: '#444' }}>No users found</td></tr>}
+                  {users.length === 0 && <tr><td colSpan={7} className="px-4 py-8 text-center text-slate-400">No users found</td></tr>}
                 </tbody>
               </table>
             </div>
@@ -319,62 +283,65 @@ export const AdminDashboard: React.FC = () => {
         )}
 
         {tab === 'promos' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <div style={{ ...card, padding: '20px' }}>
-              <p style={{ fontWeight: 700, fontSize: '14px', margin: '0 0 16px' }}>Create New Promo Code</p>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '12px', alignItems: 'end' }}>
+          <div className="space-y-6">
+            <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+              <h3 className="font-bold text-slate-800 mb-4">Create New Promo Code</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
                 <div>
-                  <p style={{ fontSize: '11px', color: '#555', fontWeight: 600, margin: '0 0 6px', textTransform: 'uppercase' }}>Code</p>
-                  <input value={promoCode} onChange={e => setPromoCode(e.target.value.toUpperCase())} placeholder="LAUNCH50" style={{ ...input, fontFamily: 'monospace' }} />
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Code</label>
+                  <input value={promoCode} onChange={e => setPromoCode(e.target.value.toUpperCase())} placeholder="LAUNCH50"
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-cac-green/30" />
                 </div>
                 <div>
-                  <p style={{ fontSize: '11px', color: '#555', fontWeight: 600, margin: '0 0 6px', textTransform: 'uppercase' }}>Max Uses</p>
-                  <input type="number" value={promoMax} onChange={e => setPromoMax(e.target.value)} style={input} />
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Max Uses</label>
+                  <input type="number" value={promoMax} onChange={e => setPromoMax(e.target.value)}
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-cac-green/30" />
                 </div>
                 <div>
-                  <p style={{ fontSize: '11px', color: '#555', fontWeight: 600, margin: '0 0 6px', textTransform: 'uppercase' }}>Expiry</p>
-                  <input type="date" value={promoExpiry} onChange={e => setPromoExpiry(e.target.value)} style={input} />
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Expiry</label>
+                  <input type="date" value={promoExpiry} onChange={e => setPromoExpiry(e.target.value)}
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-cac-green/30" />
                 </div>
-                <button onClick={createPromo} disabled={promoBusy || !promoCode.trim()}
-                  style={{ padding: '10px 20px', background: promoBusy || !promoCode.trim() ? '#1a1a1a' : '#00843D', color: promoBusy || !promoCode.trim() ? '#444' : 'white', border: 'none', borderRadius: '8px', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
-                  {promoBusy ? 'Creating...' : 'Create'}
-                </button>
+                <div className="flex items-end">
+                  <button onClick={createPromo} disabled={promoBusy || !promoCode.trim()}
+                    className="w-full py-2.5 bg-cac-green text-white rounded-xl text-sm font-bold hover:bg-cac-dark disabled:opacity-50">
+                    {promoBusy ? 'Creating...' : 'Create'}
+                  </button>
+                </div>
               </div>
             </div>
-            <div style={card}>
-              <div style={{ padding: '14px 20px', borderBottom: '1px solid #1a1a1a', display: 'flex', justifyContent: 'space-between' }}>
-                <p style={{ fontWeight: 700, fontSize: '13px', margin: 0 }}>All Promo Codes</p>
-                <span style={{ fontSize: '12px', color: '#555' }}>{(data?.promoCodes || []).length} total</span>
+            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-x-auto">
+              <div className="px-5 py-4 border-b border-slate-100 flex justify-between items-center">
+                <h3 className="font-bold text-slate-800">All Promo Codes</h3>
+                <span className="text-xs text-slate-400">{(data?.promoCodes || []).length} total</span>
               </div>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid #1a1a1a' }}>
-                    {['Code', 'Plan', 'Uses/Max', 'Expires', 'Status', ''].map(h => (
-                      <th key={h} style={{ padding: '10px 16px', textAlign: 'left', fontSize: '11px', fontWeight: 600, color: '#555', textTransform: 'uppercase' }}>{h}</th>
-                    ))}
-                  </tr>
+              <table className="w-full text-sm">
+                <thead className="bg-slate-50 border-b border-slate-100">
+                  <tr>{['Code','Plan','Uses/Max','Expires','Status',''].map(h => (
+                    <th key={h} className="px-4 py-3 text-left text-xs font-bold text-slate-400 uppercase">{h}</th>
+                  ))}</tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-slate-50">
                   {(data?.promoCodes || []).map((p: any) => (
-                    <tr key={p.id} style={{ borderBottom: '1px solid #111' }}>
-                      <td style={{ padding: '12px 16px', fontFamily: 'monospace', fontWeight: 700 }}>{p.code}</td>
-                      <td style={{ padding: '12px 16px', color: '#00843D', fontWeight: 700, fontSize: '11px', textTransform: 'uppercase' }}>{p.plan}</td>
-                      <td style={{ padding: '12px 16px', color: '#ccc' }}>{p.uses_count}/{p.max_uses}</td>
-                      <td style={{ padding: '12px 16px', color: '#555', fontSize: '12px' }}>{p.expires_at ? fmtDate(p.expires_at) : 'No expiry'}</td>
-                      <td style={{ padding: '12px 16px' }}>
-                        <span style={{ padding: '3px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, background: p.is_active ? '#0a2a0a' : '#2a0a0a', color: p.is_active ? '#00843D' : '#ff6b6b' }}>
+                    <tr key={p.id} className="hover:bg-slate-50/50">
+                      <td className="px-4 py-3 font-mono font-bold text-slate-800">{p.code}</td>
+                      <td className="px-4 py-3 text-cac-green font-semibold uppercase text-xs">{p.plan}</td>
+                      <td className="px-4 py-3 text-slate-600">{p.uses_count}/{p.max_uses}</td>
+                      <td className="px-4 py-3 text-slate-400 text-xs">{p.expires_at ? fmtDate(p.expires_at) : 'No expiry'}</td>
+                      <td className="px-4 py-3">
+                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${p.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-500'}`}>
                           {p.is_active ? 'Active' : 'Inactive'}
                         </span>
                       </td>
-                      <td style={{ padding: '12px 16px' }}>
+                      <td className="px-4 py-3">
                         <button onClick={() => togglePromo(p.id, p.is_active)}
-                          style={{ background: 'none', border: 'none', color: p.is_active ? '#ff6b6b' : '#00843D', cursor: 'pointer', fontSize: '12px', fontWeight: 700 }}>
+                          className={`text-xs font-bold hover:underline ${p.is_active ? 'text-red-500' : 'text-cac-green'}`}>
                           {p.is_active ? 'Deactivate' : 'Activate'}
                         </button>
                       </td>
                     </tr>
                   ))}
-                  {(data?.promoCodes || []).length === 0 && <tr><td colSpan={6} style={{ padding: '32px', textAlign: 'center', color: '#444' }}>No promo codes yet</td></tr>}
+                  {(data?.promoCodes || []).length === 0 && <tr><td colSpan={6} className="px-4 py-8 text-center text-slate-400">No promo codes yet</td></tr>}
                 </tbody>
               </table>
             </div>
@@ -382,53 +349,57 @@ export const AdminDashboard: React.FC = () => {
         )}
 
         {tab === 'manual' && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', maxWidth: '800px' }}>
-            <div style={{ ...card, padding: '20px' }}>
-              <p style={{ fontWeight: 700, fontSize: '14px', margin: '0 0 6px' }}>Manual Plan Override</p>
-              <p style={{ fontSize: '12px', color: '#555', margin: '0 0 16px' }}>Use when Paystack webhook missed an upgrade.</p>
-              <div style={{ background: '#0a1a2a', border: '1px solid #1a3a5a', borderRadius: '8px', padding: '10px 14px', fontSize: '12px', color: '#60a5fa', marginBottom: '16px' }}>
+          <div className="space-y-6 max-w-lg">
+            <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm space-y-5">
+              <div>
+                <h3 className="font-bold text-slate-800">Manual Plan Override</h3>
+                <p className="text-xs text-slate-400 mt-1">Use when Paystack webhook missed an upgrade.</p>
+              </div>
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-700">
                 In Users tab, click a user email to auto-fill their ID here.
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div className="space-y-3">
                 <div>
-                  <p style={{ fontSize: '11px', color: '#555', fontWeight: 600, margin: '0 0 6px', textTransform: 'uppercase' }}>User ID (UUID)</p>
+                  <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">User ID (UUID)</label>
                   <input value={manualId} onChange={e => setManualId(e.target.value)} placeholder="Paste user UUID"
-                    style={{ ...input, fontFamily: 'monospace' }} />
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-cac-green/30" />
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <p style={{ fontSize: '11px', color: '#555', fontWeight: 600, margin: '0 0 6px', textTransform: 'uppercase' }}>Plan</p>
-                    <select value={manualPlan} onChange={e => setManualPlan(e.target.value)} style={{ ...input, cursor: 'pointer' }}>
+                    <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Plan</label>
+                    <select value={manualPlan} onChange={e => setManualPlan(e.target.value)}
+                      className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-cac-green/30">
                       <option value="pro">Pro</option>
                       <option value="free">Free (downgrade)</option>
                     </select>
                   </div>
                   <div>
-                    <p style={{ fontSize: '11px', color: '#555', fontWeight: 600, margin: '0 0 6px', textTransform: 'uppercase' }}>Months</p>
-                    <input type="number" min="1" max="24" value={manualMonths} onChange={e => setManualMonths(e.target.value)} style={input} />
+                    <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase">Months</label>
+                    <input type="number" min="1" max="24" value={manualMonths} onChange={e => setManualMonths(e.target.value)}
+                      className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-cac-green/30" />
                   </div>
                 </div>
                 <button onClick={setPlan} disabled={manualBusy || !manualId.trim()}
-                  style={{ padding: '11px', background: manualBusy || !manualId.trim() ? '#1a1a1a' : '#00843D', color: manualBusy || !manualId.trim() ? '#444' : 'white', border: 'none', borderRadius: '8px', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
+                  className="w-full py-3 bg-cac-green text-white rounded-xl text-sm font-bold hover:bg-cac-dark disabled:opacity-50 transition-all">
                   {manualBusy ? 'Updating...' : 'Set to ' + manualPlan.toUpperCase() + ' for ' + manualMonths + ' month(s)'}
                 </button>
               </div>
             </div>
-            <div style={{ ...card, padding: '20px' }}>
-              <p style={{ fontWeight: 700, fontSize: '14px', margin: '0 0 16px' }}>Quick Links</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
+              <h3 className="font-bold text-slate-800 text-sm mb-4">Quick Links</h3>
+              <div className="grid grid-cols-2 gap-2">
                 {[
-                  ['Supabase',          'https://app.supabase.com'],
-                  ['Paystack',          'https://dashboard.paystack.com'],
-                  ['Vercel',            'https://vercel.com/dashboard'],
-                  ['Resend',            'https://resend.com/dashboard'],
-                  ['Termii',            'https://app.termii.com'],
-                  ['Groq Console',      'https://console.groq.com'],
+                  ['Supabase',  'https://app.supabase.com'],
+                  ['Paystack',  'https://dashboard.paystack.com'],
+                  ['Vercel',    'https://vercel.com/dashboard'],
+                  ['Resend',    'https://resend.com/dashboard'],
+                  ['Termii',    'https://app.termii.com'],
+                  ['Groq',      'https://console.groq.com'],
                 ].map(([label, url]) => (
                   <a key={label} href={url} target="_blank" rel="noopener noreferrer"
-                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: '#1a1a1a', borderRadius: '8px', textDecoration: 'none', color: '#ccc', fontSize: '13px', border: '1px solid #222' }}>
-                    {label}
-                    <span style={{ color: '#555' }}>{Icons.link}</span>
+                    className="flex items-center gap-2 p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+                    <span className="text-sm font-semibold text-slate-700">{label}</span>
+                    <span className="ml-auto text-slate-400 text-xs">→</span>
                   </a>
                 ))}
               </div>
