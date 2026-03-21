@@ -81,7 +81,7 @@ function detectMonthYear(filename: string): string {
 function monthYearLabel(my: string): string {
   const [y, m] = my.split('-');
   const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  return (months[parseInt(m) - 1] || m) + '' + y;
+  return (months[parseInt(m) - 1] || m) + ' ' + y;
 }
 
 const MONTH_OPTIONS = (() => {
@@ -124,7 +124,7 @@ async function extractTextFromFile(file: File, password?: string): Promise<strin
       for (let i = 1; i <= Math.min(pdf.numPages, 20); i++) {
         const page = await pdf.getPage(i);
         const tc = await page.getTextContent();
-        lines.push(tc.items.map((item: any) => item.str).join(''));
+        lines.push(tc.items.map((item: any) => item.str).join(' '));
       }
       const fullText = lines.join('\n');
       if (fullText.trim().length > 50) return fullText;
@@ -185,7 +185,7 @@ Return ONLY a JSON array, no markdown, no explanation:
 
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer' + apiKey },
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
     body: JSON.stringify({
       model: isImage ? 'llama-3.2-90b-vision-preview' : 'llama-3.3-70b-versatile',
       max_tokens: 4000,
@@ -236,8 +236,8 @@ const StatementsTab: React.FC<{ company: Company; onNavigate: (v: AppView) => vo
 
   const handleDelete = async (stmt: any) => {
     if (!window.confirm(
-      'Delete' + monthYearLabel(stmt.monthYear) + 'statement?\n\nThis will permanently remove the statement AND all' +
-      (stmt.notes?.match(/\d+/)?.[0] || 'associated') + 'ledger entries imported from it. This cannot be undone.'
+      'Delete ' + monthYearLabel(stmt.monthYear) + ' statement?\n\nThis will permanently remove the statement AND all ' +
+      (stmt.notes?.match(/\d+/)?.[0] || 'associated') + ' ledger entries imported from it. This cannot be undone.'
     )) return;
 
     setDeleting(stmt.id);
@@ -248,7 +248,7 @@ const StatementsTab: React.FC<{ company: Company; onNavigate: (v: AppView) => vo
       if (stmt.storagePath) await db.deleteEvidence(stmt.id, stmt.storagePath);
       setStatements(prev => prev.filter(s => s.id !== stmt.id));
     } catch (e: any) {
-      alert('Delete failed:' + (e?.message || 'Unknown error'));
+      alert('Delete failed: ' + (e?.message || 'Unknown error'));
     } finally {
       setDeleting(null);
     }
@@ -257,7 +257,7 @@ const StatementsTab: React.FC<{ company: Company; onNavigate: (v: AppView) => vo
   if (loading) return (
     <div className="flex items-center justify-center py-20">
       <div className="text-center space-y-3">
-        <div className="text-4xl animate-pulse"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg></span></div>
+        <div className="text-4xl animate-pulse">🏦</div>
         <p className="text-slate-500 text-sm">Loading statements...</p>
       </div>
     </div>
@@ -265,7 +265,7 @@ const StatementsTab: React.FC<{ company: Company; onNavigate: (v: AppView) => vo
 
   if (statements.length === 0) return (
     <div className="text-center py-20 space-y-4">
-      <div className="text-5xl"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></span></div>
+      <div className="text-5xl">📂</div>
       <p className="font-bold text-slate-700">No bank statements imported yet</p>
       <p className="text-sm text-slate-400">Use the Import tab to upload your first statement</p>
     </div>
@@ -284,14 +284,14 @@ const StatementsTab: React.FC<{ company: Company; onNavigate: (v: AppView) => vo
           <div key={stmt.id} className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-center text-2xl shrink-0"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg></span></div>
+                <div className="w-12 h-12 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-center text-2xl shrink-0">🏦</div>
                 <div>
                   <p className="font-bold text-slate-900">{monthYearLabel(stmt.monthYear)}</p>
                   <p className="text-xs text-slate-500 mt-0.5">{stmt.name}</p>
                   <div className="flex items-center gap-3 mt-1">
                     <span className="text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full">{txCount} transactions</span>
                     <span className="text-[10px] text-slate-400">Uploaded {stmt.uploadDate}</span>
-                    <span className="text-[10px] text-slate-400">{stmt.sizeBytes ? (stmt.sizeBytes / 1024).toFixed(1) + 'KB' : ''}</span>
+                    <span className="text-[10px] text-slate-400">{stmt.sizeBytes ? (stmt.sizeBytes / 1024).toFixed(1) + ' KB' : ''}</span>
                   </div>
                 </div>
               </div>
@@ -300,7 +300,7 @@ const StatementsTab: React.FC<{ company: Company; onNavigate: (v: AppView) => vo
                 disabled={deleting === stmt.id}
                 className="shrink-0 text-xs font-bold text-red-400 hover:text-red-600 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-xl transition-colors disabled:opacity-50"
               >
-                {deleting === stmt.id ? 'Deleting...' : 'Delete'}
+                {deleting === stmt.id ? 'Deleting...' : '🗑️ Delete'}
               </button>
             </div>
           </div>
@@ -308,7 +308,7 @@ const StatementsTab: React.FC<{ company: Company; onNavigate: (v: AppView) => vo
       })}
 
       <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-800">
-        <strong><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> Note:</strong> Deleting a bank statement permanently removes it and all its imported transactions from your ledger. This action cannot be undone. Only delete if the statement was imported by mistake.
+        <strong>⚠️ Note:</strong> Deleting a bank statement permanently removes it and all its imported transactions from your ledger. This action cannot be undone. Only delete if the statement was imported by mistake.
       </div>
     </div>
   );
@@ -349,7 +349,7 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
     // Duplicate check
     const exists = await db.bankStatementExists(company.id, monthYear);
     if (exists) {
-      setError(monthYearLabel(monthYear) + 'statement already imported. Delete it first from the Statements tab if you need to re-import.');
+      setError(monthYearLabel(monthYear) + ' statement already imported. Delete it first from the Statements tab if you need to re-import.');
       return;
     }
 
@@ -403,7 +403,7 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
           companyId: company.id,
           date: t.date,
           type: t.type,
-          description: '[' + monthYearLabel(monthYear) + ']' + t.description,
+          description: '[' + monthYearLabel(monthYear) + '] ' + t.description,
           amount: t.amount,
           taxAmount: t.taxAmount,
           sourceId: stmtId,
@@ -421,7 +421,7 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
           companyId: company.id,
           uploadDate: new Date().toISOString().split('T')[0],
           category: 'bank_statement',
-          notes: count + 'transactions imported to ledger on' + new Date().toLocaleDateString('en-NG'),
+          notes: count + ' transactions imported to ledger on ' + new Date().toLocaleDateString('en-NG'),
           monthYear,
         } as any);
         setVaultSaved(true);
@@ -458,7 +458,7 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
 
       {/* Tabs */}
       <div className="flex gap-1 bg-slate-100 p-1 rounded-xl w-fit">
-          {([['import', 'Import Statement'], ['statements', 'My Statements']] as [Tab, string][]).map(([t, label]) => (
+          {([['import', '📤 Import Statement'], ['statements', '📂 My Statements']] as [Tab, string][]).map(([t, label]) => (
           <button key={t} onClick={() => { setTab(t); if (t === 'import') reset(); }}
             className={`px-5 py-2 rounded-lg text-sm font-bold transition-all ${tab === t ? 'bg-white text-cac-green shadow' : 'text-slate-500 hover:text-slate-700'}`}>
             {label}
@@ -484,7 +484,7 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
                 onClick={() => fileRef.current?.click()}
                 className={`border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all ${dragOver ? 'border-cac-green bg-green-50' : 'border-slate-200 hover:border-cac-green hover:bg-green-50/50'}`}
               >
-                <div className="text-5xl mb-4"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg></span></div>
+                <div className="text-5xl mb-4">📄</div>
                 <p className="font-bold text-slate-900">Drop your bank statement here</p>
                 <p className="text-sm text-slate-500 mt-1">or click to browse</p>
                 <div className="flex items-center justify-center gap-2 mt-4">
@@ -500,7 +500,7 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
               {file && (
                 <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 space-y-4">
                   <div className="flex items-center gap-3">
-                    <span className="text-2xl"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></span></span>
+                    <span className="text-2xl">📎</span>
                     <div>
                       <p className="font-bold text-sm text-slate-900">{file.name}</p>
                       <p className="text-xs text-slate-400">{(file.size / 1024).toFixed(1)} KB</p>
@@ -532,7 +532,7 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
                         placeholder="e.g. date of birth or account number"
                         className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-cac-green"
                       />
-                      <p className="text-xs text-slate-400"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg></span> GTBank: date of birth (DDMMYYYY) · Access Bank: last 4 digits of phone · Zenith: date of birth</p>
+                      <p className="text-xs text-slate-400">💡 GTBank: date of birth (DDMMYYYY) · Access Bank: last 4 digits of phone · Zenith: date of birth</p>
                     </div>
                   )}
 
@@ -546,16 +546,11 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
               <div className="bg-blue-50 rounded-2xl p-5 space-y-3">
                 <p className="font-bold text-blue-900 text-sm">How it works</p>
                 <div className="grid grid-cols-4 gap-3">
-                    {[
-                      ['Upload statement', 'Select your PDF or Excel bank statement'],
-                      ['AI extracts transactions', 'AI reads and categorises each row'],
-                      ['Review and edit', 'Correct any misclassified entries'],
-                      ['Saves to Ledger', 'All transactions added automatically'],
-                    ].map(([title, desc], i) => (
-                      <div key={i} className="text-center p-3 bg-white rounded-xl border border-blue-100">
-                        <p className="text-xs font-bold text-blue-900 mb-1">{i + 1}. {title}</p>
-                        <p className="text-[10px] text-blue-600">{desc}</p>
-                      </div>
+                  {[['📤','Upload statement'],['🤖','AI extracts transactions'],['✅','Review & edit'],['📒','Saves to Ledger']].map(([icon, label], i) => (
+                    <div key={i} className="text-center">
+                      <div className="text-2xl mb-1">{icon}</div>
+                      <p className="text-xs text-blue-800 font-semibold">{label}</p>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -565,7 +560,7 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
           {/* PROCESSING STEP */}
           {step === 'processing' && (
             <div className="min-h-[50vh] flex flex-col items-center justify-center text-center space-y-5">
-              <div className="w-20 h-20 bg-green-50 rounded-2xl flex items-center justify-center text-4xl animate-pulse"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg></span></div>
+              <div className="w-20 h-20 bg-green-50 rounded-2xl flex items-center justify-center text-4xl animate-pulse">🤖</div>
               <div>
                 <h2 className="text-xl font-extrabold text-slate-900">AI is reading your statement</h2>
                 <p className="text-slate-500 text-sm mt-1">Extracting transactions and calculating Nigerian tax obligations...</p>
@@ -589,7 +584,7 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
                   <button onClick={() => setStep('upload')} className="text-sm text-slate-500 border border-slate-200 px-4 py-2 rounded-xl hover:bg-slate-50">← Re-upload</button>
                   <button onClick={importToLedger} disabled={saving || selected.length === 0}
                     className="bg-cac-green text-white px-5 py-2 rounded-xl font-bold text-sm hover:bg-cac-dark disabled:opacity-50">
-                    {saving ? 'Importing...' : 'Import' + selected.length + 'to Ledger'}
+                    {saving ? 'Importing...' : 'Import ' + selected.length + ' to Ledger'}
                   </button>
                 </div>
               </header>
@@ -603,7 +598,7 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
                   { label: "VAT to Remit",   value: fmt(totalVAT),      color: 'text-amber-700',  bg: 'bg-amber-50'  },
                   { label: "WHT to Deduct",  value: fmt(totalWHT),      color: 'text-purple-700', bg: 'bg-purple-50' },
                 ].map(s => (
-                  <div key={s.label} className={s.bg + 'rounded-2xl p-4'}>
+                  <div key={s.label} className={s.bg + ' rounded-2xl p-4'}>
                     <p className="text-xs text-slate-500 font-semibold">{s.label}</p>
                     <p className={`text-lg font-extrabold mt-1 ${s.color}`}>{s.value}</p>
                   </div>
@@ -628,7 +623,7 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
                   <table className="w-full text-sm">
                     <thead className="bg-slate-50 text-xs text-slate-500 font-bold uppercase tracking-wider">
                       <tr>
-                        <th className="px-4 py-3 text-left w-8"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></th>
+                        <th className="px-4 py-3 text-left w-8">✓</th>
                         <th className="px-4 py-3 text-left">Date</th>
                         <th className="px-4 py-3 text-left">Description</th>
                         <th className="px-4 py-3 text-left">Category</th>
@@ -664,14 +659,14 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
           {/* DONE STEP */}
           {step === 'done' && (
             <div className="min-h-[50vh] flex flex-col items-center justify-center text-center space-y-5 max-w-md mx-auto">
-              <div className="w-20 h-20 bg-green-50 border-2 border-green-200 rounded-2xl flex items-center justify-center text-4xl"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span></div>
+              <div className="w-20 h-20 bg-green-50 border-2 border-green-200 rounded-2xl flex items-center justify-center text-4xl">✅</div>
               <div className="space-y-2">
                 <h2 className="text-xl font-extrabold text-slate-900">Import Complete!</h2>
                 <p className="text-slate-500 text-sm">{savedCount} transactions from {monthYearLabel(monthYear)} added to your ledger.</p>
-                {vaultSaved && <p className="text-xs text-cac-green font-bold"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span> Statement saved to Evidence Vault</p>}
+                {vaultSaved && <p className="text-xs text-cac-green font-bold">✅ Statement saved to Evidence Vault</p>}
                 {vaultError && (
                   <div className="bg-red-50 border border-red-200 rounded-xl px-3 py-2 text-left">
-                    <p className="text-xs font-bold text-red-700"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> Could not save to Evidence Vault:</p>
+                    <p className="text-xs font-bold text-red-700">⚠️ Could not save to Evidence Vault:</p>
                     <p className="text-xs text-red-600 mt-0.5">{vaultError}</p>
                   </div>
                 )}
