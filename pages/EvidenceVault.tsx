@@ -4,11 +4,11 @@ import { Card, Button } from '../components/Shared';
 import * as db from '../services/db';
 
 const CATEGORY_LABELS: Record<EvidenceCategory, { label: string; icon: string; color: string }> = {
-  receipt:        { label: 'Receipt',        icon: '🧾', color: 'bg-green-50 text-green-700 border-green-200' },
-  invoice:        { label: 'Invoice',         icon: '📄', color: 'bg-blue-50 text-blue-700 border-blue-200' },
-  payment_proof:  { label: 'Payment Proof',   icon: '✅', color: 'bg-purple-50 text-purple-700 border-purple-200' },
-  bank_statement: { label: 'Bank Statement',  icon: '🏦', color: 'bg-amber-50 text-amber-700 border-amber-200' },
-  other:          { label: 'Other',           icon: '📎', color: 'bg-slate-50 text-slate-700 border-slate-200' },
+  receipt:        { label: "Receipt",        icon: '🧾', color: 'bg-green-50 text-green-700 border-green-200' },
+  invoice:        { label: "Invoice",         icon: '📄', color: 'bg-blue-50 text-blue-700 border-blue-200' },
+  payment_proof:  { label: "Payment Proof",   icon: '✅', color: 'bg-purple-50 text-purple-700 border-purple-200' },
+  bank_statement: { label: "Bank Statement",  icon: '🏦', color: 'bg-amber-50 text-amber-700 border-amber-200' },
+  other:          { label: "Other",           icon: '📎', color: 'bg-slate-50 text-slate-700 border-slate-200' },
 };
 
 const fmtSize = (bytes: number) => {
@@ -366,7 +366,7 @@ export const EvidenceVault: React.FC<EvidenceVaultProps> = ({ company }) => {
       ) : (
         <>
           <div className="flex items-center justify-between">
-            <p className="text-sm text-slate-500 font-semibold">{filtered.length} document{filtered.length !== 1 ? 's' : ''}</p>
+            <p className="text-sm text-slate-500 font-semibold">{filtered.length} document{filtered.length !== 1 ? 's" : ''}</p>
             {filterCat !== 'all' && (
               <button onClick={() => setFilterCat('all')} className="text-xs text-cac-green font-bold hover:underline">Clear filter</button>
             )}

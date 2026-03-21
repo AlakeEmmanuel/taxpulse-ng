@@ -52,18 +52,18 @@ const NotificationToggle: React.FC = () => {
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className="text-2xl">{subscribed ? '🔔' : '🔕'}</span>
+          <span className="text-2xl">{subscribed ? '🔔" : '🔕'}</span>
           <div>
-            <p className="text-sm font-bold text-slate-900">{subscribed ? 'Notifications enabled' : 'Notifications disabled'}</p>
-            <p className="text-xs text-slate-500">{subscribed ? "You'll get alerts 7 days and 1 day before deadlines" : "Enable to get tax deadline alerts"}</p>
+            <p className="text-sm font-bold text-slate-900">{subscribed ? 'Notifications enabled" : 'Notifications disabled'}</p>
+            <p className="text-xs text-slate-500">{subscribed ? 'You'll get alerts 7 days and 1 day before deadlines" : "Enable to get tax deadline alerts"}</p>
           </div>
         </div>
       <button
         onClick={toggle}
         disabled={loading}
-        className={"relative inline-flex h-6 w-11 items-center rounded-full transition-colors " + (subscribed ? "bg-cac-green" : "bg-slate-200") + " disabled:opacity-50"}
+        className={"relative inline-flex h-6 w-11 items-center rounded-full transition-colors ' + (subscribed ? 'bg-cac-green" : "bg-slate-200") + ' disabled:opacity-50'}
       >
-        <span className={"inline-block h-4 w-4 transform rounded-full bg-white transition-transform " + (subscribed ? "translate-x-6" : "translate-x-1")} />
+        <span className={"inline-block h-4 w-4 transform rounded-full bg-white transition-transform ' + (subscribed ? 'translate-x-6" : "translate-x-1")} />
       </button>
       </div>
       {error && <p className="text-xs text-red-500 bg-red-50 rounded-lg px-3 py-2">{error}</p>}
@@ -198,11 +198,11 @@ export const SettingsPage: React.FC<SettingsProps> = ({ company, onCompanyUpdate
             <p className="font-semibold text-sm text-slate-800">Has Employees (PAYE Applicable)</p>
             <p className="text-xs text-slate-400">PAYE due 10th of each month → State IRS</p>
           </div>
-          <input type="checkbox" className="accent-cac-green w-4 h-4" checked={form.hasEmployees} onChange={e => update('hasEmployees', e.target.checked)} />
+          <input type="checkbox" className="accent-cac-green w-4 h-4" checked={form.hasEmployees} onChange={e => update("hasEmployees", e.target.checked)} />
         </label>
 
         {form.hasEmployees && (
-          <Input label="Number of Employees" type="number" value={String(form.employeeCount || '')} onChange={e => update('employeeCount', parseInt(e.target.value) || 0)} placeholder="0" />
+          <Input label="Number of Employees" type="number" value={String(form.employeeCount || "')} onChange={e => update('employeeCount', parseInt(e.target.value) || 0)} placeholder="0" />
         )}
 
         <label className="flex items-center justify-between p-3 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition">
@@ -210,7 +210,7 @@ export const SettingsPage: React.FC<SettingsProps> = ({ company, onCompanyUpdate
             <p className="font-semibold text-sm text-slate-800">Pays Vendors (WHT Applicable)</p>
             <p className="text-xs text-slate-400">5% goods/construction · 10% services · Due 21st monthly → NRS</p>
           </div>
-          <input type="checkbox" className="accent-cac-green w-4 h-4" checked={form.paysVendors} onChange={e => update('paysVendors', e.target.checked)} />
+          <input type="checkbox" className="accent-cac-green w-4 h-4" checked={form.paysVendors} onChange={e => update("paysVendors", e.target.checked)} />
         </label>
         </>)}
 
@@ -220,7 +220,7 @@ export const SettingsPage: React.FC<SettingsProps> = ({ company, onCompanyUpdate
               <p className="font-semibold text-sm text-slate-800">Collects VAT (≥₦100M Turnover)</p>
               <p className="text-xs text-slate-400">NTA 2025: VAT registration threshold raised to ₦100M (was ₦25M)</p>
             </div>
-            <input type="checkbox" className="accent-cac-green w-4 h-4" checked={form.collectsVat} onChange={e => update('collectsVat', e.target.checked)} />
+            <input type="checkbox" className="accent-cac-green w-4 h-4" checked={form.collectsVat} onChange={e => update("collectsVat", e.target.checked)} />
           </label>
         )}
 
@@ -266,7 +266,7 @@ export const SettingsPage: React.FC<SettingsProps> = ({ company, onCompanyUpdate
               <p className="font-semibold text-sm text-slate-800">NSITF (3+ employees)</p>
               <p className="text-xs text-slate-400">1% of gross payroll · due 16th monthly → National Social Insurance Trust Fund</p>
             </div>
-            <input type="checkbox" className="accent-cac-green w-4 h-4" checked={form.hasNSITF || false} onChange={e => update('hasNSITF', e.target.checked)} />
+            <input type="checkbox" className="accent-cac-green w-4 h-4" checked={form.hasNSITF || false} onChange={e => update("hasNSITF", e.target.checked)} />
           </label>
 
           <label className="flex items-center justify-between p-3 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition">
@@ -274,7 +274,7 @@ export const SettingsPage: React.FC<SettingsProps> = ({ company, onCompanyUpdate
               <p className="font-semibold text-sm text-slate-800">Pension (3+ employees)</p>
               <p className="text-xs text-slate-400">8% employee + 10% employer · due 7 days after payday → Pension Fund Admins</p>
             </div>
-            <input type="checkbox" className="accent-cac-green w-4 h-4" checked={form.hasPension || false} onChange={e => update('hasPension', e.target.checked)} />
+            <input type="checkbox" className="accent-cac-green w-4 h-4" checked={form.hasPension || false} onChange={e => update("hasPension", e.target.checked)} />
           </label>
 
           <label className="flex items-center justify-between p-3 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition">
@@ -282,7 +282,7 @@ export const SettingsPage: React.FC<SettingsProps> = ({ company, onCompanyUpdate
               <p className="font-semibold text-sm text-slate-800">ITF (5+ staff or ₦50M+ turnover)</p>
               <p className="text-xs text-slate-400">1% of annual payroll · due 1 April → Industrial Training Fund</p>
             </div>
-            <input type="checkbox" className="accent-cac-green w-4 h-4" checked={form.hasITF || false} onChange={e => update('hasITF', e.target.checked)} />
+            <input type="checkbox" className="accent-cac-green w-4 h-4" checked={form.hasITF || false} onChange={e => update("hasITF", e.target.checked)} />
           </label>
 
           <label className="flex items-center justify-between p-3 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition">
@@ -290,7 +290,7 @@ export const SettingsPage: React.FC<SettingsProps> = ({ company, onCompanyUpdate
               <p className="font-semibold text-sm text-slate-800">NHF contributions</p>
               <p className="text-xs text-slate-400">2.5% of employee basic salary · monthly → Federal Mortgage Bank of Nigeria</p>
             </div>
-            <input type="checkbox" className="accent-cac-green w-4 h-4" checked={form.hasNHF || false} onChange={e => update('hasNHF', e.target.checked)} />
+            <input type="checkbox" className="accent-cac-green w-4 h-4" checked={form.hasNHF || false} onChange={e => update("hasNHF", e.target.checked)} />
           </label>
         </Card>
       )}
@@ -304,7 +304,7 @@ export const SettingsPage: React.FC<SettingsProps> = ({ company, onCompanyUpdate
               <p className="font-semibold text-sm text-slate-800">Track CAC annual returns</p>
               <p className="text-xs text-slate-400">All registered companies must file with CAC by 30 June each year. Penalty: ₦3,000/day.</p>
             </div>
-            <input type="checkbox" className="accent-cac-green w-4 h-4" checked={form.cacAnnualReturns !== false} onChange={e => update('cacAnnualReturns', e.target.checked)} />
+            <input type="checkbox" className="accent-cac-green w-4 h-4" checked={form.cacAnnualReturns !== false} onChange={e => update("cacAnnualReturns", e.target.checked)} />
           </label>
         </Card>
       )}
@@ -326,7 +326,7 @@ export const SettingsPage: React.FC<SettingsProps> = ({ company, onCompanyUpdate
               <p className="font-semibold text-sm text-slate-800">Enable WhatsApp reminders</p>
               <p className="text-xs text-slate-400">Agree to receive deadline alerts from TaxPulse NG on WhatsApp</p>
             </div>
-            <input type="checkbox" className="accent-cac-green w-4 h-4" checked={form.whatsappOptin || false} onChange={e => update('whatsappOptin', e.target.checked)} />
+            <input type="checkbox" className="accent-cac-green w-4 h-4" checked={form.whatsappOptin || false} onChange={e => update("whatsappOptin", e.target.checked)} />
           </label>
         )}
       </Card>

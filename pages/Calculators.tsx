@@ -50,9 +50,9 @@ const VATCalculator: React.FC = () => {
       {val > 0 && (
         <div className="bg-slate-50 rounded-xl p-4 space-y-2">
           {[
-            { label: 'Net Amount',  val: fmt(net),   color: 'text-slate-700' },
+            { label: "Net Amount",  val: fmt(net),   color: 'text-slate-700' },
             { label: `VAT (${zeroRated ? '0%' : '7.5%'})`, val: fmt(vat), color: 'text-blue-600' },
-            { label: 'Total',       val: fmt(total), color: 'text-slate-900 font-extrabold' },
+            { label: "Total",       val: fmt(total), color: 'text-slate-900 font-extrabold' },
           ].map(r => (
             <div key={r.label} className="flex justify-between text-sm">
               <span className="text-slate-500">{r.label}</span>
@@ -115,7 +115,7 @@ const WHTCalculator: React.FC = () => {
             className="w-4 h-4 accent-cac-green" />
           <span className="text-xs text-slate-700">Vendor has a valid TIN</span>
         </label>
-        <Input label="Vendor's total monthly transactions with you (₦)" type="number"
+          <Input label="Monthly vendor transactions (N)" type="number"
           value={monthlyTxn} onChange={e => setMonthlyTxn(e.target.value)}
           placeholder={`Auto: using ${fmt(val)} if blank`} />
         {hasTIN && monthly <= 2_000_000 && monthly > 0 && (
@@ -132,9 +132,9 @@ const WHTCalculator: React.FC = () => {
       {val > 0 && (
         <div className={`rounded-xl p-4 space-y-2 ${exempt ? 'bg-green-50 border border-green-200' : 'bg-slate-50'}`}>
           {[
-            { label: 'Gross Amount',   val: fmt(val),        color: 'text-slate-700' },
+            { label: "Gross Amount",   val: fmt(val),        color: 'text-slate-700' },
             { label: `WHT (${exempt ? '0% -- exempt' : (whtInfo.rate * 100).toFixed(0) + '%'})`, val: fmt(wht), color: exempt ? 'text-green-600 font-bold' : 'text-purple-600' },
-            { label: 'Net to Vendor',  val: fmt(netPayable), color: 'text-slate-900 font-extrabold' },
+            { label: "Net to Vendor",  val: fmt(netPayable), color: 'text-slate-900 font-extrabold' },
           ].map(r => (
             <div key={r.label} className="flex justify-between text-sm">
               <span className="text-slate-500">{r.label}</span>
@@ -204,10 +204,10 @@ const CITCalculator: React.FC = () => {
           {p > 0 && (
             <div className="space-y-2">
               {[
-                { label: 'Taxable Profit',     val: fmt(p),             color: 'text-slate-700' },
+                { label: "Taxable Profit",     val: fmt(p),             color: 'text-slate-700' },
                 { label: `CIT (${(result.rate * 100).toFixed(0)}%)`,   val: fmt(result.tax),     color: 'text-orange-600' },
-                { label: 'Dev Levy (4%)',       val: fmt(result.devLevy), color: 'text-red-500', hide: result.rate === 0 },
-                { label: 'Total Tax Burden',    val: fmt(result.total),  color: 'text-slate-900 font-extrabold' },
+                { label: "Dev Levy (4%)",       val: fmt(result.devLevy), color: 'text-red-500', hide: result.rate === 0 },
+                { label: "Total Tax Burden",    val: fmt(result.total),  color: 'text-slate-900 font-extrabold' },
               ].filter(r => !r.hide).map(r => (
                 <div key={r.label} className="flex justify-between text-sm">
                   <span className="text-slate-500">{r.label}</span>
@@ -225,8 +225,8 @@ const CITCalculator: React.FC = () => {
       <div className="space-y-2">
         <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">NTA 2025 CIT Structure</p>
         {[
-          { label: 'Small Company', sub: 'Turnover ≤ ₦50M', cit: '0%', dev: '0%', badge: 'green' },
-          { label: 'Standard Company', sub: 'Turnover > ₦50M', cit: '30%', dev: '4%', badge: 'orange' },
+          { label: "Small Company", sub: 'Turnover ≤ ₦50M', cit: '0%', dev: '0%', badge: 'green' },
+          { label: "Standard Company", sub: 'Turnover > ₦50M', cit: '30%', dev: '4%', badge: 'orange' },
         ].map(r => (
           <div key={r.label} className={`flex items-center justify-between rounded-xl px-3 py-2.5 ${r.badge === 'green' ? 'bg-green-50' : 'bg-orange-50'}`}>
             <div>
@@ -318,12 +318,12 @@ const CGTCalculator: React.FC = () => {
           ) : (
             <>
               {[
-                { label: 'Sale Proceeds',        val: fmt(p),                     color: 'text-slate-700' },
-                { label: 'Total Allowable Costs', val: fmt(c + i + d),            color: 'text-slate-700' },
+                { label: "Sale Proceeds",        val: fmt(p),                     color: 'text-slate-700' },
+                { label: "Total Allowable Costs", val: fmt(c + i + d),            color: 'text-slate-700' },
                 { label: result.chargeableGain > 0 ? 'Chargeable Gain' : 'Capital Loss',
                   val: fmt(result.chargeableGain || result.loss),
                   color: result.chargeableGain > 0 ? 'text-amber-600 font-bold' : 'text-blue-600 font-bold' },
-                { label: 'CGT @ 10%',            val: fmt(result.tax),            color: 'text-red-600 font-extrabold' },
+                { label: "CGT @ 10%",            val: fmt(result.tax),            color: 'text-red-600 font-extrabold' },
               ].map(r => (
                 <div key={r.label} className="flex justify-between text-sm">
                   <span className="text-slate-500">{r.label}</span>

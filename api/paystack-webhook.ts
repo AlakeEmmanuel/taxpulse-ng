@@ -4,7 +4,7 @@
  *
  * SETUP CHECKLIST:
  * 1. Place this file at: Downloads/taxpulse-ng/api/paystack-webhook.ts
- * 2. Place api/package.json ({"type":"commonjs"}) in the SAME api/ folder
+ * 2. Place api/package.json ({"type" : "commonjs"}) in the SAME api/ folder
  * 3. Vercel env vars needed (Settings → Environment Variables):
  *      PAYSTACK_SECRET_KEY         → sk_live_xxx
  *      SUPABASE_URL                → same as VITE_SUPABASE_URL

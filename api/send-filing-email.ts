@@ -33,10 +33,10 @@ function buildEmailHtml(p: FilingEmailPayload): string {
   return `<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/></head>
-<body style="margin:0;padding:0;background:#F7F7F5;font-family:'Segoe UI',Arial,sans-serif;">
+<body style="margin:0;padding:0;background:#F7F7F5;font-family:Segoe UI",Arial,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#F7F7F5;padding:32px 16px;">
     <tr><td align="center">
-      <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;overflow:hidden;border:1px solid #e8e8e4;max-width:600px;width:100%;">
+      <table width="600" cellpadding="0" cellspacing="0" style='background:#fff;border-radius:16px;overflow:hidden;border:1px solid #e8e8e4;max-width:600px;width:100%;'>
 
         <!-- Header -->
         <tr><td style="background:${GREEN};padding:28px 32px;">
@@ -68,7 +68,7 @@ function buildEmailHtml(p: FilingEmailPayload): string {
               ['Payment Date', formatDate(p.paymentDate)],
               ...(p.receiptRef ? [['Reference No.', p.receiptRef]] : []),
             ].map(([label, val], i) => `
-            <tr style="background:${i % 2 === 0 ? '#f7f7f5' : '#fff'}">
+            <tr style="background:${i % 2 === 0 ? '#f7f7f5' : "#fff"}">
               <td style="padding:10px 12px;color:#888;font-size:13px;width:45%;">${label}</td>
               <td style="padding:10px 12px;color:#0d0d0d;font-size:13px;font-weight:600;">${val}</td>
             </tr>`).join('')}

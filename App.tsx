@@ -26,7 +26,7 @@ import { supabase } from './services/supabaseClient';
 
 export type AppView =
   | 'dashboard' | 'onboarding' | 'calculators' | 'pit'
-  | 'ledger" | 'settings" | 'ai' | 'vault' | 'penalties' | 'export' | 'import' | 'payslip' | 'invoice'
+  | 'ledger' | 'settings' | 'ai' | 'vault' | 'penalties' | 'export' | 'import' | 'payslip' | 'invoice'
   | 'salary' | 'planner' | 'tcc' | 'payroll-csv';
 
 const PRO_VIEWS: AppView[] = ['ai', 'vault', 'export', 'import', 'payslip', 'invoice'];

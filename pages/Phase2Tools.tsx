@@ -58,15 +58,15 @@ export const SalarySimulator: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {[
-                  { label: 'Gross Salary',        field: 'gross',            inverse: false },
-                  { label: 'PAYE (NTA 2025)',      field: 'paye',             inverse: true  },
-                  { label: 'Pension (8%)',          field: 'pension',          inverse: true  },
-                  { label: 'NHIS (1.5%)',           field: 'nhis',             inverse: true  },
-                  { label: 'NHF (2.5% basic)',      field: 'nhf',              inverse: true  },
-                  { label: 'NET TAKE-HOME',         field: 'netPay',           inverse: false },
-                  { label: 'Employer Pension (10%)',field: 'employerPension',  inverse: true  },
-                  { label: 'NSITF (1%)',            field: 'nsitf',            inverse: true  },
-                  { label: 'Total Employer Cost',   field: 'totalEmployerCost', inverse: true },
+                  { label: "Gross Salary",        field: 'gross',            inverse: false },
+                  { label: "PAYE (NTA 2025)",      field: 'paye',             inverse: true  },
+                  { label: "Pension (8%)",          field: 'pension',          inverse: true  },
+                  { label: "NHIS (1.5%)",           field: 'nhis',             inverse: true  },
+                  { label: "NHF (2.5% basic)",      field: 'nhf',              inverse: true  },
+                  { label: "NET TAKE-HOME",         field: 'netPay',           inverse: false },
+                  { label: "Employer Pension (10%)",field: 'employerPension',  inverse: true  },
+                  { label: "NSITF (1%)",            field: 'nsitf',            inverse: true  },
+                  { label: "Total Employer Cost",   field: 'totalEmployerCost', inverse: true },
                 ].map(({ label, field, inverse }) => {
                   const cv = cCalc[field as keyof typeof cCalc] as number;
                   const pv = pCalc[field as keyof typeof pCalc] as number;
@@ -168,14 +168,14 @@ export const AnnualTaxPlanner: React.FC<AnnualPlannerProps> = ({ company }) => {
           {/* Annual totals summary */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
-              { label: 'Annual VAT',         val: totals.vatDue,     show: company.collectsVat, color: 'text-blue-600' },
-              { label: 'Annual PAYE',         val: totals.payeDue,    show: company.hasEmployees, color: 'text-purple-600' },
-              { label: 'Annual WHT',          val: totals.whtDue,     show: company.paysVendors, color: 'text-amber-600' },
-              { label: 'Annual Pension',      val: totals.pensionDue, show: company.hasPension, color: 'text-teal-600' },
-              { label: 'Annual NSITF',        val: totals.nsitfDue,   show: company.hasNSITF, color: 'text-indigo-600' },
-              { label: 'Annual NHF',          val: totals.nhfDue,     show: company.hasNHF, color: 'text-pink-600' },
-              { label: 'TOTAL ANNUAL TAX',    val: totals.totalDue,   show: true, color: 'text-red-600 font-extrabold text-base' },
-              { label: 'Monthly Average',     val: totals.totalDue/12, show: true, color: 'text-slate-700 font-bold' },
+              { label: "Annual VAT",         val: totals.vatDue,     show: company.collectsVat, color: 'text-blue-600' },
+              { label: "Annual PAYE",         val: totals.payeDue,    show: company.hasEmployees, color: 'text-purple-600' },
+              { label: "Annual WHT",          val: totals.whtDue,     show: company.paysVendors, color: 'text-amber-600' },
+              { label: "Annual Pension",      val: totals.pensionDue, show: company.hasPension, color: 'text-teal-600' },
+              { label: "Annual NSITF",        val: totals.nsitfDue,   show: company.hasNSITF, color: 'text-indigo-600' },
+              { label: "Annual NHF",          val: totals.nhfDue,     show: company.hasNHF, color: 'text-pink-600' },
+              { label: "TOTAL ANNUAL TAX",    val: totals.totalDue,   show: true, color: 'text-red-600 font-extrabold text-base' },
+              { label: "Monthly Average",     val: totals.totalDue/12, show: true, color: 'text-slate-700 font-bold' },
             ].filter(s => s.show).map(s => (
               <div key={s.label} className="bg-slate-50 rounded-xl p-3 text-center">
                 <p className="text-xs text-slate-400 mb-1">{s.label}</p>
@@ -287,10 +287,10 @@ export const TCCTracker: React.FC<{ company: Company }> = ({ company }) => {
 
   const statusInfo = (expiry: string) => {
     const d = getDaysLeft(expiry);
-    if (d < 0)   return { label: 'Expired',      color: 'bg-red-100 text-red-700',    ring: 'border-red-300' };
+    if (d < 0)   return { label: "Expired",      color: 'bg-red-100 text-red-700',    ring: 'border-red-300' };
     if (d <= 30) return { label: `${d}d left`,   color: 'bg-amber-100 text-amber-700', ring: 'border-amber-300' };
     if (d <= 60) return { label: `${d}d left`,   color: 'bg-yellow-100 text-yellow-700', ring: 'border-yellow-200' };
-    return { label: 'Valid',                       color: 'bg-green-100 text-green-700', ring: 'border-green-200' };
+    return { label: "Valid",                       color: 'bg-green-100 text-green-700', ring: 'border-green-200' };
   };
 
   const stateIRS = getStateIRS(company.state);
@@ -385,7 +385,7 @@ export const TCCTracker: React.FC<{ company: Company }> = ({ company }) => {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${s.color}`}>{s.label}</span>
-                    <span className="text-xs font-bold text-slate-600 uppercase">{entry.type === 'federal' ? 'Federal (NRS)' : `State (${company.state} IRS)`}</span>
+                    <span className="text-xs font-bold text-slate-600 uppercase">{entry.type === 'federal" ? 'Federal (NRS)' : `State (${company.state} IRS)`}</span>
                   </div>
                   {entry.tccNumber && <p className="text-sm font-bold text-slate-800">{entry.tccNumber}</p>}
                   <p className="text-xs text-slate-500 mt-1">
@@ -459,7 +459,7 @@ export const PayrollCSVExport: React.FC<{ company: Company }> = ({ company }) =>
       ]);
     });
 
-    const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
+    const csv = rows.map(r => r.map(v => `"${v}'`).join(',')).join('\n');
     const blob = new Blob([csv], { type:'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);

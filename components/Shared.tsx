@@ -13,9 +13,9 @@ export const Button: React.FC<{
   onClick?: () => void;
   variant?: 'primary' | 'secondary' | 'outline' | 'danger' | 'ghost';
   className?: string;
-  type?: "button" | "submit" | "reset";
+  type?: "button' | 'submit" | "reset";
   disabled?: boolean;
-}> = ({ children, onClick, variant = 'primary', className = "", type = "button", disabled = false }) => {
+}> = ({ children, onClick, variant = 'primary', className = "", type = 'button', disabled = false }) => {
   const styles = {
     primary:   "bg-cac-green text-white hover:bg-cac-dark",
     secondary: "bg-cac-gold text-white hover:opacity-90",

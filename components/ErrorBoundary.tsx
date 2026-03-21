@@ -26,7 +26,7 @@ export class ErrorBoundary extends React.Component<{ children: React.ReactNode }
             <div>
               <h1 className="text-xl font-extrabold text-slate-900">Something went wrong</h1>
               <p className="text-slate-500 text-sm mt-2">
-                TaxPulse ran into an unexpected error. Your data is safe — this is just a display issue.
+                TaxPulse ran into an unexpected error. Your data is safe -- this is just a display issue.
               </p>
             </div>
             {this.state.error && (

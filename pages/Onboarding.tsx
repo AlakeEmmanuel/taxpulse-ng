@@ -6,10 +6,10 @@ interface OnboardingProps {
 }
 
 const STEPS = [
-  { id: 1, title: 'Your Profile', subtitle: 'Tell us about yourself or your business', icon: '🏢' },
-  { id: 2, title: 'Registration', subtitle: 'CAC & Tax registration details', icon: '📋' },
-  { id: 3, title: 'Tax Profile', subtitle: 'Configure your tax obligations', icon: '🧾' },
-  { id: 4, title: 'Ready!', subtitle: 'Review and launch', icon: '🚀' },
+  { id: 1, title: "Your Profile", subtitle: 'Tell us about yourself or your business', icon: '🏢' },
+  { id: 2, title: "Registration", subtitle: 'CAC & Tax registration details', icon: '📋' },
+  { id: 3, title: "Tax Profile", subtitle: 'Configure your tax obligations', icon: '🧾' },
+  { id: 4, title: "Ready!", subtitle: 'Review and launch', icon: '🚀' },
 ];
 
 const INDUSTRIES = [
@@ -323,9 +323,9 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                       <label className="block text-sm font-semibold text-slate-700 mb-2">Employment Type *</label>
                       <div className="grid grid-cols-1 gap-2">
                         {([
-                          { val: 'employed', label: 'Employed', desc: 'Salary earner -- PAYE deducted by employer' },
-                          { val: 'self-employed', label: 'Self-Employed / Freelancer', desc: 'Runs own business -- must file & pay PIT directly' },
-                          { val: 'both', label: 'Both (Salary + Business Income)', desc: 'Employed and has other income sources' },
+                          { val: 'employed', label: "Employed", desc: 'Salary earner -- PAYE deducted by employer' },
+                          { val: 'self-employed', label: "Self-Employed / Freelancer", desc: 'Runs own business -- must file & pay PIT directly' },
+                          { val: 'both', label: "Both (Salary + Business Income)", desc: 'Employed and has other income sources' },
                         ] as const).map(opt => (
                           <button
                             key={opt.val}

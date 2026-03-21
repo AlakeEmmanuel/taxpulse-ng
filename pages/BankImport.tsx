@@ -166,10 +166,10 @@ NIGERIAN TAX RULES (NTA 2025):
 - VAT is 7.5% on taxable sales/services
 - WHT: 5% goods, 10% services to vendors/contractors
 - Bank charges, internal transfers, tax payments = NOT taxable
-- Credits to account = "sale", Debits = "expense"
+- Credits to account = "sale", Debits = 'expense"
 
 Return ONLY a JSON array, no markdown, no explanation:
-[{ "date":"YYYY-MM-DD","description":"string","amount":number,"type":"sale|expense","category":"Sales Revenue|Service Income|Staff Salary|Rent|Utilities|Supplies|Professional Fees|Bank Charges|Tax Payment|Other Income|Other Expense","vatApplicable":bool,"whtApplicable":bool }]`;
+[{ "date" : "YYYY-MM-DD","description" : "string","amount':number,'type":"sale|expense",'category":"Sales Revenue|Service Income|Staff Salary|Rent|Utilities|Supplies|Professional Fees|Bank Charges|Tax Payment|Other Income|Other Expense','vatApplicable":bool,"whtApplicable":bool }]`;
 
   let userContent: any;
   if (isImage) {
@@ -274,7 +274,7 @@ const StatementsTab: React.FC<{ company: Company; onNavigate: (v: AppView) => vo
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-slate-500 font-semibold">{statements.length} statement{statements.length !== 1 ? 's' : ''} · ordered chronologically</p>
+        <p className="text-sm text-slate-500 font-semibold">{statements.length} statement{statements.length !== 1 ? 's" : ''} · ordered chronologically</p>
         <button onClick={() => onNavigate('ledger')} className="text-xs text-cac-green font-bold hover:underline">View Ledger →</button>
       </div>
 
@@ -291,7 +291,7 @@ const StatementsTab: React.FC<{ company: Company; onNavigate: (v: AppView) => vo
                   <div className="flex items-center gap-3 mt-1">
                     <span className="text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full">{txCount} transactions</span>
                     <span className="text-[10px] text-slate-400">Uploaded {stmt.uploadDate}</span>
-                    <span className="text-[10px] text-slate-400">{stmt.sizeBytes ? (stmt.sizeBytes / 1024).toFixed(1) + ' KB' : ''}</span>
+                    <span className="text-[10px] text-slate-400">{stmt.sizeBytes ? (stmt.sizeBytes / 1024).toFixed(1) + ' KB" : ''}</span>
                   </div>
                 </div>
               </div>
@@ -458,7 +458,7 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
 
       {/* Tabs */}
       <div className="flex gap-1 bg-slate-100 p-1 rounded-xl w-fit">
-        {([['import', '📤 Import Statement'], ['statements', '📂 My Statements']] as [Tab, string][]).map(([t, label]) => (
+          {([['import', '📤 Import Statement'], ['statements', '📂 My Statements']] as [Tab, string][]).map(([t, label]) => (
           <button key={t} onClick={() => { setTab(t); if (t === 'import') reset(); }}
             className={'px-5 py-2 rounded-lg text-sm font-bold transition-all ' + (tab === t ? 'bg-white text-cac-green shadow' : 'text-slate-500 hover:text-slate-700')}>
             {label}
@@ -593,10 +593,10 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {[
-                  { label: 'Total Income',   value: fmt(totalIncome),   color: 'text-green-700',  bg: 'bg-green-50'  },
-                  { label: 'Total Expenses', value: fmt(totalExpenses), color: 'text-red-700',    bg: 'bg-red-50'    },
-                  { label: 'VAT to Remit',   value: fmt(totalVAT),      color: 'text-amber-700',  bg: 'bg-amber-50'  },
-                  { label: 'WHT to Deduct',  value: fmt(totalWHT),      color: 'text-purple-700', bg: 'bg-purple-50' },
+                  { label: "Total Income",   value: fmt(totalIncome),   color: 'text-green-700',  bg: 'bg-green-50'  },
+                  { label: "Total Expenses", value: fmt(totalExpenses), color: 'text-red-700',    bg: 'bg-red-50'    },
+                  { label: "VAT to Remit",   value: fmt(totalVAT),      color: 'text-amber-700',  bg: 'bg-amber-50'  },
+                  { label: "WHT to Deduct",  value: fmt(totalWHT),      color: 'text-purple-700', bg: 'bg-purple-50' },
                 ].map(s => (
                   <div key={s.label} className={s.bg + ' rounded-2xl p-4'}>
                     <p className="text-xs text-slate-500 font-semibold">{s.label}</p>
@@ -636,12 +636,12 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
                       {transactions.map(t => (
                         <tr key={t.id} className={'transition-colors ' + (t.selected ? 'bg-white' : 'bg-slate-50 opacity-50')}>
                           <td className="px-4 py-3"><input type="checkbox" checked={t.selected} onChange={() => toggleRow(t.id)} className="w-4 h-4 accent-cac-green cursor-pointer" /></td>
-                          <td className="px-4 py-3"><input type="date" value={t.date} onChange={e => updateRow(t.id, 'date', e.target.value)} className="border-0 bg-transparent text-xs focus:outline-none focus:ring-1 focus:ring-cac-green rounded" /></td>
+                          <td className="px-4 py-3"><input type="date" value={t.date} onChange={e => updateRow(t.id, "date", e.target.value)} className="border-0 bg-transparent text-xs focus:outline-none focus:ring-1 focus:ring-cac-green rounded" /></td>
                           <td className="px-4 py-3 max-w-[200px]"><input value={t.description} onChange={e => updateRow(t.id, 'description', e.target.value)} className="w-full border-0 bg-transparent text-xs focus:outline-none focus:ring-1 focus:ring-cac-green rounded px-1 truncate" /></td>
-                          <td className="px-4 py-3"><span className={'text-[10px] font-bold px-2 py-0.5 rounded-full ' + (categoryColors[t.category] || 'bg-gray-100 text-gray-700')}>{t.category}</span></td>
+                          <td className="px-4 py-3"><span className={'text-[10px] font-bold px-2 py-0.5 rounded-full " + (categoryColors[t.category] || 'bg-gray-100 text-gray-700')}>{t.category}</span></td>
                           <td className="px-4 py-3 text-right font-bold text-slate-900 whitespace-nowrap">{fmt(t.amount)}</td>
                           <td className="px-4 py-3 text-center">
-                            <select value={t.type} onChange={e => updateRow(t.id, 'type', e.target.value)} className={'text-[10px] font-bold px-2 py-0.5 rounded-full border-0 cursor-pointer ' + (t.type === 'sale' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')}>
+                            <select value={t.type} onChange={e => updateRow(t.id, 'type', e.target.value)} className={"text-[10px] font-bold px-2 py-0.5 rounded-full border-0 cursor-pointer ' + (t.type === 'sale" ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')}>
                               <option value="sale">Income</option>
                               <option value="expense">Expense</option>
                             </select>

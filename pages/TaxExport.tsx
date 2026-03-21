@@ -333,7 +333,7 @@ async function generatePAYESchedule(doc: any, company: Company, period: string, 
     '4. Obtain and retain the payment receipt / confirmation as proof of remittance.',
     '5. File annual employer return (Form H1) by 31 January each year for the preceding year.',
     '6. Penalty for non-deduction: 40% of undeducted tax (NTA 2025, stiffened enforcement).',
-    '7. PAYE is due to the State IRS of the employee\'s state of RESIDENCE, not the business location.',
+    "7. PAYE is due to the State IRS of the employee\"s state of RESIDENCE, not the business location.",
   ].forEach(line => { doc.text(line, 14, y); y += 7; });
 }
 
@@ -500,7 +500,7 @@ async function generateCITReturn(doc: any, company: Company, period: string, led
     body: [
       ['Small Company', 'Turnover ≤₦50M AND fixed assets ≤₦250M', '0%', '0%', '0%'],
       ['Standard Company', 'All other companies', '30%', '4%', 'Applicable'],
-      ['Professional Services', 'Law, accounting, consulting (cannot be "small")', '30%', '4%', 'Applicable'],
+        ['Professional Services', 'Law, accounting, consulting (cannot be small)', '30%', '4%', 'Applicable'],
     ],
     theme: 'grid',
     headStyles: { fillColor: GREEN, textColor: WHITE, fontStyle: 'bold', fontSize: 9 },
@@ -726,12 +726,12 @@ async function generateComplianceSummary(doc: any, company: Company, period: str
 
 // ─── Report type definitions ──────────────────────────────────────────────────
 const REPORT_TYPES = [
-  { id: 'compliance', label: 'Tax Compliance Summary', desc: 'Full overview -- all obligations, financial summary, compliance score', icon: '📊', color: 'bg-slate-50 border-slate-200', always: true },
-  { id: 'vat', label: 'VAT Return (Form 002)', desc: 'Monthly VAT return with output/input VAT computation. File with NRS by 21st.', icon: '🧾', color: 'bg-blue-50 border-blue-200', requires: 'vat' },
-  { id: 'paye', label: 'PAYE Monthly Schedule', desc: 'Employee payroll PAYE schedule with NTA 2025 bands. File with State IRS by 10th.', icon: '👥', color: 'bg-purple-50 border-purple-200', requires: 'paye' },
-  { id: 'wht', label: 'WHT Schedule', desc: 'Withholding tax deduction schedule with vendor breakdown. File with NRS by 21st.', icon: '🤝', color: 'bg-amber-50 border-amber-200', requires: 'wht' },
-  { id: 'cit', label: 'CIT Computation Sheet', desc: 'Company Income Tax computation + small company check. File with NRS within 6 months.', icon: '🏢', color: 'bg-green-50 border-green-200', requires: 'cit' },
-  { id: 'pit', label: 'PIT Self-Assessment (Form A)', desc: 'Personal Income Tax return with all deductions. File with State IRS by 31 March.', icon: '👤', color: 'bg-rose-50 border-rose-200', requires: 'pit' },
+  { id: 'compliance', label: "Tax Compliance Summary", desc: 'Full overview -- all obligations, financial summary, compliance score', icon: '📊', color: 'bg-slate-50 border-slate-200', always: true },
+  { id: 'vat', label: "VAT Return (Form 002)", desc: 'Monthly VAT return with output/input VAT computation. File with NRS by 21st.', icon: '🧾', color: 'bg-blue-50 border-blue-200', requires: 'vat' },
+  { id: 'paye', label: "PAYE Monthly Schedule", desc: 'Employee payroll PAYE schedule with NTA 2025 bands. File with State IRS by 10th.', icon: '👥', color: 'bg-purple-50 border-purple-200', requires: 'paye' },
+  { id: 'wht', label: "WHT Schedule", desc: 'Withholding tax deduction schedule with vendor breakdown. File with NRS by 21st.', icon: '🤝', color: 'bg-amber-50 border-amber-200', requires: 'wht' },
+  { id: 'cit', label: "CIT Computation Sheet", desc: 'Company Income Tax computation + small company check. File with NRS within 6 months.', icon: '🏢', color: 'bg-green-50 border-green-200', requires: 'cit' },
+  { id: 'pit', label: "PIT Self-Assessment (Form A)", desc: 'Personal Income Tax return with all deductions. File with State IRS by 31 March.', icon: '👤', color: 'bg-rose-50 border-rose-200', requires: 'pit' },
 ];
 
 interface TaxExportProps { company: Company; onNavigate?: (v: string) => void; }

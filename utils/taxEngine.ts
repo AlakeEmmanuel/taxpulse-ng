@@ -757,7 +757,7 @@ export function generateObligations(company: Company): Omit<TaxObligation, 'id'>
         checklist: [
           { label: 'Calculate 8% employee contribution per payslip', completed: false },
           { label: 'Calculate 10% employer contribution', completed: false },
-          { label: 'Remit total 18% to employees' respective PFAs', completed: false },
+          { label: "Remit total 18% to employees" respective PFAs", completed: false },
           { label: 'Deadline: 7 days after salary payment date (PRA 2014)', completed: false },
           { label: 'Keep pension remittance advice from each PFA', completed: false },
         ],
@@ -811,7 +811,7 @@ export function generateObligations(company: Company): Omit<TaxObligation, 'id'>
         status,
         estimatedAmount: 0,
         checklist: [
-          { label: "Calculate 2.5% of each employee's basic salary", completed: false },
+          { label: "Calculate 2.5% of each employee's basic salary', completed: false },
           { label: 'Log in to FMBN portal: www.fmbn.gov.ng', completed: false },
           { label: 'Submit NHF remittance schedule for all employees', completed: false },
           { label: 'Remit via REMITA to Federal Mortgage Bank of Nigeria (FMBN)', completed: false },

@@ -17,33 +17,33 @@ interface LayoutProps {
 }
 
 const MAIN_NAV: { icon: string; label: string; view: AppView }[] = [
-  { icon: '🏠', label: 'Home',        view: 'dashboard' },
-  { icon: '📊', label: 'Calculators', view: 'calculators' },
-  { icon: '👤', label: 'Income Tax',  view: 'pit' },
-  { icon: '📒', label: 'Ledger',      view: 'ledger' },
-  { icon: '🤖', label: 'AI Help',     view: 'ai' },
+  { icon: '🏠', label: "Home",        view: 'dashboard' },
+  { icon: '📊', label: "Calculators", view: 'calculators' },
+  { icon: '👤', label: "Income Tax",  view: 'pit' },
+  { icon: '📒', label: "Ledger",      view: 'ledger' },
+  { icon: '🤖', label: "AI Help",     view: 'ai' },
 ];
 
 const TOOLS_NAV: { icon: string; label: string; view: AppView }[] = [
-  { icon: '🗄️',  label: 'Evidence Vault', view: 'vault' },
-  { icon: '⚠️',  label: 'Penalties',      view: 'penalties' },
-  { icon: '📄',  label: 'PDF Export',     view: 'export' },
-  { icon: '🏦',  label: 'Bank Import',    view: 'import' },
-  { icon: '🧾',  label: 'Payslips',        view: 'payslip' },
-  { icon: '📋',  label: 'Invoices',        view: 'invoice' },
-  { icon: '💰',  label: 'Salary Sim',     view: 'salary' },
-  { icon: '📆',  label: 'Tax Planner',    view: 'planner' },
-  { icon: '📜',  label: 'TCC Tracker',    view: 'tcc' },
-  { icon: '📊',  label: 'Payroll CSV',    view: 'payroll-csv' },
+  { icon: '🗄️',  label: "Evidence Vault", view: 'vault' },
+  { icon: '⚠️',  label: "Penalties",      view: 'penalties' },
+  { icon: '📄',  label: "PDF Export",     view: 'export' },
+  { icon: '🏦',  label: "Bank Import",    view: 'import' },
+  { icon: '🧾',  label: "Payslips",        view: 'payslip' },
+  { icon: '📋',  label: "Invoices",        view: 'invoice' },
+  { icon: '💰',  label: "Salary Sim",     view: 'salary' },
+  { icon: '📆',  label: "Tax Planner",    view: 'planner' },
+  { icon: '📜',  label: "TCC Tracker",    view: 'tcc' },
+  { icon: '📊',  label: "Payroll CSV",    view: 'payroll-csv' },
 ];
 
 // Mobile shows only the 5 most-used + settings
 const MOBILE_NAV: { icon: string; label: string; view: AppView }[] = [
-  { icon: '🏠', label: 'Home',    view: 'dashboard' },
-  { icon: '📒', label: 'Ledger',  view: 'ledger' },
-  { icon: '🗄️', label: 'Vault',   view: 'vault' },
-  { icon: '🤖', label: 'AI Help', view: 'ai' },
-  { icon: '⚙️', label: 'More',    view: 'settings' },
+  { icon: '🏠', label: "Home",    view: 'dashboard' },
+  { icon: '📒', label: "Ledger",  view: 'ledger' },
+  { icon: '🗄️', label: "Vault",   view: 'vault' },
+  { icon: '🤖', label: "AI Help", view: 'ai' },
+  { icon: '⚙️', label: "More",    view: 'settings' },
 ];
 
 const Layout: React.FC<LayoutProps> = ({
@@ -70,7 +70,7 @@ const Layout: React.FC<LayoutProps> = ({
             {isPro && <span className="hidden sm:block bg-amber-400 text-amber-900 text-[9px] font-black px-2.5 py-1 rounded-full">PRO</span>}
             {!isPro && onUpgrade && <button onClick={onUpgrade} className="hidden sm:block text-[10px] font-black text-cac-green border border-cac-green/30 px-2.5 py-1 rounded-full hover:bg-green-50">Upgrade</button>}
             <button onClick={() => onNavigate('settings')} className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${currentView === 'settings' ? 'bg-cac-green text-white' : 'text-slate-400 hover:bg-slate-100'}`} title="Settings">⚙️</button>
-            {isAdmin && <a href="/admin" className="w-9 h-9 rounded-xl flex items-center justify-center text-amber-500 hover:bg-amber-50 transition-colors font-bold text-xs" title="Admin Panel">ADM</a>}
+            {isAdmin && <a href="/admin" className='w-9 h-9 rounded-xl flex items-center justify-center text-amber-500 hover:bg-amber-50 transition-colors font-bold text-xs' title="Admin Panel">ADM</a>}
             {onSignOut && <button onClick={onSignOut} className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:bg-slate-100 transition-colors" title="Sign out"><svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>}
           </div>
 
@@ -187,7 +187,7 @@ const Layout: React.FC<LayoutProps> = ({
           </button>
           <div className={`px-3 py-3 rounded-xl border ${isPro ? 'bg-amber-50 border-amber-200' : 'bg-green-50 border-green-100'}`}>
             <p className={`text-[10px] font-black uppercase tracking-wider ${isPro ? 'text-amber-700' : 'text-cac-green'}`}>{isPro ? '⭐ Pro Plan' : 'Free Plan'}</p>
-            <p className="text-[10px] text-slate-500 mt-0.5">{isPro ? 'Full access · NTA 2025 ✓' : '1 company · Upgrade for more'}</p>
+            <p className="text-[10px] text-slate-500 mt-0.5">{isPro ? 'Full access · NTA 2025 ✓" : '1 company · Upgrade for more'}</p>
           </div>
         </div>
       </div>

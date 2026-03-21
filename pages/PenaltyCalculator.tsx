@@ -8,12 +8,12 @@ const CBN_MPR = 0.2725; // CBN Monetary Policy Rate (27.25%)
 const LATE_REMITTANCE_RATE = 0.10 + CBN_MPR; // 10% p.a. + MPR = 37.25%
 
 const TAX_TYPES = [
-  { value: 'vat',    label: 'VAT',  authority: 'NRS (formerly FIRS)', dueDay: '21st of following month' },
-  { value: 'paye',   label: 'PAYE', authority: 'State IRS',           dueDay: '10th of following month' },
-  { value: 'wht',    label: 'WHT',  authority: 'NRS (formerly FIRS)', dueDay: '21st of following month' },
-  { value: 'cit',    label: 'CIT',  authority: 'NRS (formerly FIRS)', dueDay: '6 months after year-end' },
-  { value: 'pit',    label: 'PIT',  authority: 'State IRS',           dueDay: '31st March annually' },
-  { value: 'devlevy',label: 'Development Levy', authority: 'NRS',   dueDay: 'Same as CIT filing' },
+  { value: 'vat',    label: "VAT",  authority: 'NRS (formerly FIRS)', dueDay: '21st of following month' },
+  { value: 'paye',   label: "PAYE", authority: 'State IRS',           dueDay: '10th of following month' },
+  { value: 'wht',    label: "WHT",  authority: 'NRS (formerly FIRS)', dueDay: '21st of following month' },
+  { value: 'cit',    label: "CIT",  authority: 'NRS (formerly FIRS)', dueDay: '6 months after year-end' },
+  { value: 'pit',    label: "PIT",  authority: 'State IRS',           dueDay: '31st March annually' },
+  { value: 'devlevy',label: "Development Levy", authority: 'NRS',   dueDay: 'Same as CIT filing' },
 ];
 
 const PENALTY_SCENARIOS = [

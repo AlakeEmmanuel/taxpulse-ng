@@ -240,7 +240,7 @@ export const InvoiceGenerator: React.FC<InvoiceGeneratorProps> = ({ company }) =
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-xs text-blue-800 space-y-1">
         <p className="font-bold">📋 What an NTA 2025-compliant VAT invoice must contain</p>
         <div className="grid md:grid-cols-2 gap-1 mt-1">
-          <p>• "TAX INVOICE" title (not just "Invoice")</p>
+          <p>• "TAX INVOICE' title (not just 'Invoice")</p>
           <p>• Supplier TIN and VAT Registration Number</p>
           <p>• Client name, address and TIN (for B2B)</p>
           <p>• Invoice number and date</p>
@@ -323,7 +323,7 @@ export const InvoiceGenerator: React.FC<InvoiceGeneratorProps> = ({ company }) =
                     onChange={e => updateLine(i, 'vatApplicable', e.target.checked)}
                     className="accent-cac-green w-4 h-4"
                   />
-                  <span className="text-xs text-slate-600">{line.vatApplicable ? '7.5%' : '0%'}</span>
+                  <span className="text-xs text-slate-600">{line.vatApplicable ? '7.5%" : '0%'}</span>
                 </label>
               </div>
               <div className="col-span-4 md:col-span-1 text-right text-sm font-bold text-slate-700 py-2">

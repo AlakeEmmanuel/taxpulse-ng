@@ -212,10 +212,10 @@ export const AccountantView: React.FC<AccountantViewProps> = ({ token }) => {
           <h2 className="font-bold text-slate-800 mb-3">Financial Summary</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { label: 'Total Revenue',    value: fmt(totalRevenue),  color: 'text-cac-green' },
-              { label: 'Total Expenses',   value: fmt(totalExpenses), color: 'text-slate-700' },
-              { label: 'VAT Collected',    value: fmt(vatCollected),  color: 'text-amber-600' },
-              { label: 'WHT Deducted',     value: fmt(whtDeducted),   color: 'text-purple-600' },
+              { label: "Total Revenue",    value: fmt(totalRevenue),  color: 'text-cac-green' },
+              { label: "Total Expenses",   value: fmt(totalExpenses), color: 'text-slate-700' },
+              { label: "VAT Collected",    value: fmt(vatCollected),  color: 'text-amber-600' },
+              { label: "WHT Deducted",     value: fmt(whtDeducted),   color: 'text-purple-600' },
             ].map(s => (
               <Card key={s.label} className="text-center">
                 <p className="text-xs text-slate-400 mb-1">{s.label}</p>
@@ -230,9 +230,9 @@ export const AccountantView: React.FC<AccountantViewProps> = ({ token }) => {
           <h2 className="font-bold text-slate-800 mb-3">Tax Obligations Overview</h2>
           <div className="grid grid-cols-3 gap-4 mb-4">
             {[
-              { label: 'Filed', count: filed.length,   color: 'bg-green-50 border-green-200 text-green-700' },
-              { label: 'Due / Overdue', count: due.length + overdue.length, color: 'bg-red-50 border-red-200 text-red-700' },
-              { label: 'Total', count: obligations.length, color: 'bg-slate-50 border-slate-200 text-slate-700' },
+              { label: "Filed", count: filed.length,   color: 'bg-green-50 border-green-200 text-green-700' },
+              { label: "Due / Overdue", count: due.length + overdue.length, color: 'bg-red-50 border-red-200 text-red-700' },
+              { label: "Total", count: obligations.length, color: 'bg-slate-50 border-slate-200 text-slate-700' },
             ].map(s => (
               <div key={s.label} className={`rounded-xl p-4 text-center border ${s.color}`}>
                 <p className="text-2xl font-extrabold">{s.count}</p>

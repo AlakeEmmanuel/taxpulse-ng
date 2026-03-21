@@ -78,7 +78,7 @@ const AddSaleModal: React.FC<{ company: Company; onClose: () => void; onSaved?: 
             <div className="bg-cac-light rounded-xl p-4 space-y-2 text-sm border border-cac-green/10">
               <p className="font-bold text-cac-green text-xs uppercase tracking-wider">VAT Breakdown (NTA 2025 -- 7.5%)</p>
               <div className="flex justify-between"><span className="text-slate-600">Net Amount</span><span className="font-bold">{fmt(net)}</span></div>
-              <div className="flex justify-between"><span className="text-slate-600">VAT {zeroRated ? '(0% -- zero-rated)' : '(7.5%)'}</span><span className={`font-bold ${zeroRated ? 'text-slate-400' : 'text-cac-green'}`}>{fmt(vat)}</span></div>
+              <div className="flex justify-between"><span className="text-slate-600">VAT {zeroRated ? "(0% -- zero-rated)" : '(7.5%)'}</span><span className={`font-bold ${zeroRated ? 'text-slate-400' : 'text-cac-green'}`}>{fmt(vat)}</span></div>
               <div className="flex justify-between border-t pt-2"><span className="font-bold text-slate-800">Total</span><span className="font-extrabold text-cac-green">{fmt(total)}</span></div>
             </div>
           )}
@@ -543,11 +543,11 @@ const Dashboard: React.FC<DashboardProps> = ({ company, onNavigate }) => {
 
   // Getting started checklist
   const gettingStarted = [
-    { id: 'profile',  label: 'Complete company profile',       done: !!(company.tin && company.rcNumber),  action: () => onNavigate('settings'), actionLabel: 'Go to Settings' },
-    { id: 'ledger',   label: 'Record your first transaction',  done: ledger.length > 0,                    action: () => setModal('sale'),       actionLabel: 'Add Sale' },
-    { id: 'import',   label: 'Import a bank statement',        done: ledger.some(l => l.sourceId),         action: () => onNavigate('import'),   actionLabel: 'Import Now' },
-    { id: 'vault',    label: 'Upload a receipt or invoice',    done: evidence.length > 0,                  action: () => onNavigate('vault'),    actionLabel: 'Open Vault' },
-    { id: 'export',   label: 'Generate your first PDF report', done: !!localStorage.getItem('taxpulse_pdf_generated_' + company.id), action: () => onNavigate('export'),   actionLabel: 'Export PDF' },
+    { id: 'profile',  label: "Complete company profile",       done: !!(company.tin && company.rcNumber),  action: () => onNavigate('settings'), actionLabel: 'Go to Settings' },
+    { id: 'ledger',   label: "Record your first transaction",  done: ledger.length > 0,                    action: () => setModal('sale'),       actionLabel: 'Add Sale' },
+    { id: 'import',   label: "Import a bank statement",        done: ledger.some(l => l.sourceId),         action: () => onNavigate('import'),   actionLabel: 'Import Now' },
+    { id: 'vault',    label: "Upload a receipt or invoice",    done: evidence.length > 0,                  action: () => onNavigate('vault'),    actionLabel: 'Open Vault' },
+    { id: 'export',   label: "Generate your first PDF report", done: !!localStorage.getItem('taxpulse_pdf_generated_' + company.id), action: () => onNavigate('export'),   actionLabel: 'Export PDF' },
   ];
   const completedSteps = gettingStarted.filter(s => s.done).length;
   const allDone = completedSteps === gettingStarted.length;
@@ -649,11 +649,11 @@ const Dashboard: React.FC<DashboardProps> = ({ company, onNavigate }) => {
           </div>
           <div className="space-y-2">
             {gettingStarted.map((step, i) => (
-              <div key={step.id} className={"flex items-center gap-3 p-3 rounded-xl transition-all " + (step.done ? 'bg-white/60 opacity-60' : 'bg-white border border-slate-100 shadow-sm')}>
-                <div className={"w-7 h-7 rounded-full flex items-center justify-center text-sm font-extrabold shrink-0 " + (step.done ? 'bg-cac-green text-white' : 'bg-slate-100 text-slate-400')}>
+              <div key={step.id} className={`flex items-center gap-3 p-3 rounded-xl transition-all ${step.done ? 'bg-white/60 opacity-60' : 'bg-white border border-slate-100 shadow-sm'}`}>
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-extrabold shrink-0 ${step.done ? 'bg-cac-green text-white' : 'bg-slate-100 text-slate-400'}`}>
                   {step.done ? '✓' : i + 1}
                 </div>
-                <p className={"flex-1 text-sm font-semibold " + (step.done ? 'line-through text-slate-400' : 'text-slate-800')}>{step.label}</p>
+                <p className={"flex-1 text-sm font-semibold ' + (step.done ? 'line-through text-slate-400" : 'text-slate-800')}>{step.label}</p>
                 {!step.done && (
                   <button
                     onClick={step.action}
@@ -689,9 +689,9 @@ const Dashboard: React.FC<DashboardProps> = ({ company, onNavigate }) => {
           </div>
         </Card>
         {[
-          { label: 'Overdue', count: overdue.length, color: 'text-red-600', bg: 'bg-red-50' },
-          { label: 'Due Soon', count: due.length, color: 'text-amber-600', bg: 'bg-amber-50' },
-          { label: 'Filed', count: filed.length, color: 'text-cac-green', bg: 'bg-green-50' },
+          { label: "Overdue", count: overdue.length, color: 'text-red-600', bg: 'bg-red-50' },
+          { label: "Due Soon", count: due.length, color: 'text-amber-600', bg: 'bg-amber-50' },
+          { label: "Filed", count: filed.length, color: 'text-cac-green', bg: 'bg-green-50' },
         ].map(s => (
           <Card key={s.label} className={`${s.bg} border-0 flex flex-col justify-center items-center p-5`}>
             <p className={`text-3xl font-extrabold ${s.color}`}>{s.count}</p>
@@ -704,11 +704,11 @@ const Dashboard: React.FC<DashboardProps> = ({ company, onNavigate }) => {
       <Card className="space-y-3">
         <h2 className="font-bold text-slate-800">Quick Actions</h2>
         <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
-          <QuickActionButton icon="🧾" label="Record Sale"    onClick={() => setModal('sale')} />
-          <QuickActionButton icon="💳" label="Add Expense"   onClick={() => setModal('expense')} />
-          <QuickActionButton icon="👥" label="Run Payroll"   onClick={() => setModal('payroll')} />
-          <QuickActionButton icon="✅" label="Mark Filed"    onClick={() => setModal('filed')} />
-          <QuickActionButton icon="🏦" label="Import Bank"   onClick={() => onNavigate('import')} />
+          <QuickActionButton icon="🧾" label="Record Sale"    onClick={() => setModal("sale")} />
+          <QuickActionButton icon="💳" label="Add Expense"   onClick={() => setModal("expense")} />
+          <QuickActionButton icon="👥" label="Run Payroll"   onClick={() => setModal("payroll")} />
+          <QuickActionButton icon="✅" label="Mark Filed"    onClick={() => setModal("filed")} />
+          <QuickActionButton icon="🏦" label="Import Bank"   onClick={() => onNavigate("import")} />
         </div>
       </Card>
 
@@ -743,12 +743,12 @@ const Dashboard: React.FC<DashboardProps> = ({ company, onNavigate }) => {
         <h2 className="font-bold text-slate-800 text-sm">NTA 2025 Quick Reference</h2>
         <div className="grid md:grid-cols-2 gap-3 text-xs">
           {[
-            { icon: '📊', title: 'PAYE Bands 2026', body: '0% first ₦800k · 15% next ₦2.2M · 18% next ₦9M · 21% next ₦13M · 23% next ₦25M · 25% above ₦50M' },
-            { icon: '🏢', title: 'CIT (NTA 2025)', body: 'Small cos (≤₦50M turnover): 0% CIT + 0% Dev Levy. Standard: 30% CIT + 4% Dev Levy. Medium category removed.' },
-            { icon: '🛡️', title: 'NSITF + Pension', body: 'NSITF: 1% payroll → NSITF (due 16th). Pension: 8% employee + 10% employer → PFAs (due within 7 days of payday). CAC annual returns: 30 June.' },
-            { icon: '📆', title: 'Plan Ahead', body: 'Use Salary Simulator to see PAYE impact before a raise. Use Annual Tax Planner to forecast 12 months of obligations. Track TCC expiry in TCC Tracker.' },
-            { icon: '🏠', title: 'Rent Relief (replaces CRA)', body: '20% of annual rent paid, max ₦500,000. CRA is fully abolished from 1 Jan 2026.' },
-            { icon: '📅', title: 'Filing Deadlines', body: 'VAT: 21st · PAYE: 10th · WHT: 21st · CIT: 6 months after year-end · PIT: 31 March · NSITF: 16th · Pension: 7 days after payday · CAC: 30 June · ITF: 1 April' },
+            { icon: '📊', title: "PAYE Bands 2026", body: '0% first ₦800k · 15% next ₦2.2M · 18% next ₦9M · 21% next ₦13M · 23% next ₦25M · 25% above ₦50M' },
+            { icon: '🏢', title: "CIT (NTA 2025)", body: 'Small cos (≤₦50M turnover): 0% CIT + 0% Dev Levy. Standard: 30% CIT + 4% Dev Levy. Medium category removed.' },
+            { icon: '🛡️', title: "NSITF + Pension", body: 'NSITF: 1% payroll → NSITF (due 16th). Pension: 8% employee + 10% employer → PFAs (due within 7 days of payday). CAC annual returns: 30 June.' },
+            { icon: '📆', title: "Plan Ahead", body: 'Use Salary Simulator to see PAYE impact before a raise. Use Annual Tax Planner to forecast 12 months of obligations. Track TCC expiry in TCC Tracker.' },
+            { icon: '🏠', title: "Rent Relief (replaces CRA)", body: '20% of annual rent paid, max ₦500,000. CRA is fully abolished from 1 Jan 2026.' },
+            { icon: '📅', title: "Filing Deadlines", body: 'VAT: 21st · PAYE: 10th · WHT: 21st · CIT: 6 months after year-end · PIT: 31 March · NSITF: 16th · Pension: 7 days after payday · CAC: 30 June · ITF: 1 April' },
           ].map(({ icon, title, body }) => (
             <div key={title} className="bg-slate-50 rounded-xl p-3 space-y-1">
               <p className="font-bold text-slate-800">{icon} {title}</p>

@@ -285,9 +285,9 @@ export const PayslipGenerator: React.FC<PayslipGeneratorProps> = ({ company }) =
                 <Input label="Full Name *" value={emp.name} onChange={e => updateEmployee(i, 'name', e.target.value)} placeholder="e.g. Amaka Okafor" />
                 <Input label="Department" value={emp.department} onChange={e => updateEmployee(i, 'department', e.target.value)} placeholder="e.g. Finance" />
                 <Input label="TIN (if available)" value={emp.tin} onChange={e => updateEmployee(i, 'tin', e.target.value)} placeholder="e.g. 12345678-0001" />
-                <Input label="Gross Monthly Salary (₦) *" type="number" value={emp.grossSalary} onChange={e => updateEmployee(i, 'grossSalary', e.target.value)} placeholder="e.g. 500000" />
+                <Input label="Gross Monthly Salary (₦) *" type="number" value={emp.grossSalary} onChange={e => updateEmployee(i, "grossSalary", e.target.value)} placeholder="e.g. 500000" />
                 <div className="col-span-2">
-                  <Input label="Annual Rent Paid (₦) -- for rent relief calculation" type="number" value={emp.annualRent} onChange={e => updateEmployee(i, 'annualRent', e.target.value)} placeholder="e.g. 600000 (optional)" />
+                  <Input label="Annual Rent Paid (₦) -- for rent relief calculation" type="number" value={emp.annualRent} onChange={e => updateEmployee(i, "annualRent", e.target.value)} placeholder="e.g. 600000 (optional)" />
                   <p className="text-xs text-slate-400 mt-1">Rent relief = 20% of annual rent, max ₦500k -- reduces PAYE liability</p>
                 </div>
               </div>

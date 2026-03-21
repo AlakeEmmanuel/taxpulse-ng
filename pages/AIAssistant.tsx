@@ -116,7 +116,7 @@ LIVE FINANCIAL DATA (from their TaxPulse ledger -- use this when answering quest
 - Due soon obligations: ${dueObs.length > 0 ? dueObs.map(o => o.type + ' (' + o.period + ', due ' + o.dueDate + ')').join(', ') : 'None'}
 - Total tax obligations tracked: ${obligations.length}
 
-When the user asks "how much do I owe" or "what are my taxes", use the live data above to give specific answers.
+When the user asks "how much do I owe' or 'what are my taxes", use the live data above to give specific answers.
 ${company.entityType === 'Individual (Personal Income Tax)'
   ? `
 INDIVIDUAL TAX CONTEXT (NTA 2025):

@@ -58,7 +58,7 @@ export const PITCalculator: React.FC = () => {
         <span className="text-xl shrink-0">📢</span>
         <div className="text-xs text-blue-800 space-y-1">
           <p className="font-bold">Updated for Nigeria Tax Reform 2026 (NTA 2025)</p>
-          <p>Key changes: <strong>CRA abolished</strong> → replaced with Rent Relief (20% of annual rent, max ₦500k). New bands: 0% on first ₦800k, then 15%–25%. Minimum tax abolished.</p>
+          <p>Key changes: <strong>CRA abolished</strong> → replaced with Rent Relief (20% of annual rent, max ₦500k). New bands: 0% on first ₦800k, then 15%-25%. Minimum tax abolished.</p>
         </div>
       </div>
 
@@ -69,11 +69,11 @@ export const PITCalculator: React.FC = () => {
             <h3 className="font-bold text-slate-800 mb-0.5">Income Sources (Annual ₦)</h3>
             <p className="text-xs text-slate-400">All figures should be annual amounts</p>
           </div>
-          <Input label="Employment / Salary"        type="number" value={inputs.employmentIncome} onChange={e => update('employmentIncome', e.target.value)} placeholder="0" />
-          <Input label="Business / Self-Employment" type="number" value={inputs.businessIncome}   onChange={e => update('businessIncome', e.target.value)}   placeholder="0" />
-          <Input label="Rental Income"              type="number" value={inputs.rentalIncome}     onChange={e => update('rentalIncome', e.target.value)}     placeholder="0" />
-          <Input label="Dividends / Interest"       type="number" value={inputs.dividends}        onChange={e => update('dividends', e.target.value)}        placeholder="0" />
-          <Input label="Other Income"               type="number" value={inputs.otherIncome}      onChange={e => update('otherIncome', e.target.value)}      placeholder="0" />
+          <Input label="Employment / Salary"        type="number" value={inputs.employmentIncome} onChange={e => update("employmentIncome", e.target.value)} placeholder="0" />
+          <Input label="Business / Self-Employment" type="number" value={inputs.businessIncome}   onChange={e => update("businessIncome", e.target.value)}   placeholder="0" />
+          <Input label="Rental Income"              type="number" value={inputs.rentalIncome}     onChange={e => update("rentalIncome", e.target.value)}     placeholder="0" />
+          <Input label="Dividends / Interest"       type="number" value={inputs.dividends}        onChange={e => update("dividends", e.target.value)}        placeholder="0" />
+          <Input label="Other Income"               type="number" value={inputs.otherIncome}      onChange={e => update("otherIncome", e.target.value)}      placeholder="0" />
 
           <div className="border-t border-slate-100 pt-3">
             <button onClick={() => setShowDeductions(v => !v)} className="text-xs font-bold text-cac-green flex items-center gap-1 hover:underline">
@@ -87,7 +87,7 @@ export const PITCalculator: React.FC = () => {
 
               <div className="bg-amber-50 border border-amber-100 rounded-xl p-3">
                 <p className="text-xs font-bold text-amber-700 mb-2">🆕 Rent Relief (replaces CRA)</p>
-                <Input label="Annual Rent Paid (₦)" type="number" value={inputs.annualRent} onChange={e => update('annualRent', e.target.value)} placeholder="e.g. 600,000" />
+                <Input label="Annual Rent Paid (₦)" type="number" value={inputs.annualRent} onChange={e => update("annualRent", e.target.value)} placeholder="e.g. 600,000" />
                 {parseFloat(inputs.annualRent) > 0 && (
                   <p className="text-xs text-amber-600 mt-1">
                     Relief = ₦{Math.min(parseFloat(inputs.annualRent) * 0.2, 500_000).toLocaleString()} (20% of rent, max ₦500k)
@@ -95,8 +95,8 @@ export const PITCalculator: React.FC = () => {
                 )}
               </div>
 
-              <Input label="NHF Contribution (default: 2.5% of basic)" type="number" value={inputs.nhf} onChange={e => update('nhf', e.target.value)} placeholder="Auto-calculated if blank" />
-              <Input label="Life Assurance Premium (max ₦100,000)" type="number" value={inputs.lifeAssurance} onChange={e => update('lifeAssurance', e.target.value)} placeholder="0" />
+              <Input label="NHF Contribution (default: 2.5% of basic)" type="number" value={inputs.nhf} onChange={e => update("nhf", e.target.value)} placeholder="Auto-calculated if blank" />
+              <Input label="Life Assurance Premium (max ₦100,000)" type="number" value={inputs.lifeAssurance} onChange={e => update("lifeAssurance", e.target.value)} placeholder="0" />
 
               <div className="bg-slate-50 rounded-xl p-3 text-xs text-slate-500 space-y-1">
                 <p className="font-bold text-slate-700">Auto-deducted:</p>
@@ -138,12 +138,12 @@ export const PITCalculator: React.FC = () => {
               <h4 className="font-bold text-slate-800 text-sm">Deductions (NTA 2025)</h4>
               {[
                 { label: `Rent Relief (20% of rent, max ₦500k)`, val: result.rentRelief || 0, color: 'text-amber-600', badge: result.rentRelief! > 0 ? '' : 'Not applicable (no rent entered)' },
-                { label: 'Pension (8%)',    val: result.pension,  color: 'text-purple-600' },
-                { label: 'NHIS (1.5%)',    val: result.nhis!,    color: 'text-indigo-600' },
-                { label: 'NHF (2.5%)',     val: result.nhf!,     color: 'text-blue-600' },
+                { label: "Pension (8%)",    val: result.pension,  color: 'text-purple-600' },
+                { label: "NHIS (1.5%)",    val: result.nhis!,    color: 'text-indigo-600' },
+                { label: "NHF (2.5%)",     val: result.nhf!,     color: 'text-blue-600' },
               ].map(({ label, val, color, badge }) => (
                 <div key={label} className="flex justify-between items-center text-sm">
-                  <span className="text-slate-600">{label}{badge ? <span className="ml-1 text-[10px] text-slate-400">({badge})</span> : ''}</span>
+                  <span className="text-slate-600">{label}{badge ? <span className="ml-1 text-[10px] text-slate-400">({badge})</span> : ""}</span>
                   <span className={`font-bold ${color}`}>{fmt(val)}</span>
                 </div>
               ))}

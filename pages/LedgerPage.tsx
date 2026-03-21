@@ -64,7 +64,7 @@ export const LedgerPage: React.FC<LedgerPageProps> = ({ company }) => {
           <p className="text-2xl font-extrabold mt-0.5">{fmt(Math.abs(netPosition))}</p>
         </div>
         <div className="text-right">
-          <p className="text-4xl">{netPosition >= 0 ? '📈' : '📉'}</p>
+          <p className="text-4xl">{netPosition >= 0 ? '📈" : '📉'}</p>
           <p className="text-xs opacity-70 mt-1">{netPosition >= 0 ? 'Surplus' : 'Deficit'}</p>
         </div>
       </div>
@@ -176,3 +176,4 @@ const groupByMonth = (entries: LedgerEntry[]) => {
   }
   return Array.from(map.entries()).map(([month, entries]) => ({ month, entries }));
 };
+
