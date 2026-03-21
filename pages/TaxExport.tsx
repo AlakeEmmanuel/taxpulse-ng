@@ -61,7 +61,7 @@ function drawHeader(doc: any, title: string, subtitle: string, company: Company)
     company.state,
     company.tin ? `TIN: ${company.tin}` : '',
     company.rcNumber ? `RC: ${company.rcNumber}` : '',
-  ].filter(Boolean).join('  ·  ');
+  ].filter(Boolean).join('·');
   doc.text(infoLine, 14, 54);
   doc.text(`Generated: ${today()}`, W - 14, 54, { align: 'right' });
 }
@@ -135,7 +135,7 @@ async function generateVATReturn(doc: any, company: Company, period: string, led
 
   // Filter ledger for period
   const periodLower = period.toLowerCase();
-  const [pMonth, pYear] = period.split(' ');
+  const [pMonth, pYear] = period.split('');
   const periodLedger = ledger.filter(l => {
     const d = new Date(l.date);
     return MONTHS_LIST[d.getMonth()] === pMonth && d.getFullYear().toString() === pYear;
@@ -255,7 +255,7 @@ async function generatePAYESchedule(doc: any, company: Company, period: string, 
 
   y = sectionTitle(doc, 'PAYE COMPUTATION SUMMARY (NTA 2025)', y);
 
-  const [pMonth, pYear] = period.split(' ');
+  const [pMonth, pYear] = period.split('');
   const periodLedger = ledger.filter(l => {
     const d = new Date(l.date);
     return MONTHS_LIST[d.getMonth()] === pMonth && d.getFullYear().toString() === pYear;
@@ -356,7 +356,7 @@ async function generateWHTSchedule(doc: any, company: Company, period: string, l
 
   y = sectionTitle(doc, 'WHT COMPUTATION SUMMARY', y);
 
-  const [pMonth, pYear] = period.split(' ');
+  const [pMonth, pYear] = period.split('');
   const periodExpenses = ledger.filter(l => {
     const d = new Date(l.date);
     return l.type === 'expense' && MONTHS_LIST[d.getMonth()] === pMonth && d.getFullYear().toString() === pYear;
@@ -486,7 +486,7 @@ async function generateCITReturn(doc: any, company: Company, period: string, led
   doc.roundedRect(14, y, doc.internal.pageSize.getWidth() - 28, 22, 3, 3, 'F');
   doc.setTextColor(isSmallCompany ? 0 : 180, isSmallCompany ? 100 : 50, isSmallCompany ? 0 : 0);
   doc.setFontSize(9); doc.setFont('helvetica', 'bold');
-  doc.text(isSmallCompany ? '<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> SMALL COMPANY EXEMPTION APPLIES' : '<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> STANDARD COMPANY -- CIT APPLIES', 20, y + 8);
+  doc.text(isSmallCompany ? 'SMALL COMPANY EXEMPTION APPLIES' : 'STANDARD COMPANY -- CIT APPLIES', 20, y + 8);
   doc.setFontSize(8); doc.setFont('helvetica', 'normal');
   doc.text(isSmallCompany
     ? `Turnover ≤₦50M: 0% CIT, 0% Dev Levy, 0% CGT under NTA 2025. Professional service firms do not qualify.`
@@ -728,12 +728,12 @@ async function generateComplianceSummary(doc: any, company: Company, period: str
 
 // ─── Report type definitions ──────────────────────────────────────────────────
 const REPORT_TYPES = [
-  { id: 'compliance', label: "Tax Compliance Summary", desc: 'Full overview -- all obligations, financial summary, compliance score', icon: (<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></span>), color: 'bg-slate-50 border-slate-200', always: true },
-  { id: 'vat', label: "VAT Return (Form 002)", desc: 'Monthly VAT return with output/input VAT computation. File with NRS by 21st.', icon: (<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1z"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/></svg></span>), color: 'bg-blue-50 border-blue-200', requires: 'vat' },
-  { id: 'paye', label: "PAYE Monthly Schedule", desc: 'Employee payroll PAYE schedule with NTA 2025 bands. File with State IRS by 10th.', icon: (<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>), color: 'bg-purple-50 border-purple-200', requires: 'paye' },
-  { id: 'wht', label: "WHT Schedule", desc: 'Withholding tax deduction schedule with vendor breakdown. File with NRS by 21st.', icon: (<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z"/></svg></span>), color: 'bg-amber-50 border-amber-200', requires: 'wht' },
-  { id: 'cit', label: "CIT Computation Sheet", desc: 'Company Income Tax computation + small company check. File with NRS within 6 months.', icon: (<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>), color: 'bg-green-50 border-green-200', requires: 'cit' },
-  { id: 'pit', label: "PIT Self-Assessment (Form A)", desc: 'Personal Income Tax return with all deductions. File with State IRS by 31 March.', icon: (<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>), color: 'bg-rose-50 border-rose-200', requires: 'pit' },
+  { id: 'compliance', label: "Tax Compliance Summary", desc: 'Full overview -- all obligations, financial summary, compliance score', icon: null, color:'bg-slate-50 border-slate-200', always: true },
+  { id: 'vat', label: "VAT Return (Form 002)", desc: 'Monthly VAT return with output/input VAT computation. File with NRS by 21st.', icon: null, color:'bg-blue-50 border-blue-200', requires: 'vat' },
+  { id: 'paye', label: "PAYE Monthly Schedule", desc: 'Employee payroll PAYE schedule with NTA 2025 bands. File with State IRS by 10th.', icon: null, color:'bg-purple-50 border-purple-200', requires: 'paye' },
+  { id: 'wht', label: "WHT Schedule", desc: 'Withholding tax deduction schedule with vendor breakdown. File with NRS by 21st.', icon: null, color:'bg-amber-50 border-amber-200', requires: 'wht' },
+  { id: 'cit', label: "CIT Computation Sheet", desc: 'Company Income Tax computation + small company check. File with NRS within 6 months.', icon: null, color:'bg-green-50 border-green-200', requires: 'cit' },
+  { id: 'pit', label: "PIT Self-Assessment (Form A)", desc: 'Personal Income Tax return with all deductions. File with State IRS by 31 March.', icon: null, color:'bg-rose-50 border-rose-200', requires: 'pit' },
 ];
 
 interface TaxExportProps { company: Company; onNavigate?: (v: string) => void; }
@@ -909,7 +909,7 @@ export const TaxExport: React.FC<TaxExportProps> = ({ company, onNavigate }) => 
           {/* Filing guide for selected report */}
           <Card className="space-y-2 text-xs">
             <p className="font-bold text-slate-800">
-              {availableReports.find(r => r.id === reportType)?.icon}{' '}
+              {availableReports.find(r => r.id === reportType)?.icon}{''}
               {availableReports.find(r => r.id === reportType)?.label}
             </p>
             {reportType === 'compliance' && <><p className="text-slate-500">Use this for your accountant, internal records, or as a working document before filing individual returns.</p></>}
@@ -941,7 +941,7 @@ export const TaxExport: React.FC<TaxExportProps> = ({ company, onNavigate }) => 
             Generating {availableReports.find(r=>r.id===reportType)?.label}...
           </span>
         ) : (
-          `<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg></span> Generate ${availableReports.find(r=>r.id===reportType)?.label}`
+          `Generate ${availableReports.find(r=>r.id===reportType)?.label}`
         )}
       </Button>
 
