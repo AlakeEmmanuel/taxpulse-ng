@@ -12,7 +12,6 @@ import { PenaltyCalculator } from './pages/PenaltyCalculator';
 import { TaxExport } from './pages/TaxExport';
 import { BankImport } from './pages/BankImport';
 import { AuthPage } from './pages/AuthPage';
-import LandingPage from './pages/LandingPage';
 import { Paywall } from './pages/Paywall';
 import { PayslipGenerator } from './pages/PayslipGenerator';
 import { InvoiceGenerator } from './pages/InvoiceGenerator';
@@ -27,7 +26,7 @@ import { supabase } from './services/supabaseClient';
 
 export type AppView =
   | 'dashboard' | 'onboarding' | 'calculators' | 'pit'
-  | 'ledger' | 'settings' | 'ai' | 'vault' | 'penalties' | 'export' | 'import' | 'payslip' | 'invoice'
+  | 'ledger" | 'settings" | 'ai' | 'vault' | 'penalties' | 'export' | 'import' | 'payslip' | 'invoice'
   | 'salary' | 'planner' | 'tcc' | 'payroll-csv';
 
 const PRO_VIEWS: AppView[] = ['ai', 'vault', 'export', 'import', 'payslip', 'invoice'];
@@ -60,7 +59,6 @@ type AppState = 'loading' | 'unauthenticated' | 'ready';
 const App: React.FC = () => {
   const [appState, setAppState]           = useState<AppState>('loading');
   const [seedingSchedule, setSeedingSchedule] = useState(false);
-  const [showLanding, setShowLanding]       = useState(true);
   const [userId, setUserId]               = useState<string | null>(null);
   const [profile, setProfile]             = useState<UserProfile | null>(null);
   const [showPaywall, setShowPaywall]     = useState(false);
@@ -203,10 +201,7 @@ const App: React.FC = () => {
       </div>
     </div>
   );
-  if (appState === 'unauthenticated') {
-    if (showLanding) return <LandingPage onGetStarted={() => setShowLanding(false)} />;
-    return <AuthPage />;
-  }
+  if (appState === 'unauthenticated') return <AuthPage />;
   if (showPaywall) return (
     <Paywall profile={profile!} onUpgraded={handleUpgraded} onContinueFree={() => setShowPaywall(false)} />
   );
