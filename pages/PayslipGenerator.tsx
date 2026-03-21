@@ -398,7 +398,10 @@ export const PayslipGenerator: React.FC<PayslipGeneratorProps> = ({ company }) =
             Generating payslips...
           </span>
         ) : (
-          `<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg></span> Generate ${employees.filter(e => e.name && e.grossSalary).length || 0} Payslip${employees.length > 1 ? 's' : ''} -- ${period}`
+          <span style={{display:'flex',alignItems:'center',gap:'6px'}}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="11" y2="17"/></svg>
+            {`Generate ${employees.filter(e => e.name && e.grossSalary).length || 0} Payslip${employees.length > 1 ? 's' : ''} -- ${period}`}
+          </span>
         )}
       </Button>
 
