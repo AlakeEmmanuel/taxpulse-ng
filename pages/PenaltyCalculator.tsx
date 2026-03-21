@@ -20,7 +20,7 @@ const PENALTY_SCENARIOS = [
   {
     id: 'failure_to_file',
     label: 'Failure to File (Late Filing)',
-    icon: '📋',
+    icon: (<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></span>),
     color: 'bg-orange-50 border-orange-200 text-orange-800',
     badgeColor: 'bg-orange-100 text-orange-700',
     description: 'Tax return not submitted by the due date',
@@ -51,7 +51,7 @@ const PENALTY_SCENARIOS = [
   {
     id: 'failure_to_deduct',
     label: 'Failure to Deduct WHT',
-    icon: '🔒',
+    icon: (<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>),
     color: 'bg-red-50 border-red-200 text-red-800',
     badgeColor: 'bg-red-100 text-red-700',
     description: 'WHT not deducted at source from vendor payments',
@@ -144,7 +144,7 @@ export const PenaltyCalculator: React.FC = () => {
 
       {/* NTA 2025 penalty notice */}
       <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex gap-3">
-        <span className="text-xl shrink-0">⚠️</span>
+        <span className="text-xl shrink-0"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span></span>
         <div className="text-xs text-red-800 space-y-1">
           <p className="font-bold">NTA 2025 -- Significantly Stiffened Penalties (effective 1 Jan 2026)</p>
           <p>• Failure to file: ₦50,000 fixed + <strong>₦25,000 per day of default</strong></p>
@@ -216,7 +216,7 @@ export const PenaltyCalculator: React.FC = () => {
                 </>
               ) : (
                 <>
-                  <p className="text-2xl font-extrabold text-cac-green">✓ On time</p>
+                  <p className="text-2xl font-extrabold text-cac-green"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> On time</p>
                   <p className="text-xs text-cac-green mt-0.5">Filed on or before due date -- no penalties</p>
                 </>
               )}
@@ -287,12 +287,12 @@ export const PenaltyCalculator: React.FC = () => {
         <h2 className="font-bold text-slate-800 text-sm">How to Avoid Penalties (NTA 2025)</h2>
         <div className="grid md:grid-cols-2 gap-3 text-xs text-slate-600">
           {[
-            { icon: '📅', tip: 'Set calendar reminders -- VAT & WHT due 21st monthly, PAYE due 10th monthly' },
-            { icon: '🏦', tip: 'Always deduct WHT before paying vendors. Non-deduction = 40% penalty, no exceptions' },
-            { icon: '📝', tip: 'File a nil return if you have no transactions for the period -- late nil returns still attract ₦50k + ₦25k/day' },
-            { icon: '🤝', tip: 'NTA 2025 allows voluntary disclosure -- come forward before NRS discovers underpayment to reduce penalties' },
-            { icon: '📁', tip: 'Keep all records for 6 years. NRS audits can go back 6 years under NTAA 2025' },
-            { icon: '✅', tip: 'Small businesses (TIN holders, ≤₦2M/month transactions) are exempt from WHT -- register your TIN now' },
+            { icon: (<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>), tip: 'Set calendar reminders -- VAT & WHT due 21st monthly, PAYE due 10th monthly' },
+            { icon: (<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg></span>), tip: 'Always deduct WHT before paying vendors. Non-deduction = 40% penalty, no exceptions' },
+            { icon: (<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg></span>), tip: 'File a nil return if you have no transactions for the period -- late nil returns still attract ₦50k + ₦25k/day' },
+            { icon: (<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z"/></svg></span>), tip: 'NTA 2025 allows voluntary disclosure -- come forward before NRS discovers underpayment to reduce penalties' },
+            { icon: (<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></span>), tip: 'Keep all records for 6 years. NRS audits can go back 6 years under NTAA 2025' },
+            { icon: (<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>), tip: 'Small businesses (TIN holders, ≤₦2M/month transactions) are exempt from WHT -- register your TIN now' },
           ].map(({ icon, tip }) => (
             <div key={tip} className="flex gap-2 p-3 bg-slate-50 rounded-xl">
               <span className="shrink-0">{icon}</span>

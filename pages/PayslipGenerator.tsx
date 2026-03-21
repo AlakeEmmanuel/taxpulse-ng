@@ -238,7 +238,7 @@ export const PayslipGenerator: React.FC<PayslipGeneratorProps> = ({ company }) =
 
       {/* Education banner */}
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-xs text-blue-800 space-y-1">
-        <p className="font-bold">📋 What a legal Nigerian payslip must show (NTA 2025 + PRA 2014)</p>
+        <p className="font-bold"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></span> What a legal Nigerian payslip must show (NTA 2025 + PRA 2014)</p>
         <div className="grid md:grid-cols-2 gap-1 mt-1">
           <p>• Gross salary and breakdown (basic, housing, transport)</p>
           <p>• PAYE deducted per NTA 2025 progressive bands</p>
@@ -373,13 +373,13 @@ export const PayslipGenerator: React.FC<PayslipGeneratorProps> = ({ company }) =
 
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">
-          <p className="font-bold">⚠️ {error}</p>
+          <p className="font-bold"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> {error}</p>
         </div>
       )}
 
       {generated && (
         <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-sm text-cac-green font-bold flex items-center gap-2">
-          ✅ Payslips downloaded! Give each employee their copy and file PAYE with State IRS by the 10th.
+          <span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span> Payslips downloaded! Give each employee their copy and file PAYE with State IRS by the 10th.
         </div>
       )}
 
@@ -390,7 +390,7 @@ export const PayslipGenerator: React.FC<PayslipGeneratorProps> = ({ company }) =
             Generating payslips...
           </span>
         ) : (
-          `📄 Generate ${employees.filter(e => e.name && e.grossSalary).length || 0} Payslip${employees.length > 1 ? 's' : ''} -- ${period}`
+          `<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg></span> Generate ${employees.filter(e => e.name && e.grossSalary).length || 0} Payslip${employees.length > 1 ? 's' : ''} -- ${period}`
         )}
       </Button>
 

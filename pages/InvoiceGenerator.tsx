@@ -180,7 +180,7 @@ export const InvoiceGenerator: React.FC<InvoiceGeneratorProps> = ({ company }) =
         doc.setFillColor(240, 253, 244);
         doc.roundedRect(14, y, W - 28, 16, 2, 2, 'F');
         doc.setTextColor(0, 100, 40); doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
-        doc.text('✓ VAT REGISTERED INVOICE -- This invoice complies with the Nigeria Tax Act 2025.', 18, y + 6);
+        doc.text('<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> VAT REGISTERED INVOICE -- This invoice complies with the Nigeria Tax Act 2025.', 18, y + 6);
         doc.text(`Supplier VAT No: ${company.vatNumber || 'Pending'}  ·  Supplier TIN: ${company.tin || 'N/A'}  ·  VAT Rate: 7.5%  ·  Filing Authority: Nigeria Revenue Service (NRS)`, 18, y + 12);
         y += 20;
       }
@@ -233,7 +233,7 @@ export const InvoiceGenerator: React.FC<InvoiceGeneratorProps> = ({ company }) =
       </header>
 
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-xs text-blue-800 space-y-1">
-        <p className="font-bold">📋 What an NTA 2025-compliant VAT invoice must contain</p>
+        <p className="font-bold"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></span> What an NTA 2025-compliant VAT invoice must contain</p>
         <div className="grid md:grid-cols-2 gap-1 mt-1">
           <p>• "TAX INVOICE' title (not just 'Invoice")</p>
           <p>• Supplier TIN and VAT Registration Number</p>
@@ -370,13 +370,13 @@ export const InvoiceGenerator: React.FC<InvoiceGeneratorProps> = ({ company }) =
 
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">
-          <p className="font-bold">⚠️ {error}</p>
+          <p className="font-bold"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> {error}</p>
         </div>
       )}
 
       {generated && (
         <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-sm text-cac-green font-bold flex items-center gap-2">
-          ✅ Invoice downloaded! Share with your client -- they can use it to claim input VAT.
+          <span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span> Invoice downloaded! Share with your client -- they can use it to claim input VAT.
         </div>
       )}
 
@@ -387,7 +387,7 @@ export const InvoiceGenerator: React.FC<InvoiceGeneratorProps> = ({ company }) =
             Generating invoice...
           </span>
         ) : (
-          `🧾 Generate Tax Invoice -- ${fmt(computed.total)}`
+          `<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1z"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/></svg></span> Generate Tax Invoice -- ${fmt(computed.total)}`
         )}
       </Button>
 

@@ -109,7 +109,7 @@ export const SalarySimulator: React.FC = () => {
       )}
 
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-700 space-y-1">
-        <p className="font-bold">📋 What this shows</p>
+        <p className="font-bold"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></span> What this shows</p>
         <p>• PAYE computed using NTA 2025 bands on annualised salary with rent relief applied</p>
         <p>• Employer total cost = gross + 10% employer pension + 1% NSITF (not deducted from employee)</p>
         <p>• Use this before offering a raise to understand the true cost to your business</p>
@@ -314,7 +314,7 @@ export const TCCTracker: React.FC<{ company: Company }> = ({ company }) => {
       </div>
 
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-800 space-y-1">
-        <p className="font-bold">📋 About Tax Clearance Certificates</p>
+        <p className="font-bold"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></span> About Tax Clearance Certificates</p>
         <p>• Federal TCC: Apply at NRS (taxpayerportal.nrs.gov.ng) after filing all federal taxes (VAT, WHT, CIT)</p>
         <p>• State TCC: Apply at {stateIRS.name} after filing all PAYE/PIT obligations</p>
         <p>• Required for: government contracts, tenders, loans, visa applications, immigration</p>
@@ -325,7 +325,7 @@ export const TCCTracker: React.FC<{ company: Company }> = ({ company }) => {
       <div className="grid grid-cols-2 gap-3">
         <a href={NRS_PORTALS.taxProMax} target="_blank" rel="noopener noreferrer"
           className="flex items-center gap-2 px-3 py-2.5 bg-cac-green/10 border border-cac-green/20 rounded-xl hover:bg-cac-green/20 transition-colors">
-          <span className="text-cac-green font-bold text-xs">🌐</span>
+          <span className="text-cac-green font-bold text-xs"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span></span>
           <div>
             <p className="text-xs font-bold text-cac-green">Apply Federal TCC</p>
             <p className="text-xs text-slate-400">NRS TaxPro Max</p>
@@ -333,7 +333,7 @@ export const TCCTracker: React.FC<{ company: Company }> = ({ company }) => {
         </a>
         <a href={stateIRS.url} target="_blank" rel="noopener noreferrer"
           className="flex items-center gap-2 px-3 py-2.5 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition-colors">
-          <span className="text-blue-600 font-bold text-xs">🌐</span>
+          <span className="text-blue-600 font-bold text-xs"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span></span>
           <div>
             <p className="text-xs font-bold text-blue-700">Apply State TCC</p>
             <p className="text-xs text-slate-400">{company.state} IRS</p>
@@ -371,7 +371,7 @@ export const TCCTracker: React.FC<{ company: Company }> = ({ company }) => {
       {/* TCC list */}
       {entries.length === 0 && !showAdd && (
         <div className="text-center py-6 text-sm text-slate-400">
-          <p className="text-2xl mb-2">📜</p>
+          <p className="text-2xl mb-2"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="11" y2="17"/></svg></span></p>
           <p>No TCC records yet. Click Add TCC to track your certificates.</p>
         </div>
       )}
@@ -421,7 +421,7 @@ export const StateIRSPanel: React.FC<{ state: string; taxType?: string }> = ({ s
       rel="noopener noreferrer"
       className="flex items-center gap-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-xl text-xs hover:bg-blue-100 transition-colors"
     >
-      <span className="text-base">🌐</span>
+      <span className="text-base"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span></span>
       <div>
         <p className="font-bold text-blue-700">File with {irs.name}</p>
         <p className="text-slate-400">{url.replace('https://', '')}</p>
@@ -502,10 +502,10 @@ export const PayrollCSVExport: React.FC<{ company: Company }> = ({ company }) =>
         <button onClick={addEmp} className="text-xs font-bold text-cac-green hover:underline">+ Add Employee</button>
       </div>
 
-      {exported && <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-sm text-cac-green font-bold">✅ CSV downloaded! Upload to your State IRS payroll portal.</div>}
+      {exported && <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-sm text-cac-green font-bold"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span> CSV downloaded! Upload to your State IRS payroll portal.</div>}
 
       <Button onClick={exportCSV} disabled={!employees.some(e=>e.name&&e.gross)} className="w-full">
-        📊 Export Payroll CSV -- {period}
+        <span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></span> Export Payroll CSV -- {period}
       </Button>
       <p className="text-xs text-slate-400 text-center">CSV contains all statutory deductions per NTA 2025 + PRA 2014. Submit to State IRS by the 10th of the following month.</p>
     </Card>

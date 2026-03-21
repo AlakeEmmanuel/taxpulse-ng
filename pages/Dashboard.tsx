@@ -55,7 +55,7 @@ const AddSaleModal: React.FC<{ company: Company; onClose: () => void; onSaved?: 
     <ModalWrapper title="Record Sale" onClose={onClose}>
       {saved ? (
         <div className="text-center py-8">
-          <p className="text-4xl mb-3">✅</p>
+          <p className="text-4xl mb-3"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span></p>
           <p className="font-bold text-cac-green">Sale recorded!</p>
         </div>
       ) : (
@@ -127,7 +127,7 @@ const AddExpenseModal: React.FC<{ company: Company; onClose: () => void; onSaved
     <ModalWrapper title="Record Expense" onClose={onClose}>
       {saved ? (
         <div className="text-center py-8">
-          <p className="text-4xl mb-3">✅</p>
+          <p className="text-4xl mb-3"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span></p>
           <p className="font-bold text-cac-green">Expense saved!</p>
         </div>
       ) : (
@@ -216,7 +216,7 @@ const PayrollModal: React.FC<{ company: Company; onClose: () => void }> = ({ com
             onClick={() => setTab(t)}
             className={`flex-1 py-2 rounded-lg text-sm font-bold transition-all ${tab === t ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}
           >
-            {t === 'paye' ? '👥 PAYE (Salaries)' : '🏢 CIT + Dev Levy'}
+            {t === 'paye' ? '<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> PAYE (Salaries)' : '<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span> CIT + Dev Levy'}
           </button>
         ))}
       </div>
@@ -308,7 +308,7 @@ const PayrollModal: React.FC<{ company: Company; onClose: () => void }> = ({ com
                   <div><p className="text-slate-500 text-xs">Total Liability</p><p className="font-extrabold text-cac-green">{fmt(citResult.total)}</p></div>
                 </div>
                 {citResult.vatExempt && (
-                  <p className="text-xs text-cac-green mt-2 font-semibold">✓ Also VAT-exempt (turnover ≤₦100M under NTAA 2025)</p>
+                  <p className="text-xs text-cac-green mt-2 font-semibold"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Also VAT-exempt (turnover ≤₦100M under NTAA 2025)</p>
                 )}
               </div>
               <p className="text-[11px] text-slate-500">{citResult.note}</p>
@@ -391,7 +391,7 @@ const MarkFiledModal: React.FC<{ company: Company; onClose: () => void; onSaved?
     return (
       <ModalWrapper title="Mark as Filed" onClose={onClose}>
         <div className="text-center py-8">
-          <p className="text-4xl mb-3">🎉</p>
+          <p className="text-4xl mb-3"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span></p>
           <p className="font-bold text-cac-green">All obligations are filed!</p>
         </div>
       </ModalWrapper>
@@ -402,7 +402,7 @@ const MarkFiledModal: React.FC<{ company: Company; onClose: () => void; onSaved?
     <ModalWrapper title="Mark as Filed" onClose={onClose}>
       {saved ? (
         <div className="text-center py-8">
-          <p className="text-4xl mb-3">✅</p>
+          <p className="text-4xl mb-3"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span></p>
           <p className="font-bold text-cac-green">Obligation marked as filed!</p>
         </div>
       ) : (
@@ -439,7 +439,7 @@ const ModalWrapper: React.FC<{ title: string; onClose: () => void; children: Rea
     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
       <div className="flex items-center justify-between p-5 border-b border-slate-100 sticky top-0 bg-white z-10">
         <h2 className="font-bold text-slate-900">{title}</h2>
-        <button onClick={onClose} className="text-slate-400 hover:text-slate-600 text-xl leading-none">✕</button>
+        <button onClick={onClose} className="text-slate-400 hover:text-slate-600 text-xl leading-none"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span></button>
       </div>
       <div className="p-5">{children}</div>
     </div>
@@ -571,7 +571,7 @@ const Dashboard: React.FC<DashboardProps> = ({ company, onNavigate }) => {
       <header>
         <div className="flex items-center gap-2 flex-wrap">
           <h1 className="text-2xl font-bold text-slate-900">{company.name}</h1>
-          <span className="bg-cac-green text-white text-[10px] font-black px-2.5 py-1 rounded-full tracking-wide">NTA 2025 ✓</span>
+          <span className="bg-cac-green text-white text-[10px] font-black px-2.5 py-1 rounded-full tracking-wide">NTA 2025 <span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></span>
         </div>
         <p className="text-slate-500 text-sm">{company.entityType} · {company.state} · {company.industry}</p>
       </header>
@@ -580,7 +580,7 @@ const Dashboard: React.FC<DashboardProps> = ({ company, onNavigate }) => {
       {!loading && obligations.length === 0 && !seeding && (
         <div className="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl p-6 space-y-4">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center text-2xl shrink-0">📅</div>
+            <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center text-2xl shrink-0"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span></div>
             <div>
               <h2 className="font-extrabold text-slate-900">Your tax schedule is empty</h2>
               <p className="text-sm text-slate-600 mt-1">
@@ -590,10 +590,10 @@ const Dashboard: React.FC<DashboardProps> = ({ company, onNavigate }) => {
           </div>
           <div className="bg-white/70 rounded-xl p-4 text-xs text-slate-600 space-y-1">
             <p className="font-bold text-slate-800 mb-2">Based on your profile, you need:</p>
-            {company.collectsVat  && <p>✅ <strong>VAT</strong> -- Monthly returns, due 21st of each month → NRS</p>}
-            {company.hasEmployees && <p>✅ <strong>PAYE</strong> -- Monthly payroll tax, due 10th of each month → State IRS</p>}
-            {company.paysVendors  && <p>✅ <strong>WHT</strong> -- Monthly withholding, due 21st of each month → NRS</p>}
-            <p>✅ <strong>CIT</strong> -- Annual filing, 6 months after your {company.yearEnd} year-end</p>
+            {company.collectsVat  && <p><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span> <strong>VAT</strong> -- Monthly returns, due 21st of each month → NRS</p>}
+            {company.hasEmployees && <p><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span> <strong>PAYE</strong> -- Monthly payroll tax, due 10th of each month → State IRS</p>}
+            {company.paysVendors  && <p><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span> <strong>WHT</strong> -- Monthly withholding, due 21st of each month → NRS</p>}
+            <p><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span> <strong>CIT</strong> -- Annual filing, 6 months after your {company.yearEnd} year-end</p>
           </div>
           <button
             onClick={async () => {
@@ -614,7 +614,7 @@ const Dashboard: React.FC<DashboardProps> = ({ company, onNavigate }) => {
             }}
             className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl text-sm transition-colors"
           >
-            🚀 Generate My Tax Schedule Now
+            <span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg></span> Generate My Tax Schedule Now
           </button>
         </div>
       )}
@@ -633,7 +633,7 @@ const Dashboard: React.FC<DashboardProps> = ({ company, onNavigate }) => {
         <div className="bg-gradient-to-br from-cac-green/5 to-emerald-50 border border-cac-green/20 rounded-2xl p-5 space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="font-extrabold text-slate-900">🚀 Get started with TaxPulse</h2>
+              <h2 className="font-extrabold text-slate-900"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg></span> Get started with TaxPulse</h2>
               <p className="text-xs text-slate-500 mt-0.5">{completedSteps} of {gettingStarted.length} steps complete</p>
             </div>
             <div className="text-right">
@@ -651,7 +651,7 @@ const Dashboard: React.FC<DashboardProps> = ({ company, onNavigate }) => {
             {gettingStarted.map((step, i) => (
               <div key={step.id} className={`flex items-center gap-3 p-3 rounded-xl transition-all ${step.done ? 'bg-white/60 opacity-60' : 'bg-white border border-slate-100 shadow-sm'}`}>
                 <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-extrabold shrink-0 ${step.done ? 'bg-cac-green text-white' : 'bg-slate-100 text-slate-400'}`}>
-                  {step.done ? '✓' : i + 1}
+                  {step.done ? (<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>) : i + 1}
                 </div>
                 <p className={`flex-1 text-sm font-semibold ${step.done ? 'line-through text-slate-400' : 'text-slate-800'}`}>{step.label}</p>
                 {!step.done && (
@@ -670,7 +670,7 @@ const Dashboard: React.FC<DashboardProps> = ({ company, onNavigate }) => {
 
       {/* NTA 2025 Reform Banner */}
       <div className="bg-gradient-to-r from-cac-green to-emerald-600 rounded-2xl p-4 text-white flex items-center gap-4">
-        <span className="text-3xl shrink-0">📋</span>
+        <span className="text-3xl shrink-0"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></span></span>
         <div>
           <p className="font-bold text-sm">Nigeria Tax Act 2025 -- Active from 1 Jan 2026</p>
           <p className="text-xs text-green-200 mt-0.5">All calculations use new PAYE bands (0%-25%), CIT ≤₦50M exempt, 4% Dev Levy. Now: Nigeria Revenue Service (NRS).</p>
@@ -704,11 +704,11 @@ const Dashboard: React.FC<DashboardProps> = ({ company, onNavigate }) => {
       <Card className="space-y-3">
         <h2 className="font-bold text-slate-800">Quick Actions</h2>
         <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
-          <QuickActionButton icon="🧾" label="Record Sale"    onClick={() => setModal("sale")} />
-          <QuickActionButton icon="💳" label="Add Expense"   onClick={() => setModal("expense")} />
-          <QuickActionButton icon="👥" label="Run Payroll"   onClick={() => setModal("payroll")} />
-          <QuickActionButton icon="✅" label="Mark Filed"    onClick={() => setModal("filed")} />
-          <QuickActionButton icon="🏦" label="Import Bank"   onClick={() => onNavigate("import")} />
+          <QuickActionButton icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1z"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/></svg>} label="Record Sale"    onClick={() => setModal("sale")} />
+          <QuickActionButton icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>} label="Add Expense"   onClick={() => setModal("expense")} />
+          <QuickActionButton icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>} label="Run Payroll"   onClick={() => setModal("payroll")} />
+          <QuickActionButton icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>} label="Mark Filed"    onClick={() => setModal("filed")} />
+          <QuickActionButton icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg>} label="Import Bank"   onClick={() => onNavigate("import")} />
         </div>
       </Card>
 
@@ -743,12 +743,12 @@ const Dashboard: React.FC<DashboardProps> = ({ company, onNavigate }) => {
         <h2 className="font-bold text-slate-800 text-sm">NTA 2025 Quick Reference</h2>
         <div className="grid md:grid-cols-2 gap-3 text-xs">
           {[
-            { icon: '📊', title: "PAYE Bands 2026", body: '0% first ₦800k · 15% next ₦2.2M · 18% next ₦9M · 21% next ₦13M · 23% next ₦25M · 25% above ₦50M' },
-            { icon: '🏢', title: "CIT (NTA 2025)", body: 'Small cos (≤₦50M turnover): 0% CIT + 0% Dev Levy. Standard: 30% CIT + 4% Dev Levy. Medium category removed.' },
-            { icon: '🛡️', title: "NSITF + Pension", body: 'NSITF: 1% payroll → NSITF (due 16th). Pension: 8% employee + 10% employer → PFAs (due within 7 days of payday). CAC annual returns: 30 June.' },
-            { icon: '📆', title: "Plan Ahead", body: 'Use Salary Simulator to see PAYE impact before a raise. Use Annual Tax Planner to forecast 12 months of obligations. Track TCC expiry in TCC Tracker.' },
-            { icon: '🏠', title: "Rent Relief (replaces CRA)", body: '20% of annual rent paid, max ₦500,000. CRA is fully abolished from 1 Jan 2026.' },
-            { icon: '📅', title: "Filing Deadlines", body: 'VAT: 21st · PAYE: 10th · WHT: 21st · CIT: 6 months after year-end · PIT: 31 March · NSITF: 16th · Pension: 7 days after payday · CAC: 30 June · ITF: 1 April' },
+            { icon: (<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></span>), title: "PAYE Bands 2026", body: '0% first ₦800k · 15% next ₦2.2M · 18% next ₦9M · 21% next ₦13M · 23% next ₦25M · 25% above ₦50M' },
+            { icon: (<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>), title: "CIT (NTA 2025)", body: 'Small cos (≤₦50M turnover): 0% CIT + 0% Dev Levy. Standard: 30% CIT + 4% Dev Levy. Medium category removed.' },
+            { icon: (<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>), title: "NSITF + Pension", body: 'NSITF: 1% payroll → NSITF (due 16th). Pension: 8% employee + 10% employer → PFAs (due within 7 days of payday). CAC annual returns: 30 June.' },
+            { icon: (<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>), title: "Plan Ahead", body: 'Use Salary Simulator to see PAYE impact before a raise. Use Annual Tax Planner to forecast 12 months of obligations. Track TCC expiry in TCC Tracker.' },
+            { icon: (<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>), title: "Rent Relief (replaces CRA)", body: '20% of annual rent paid, max ₦500,000. CRA is fully abolished from 1 Jan 2026.' },
+            { icon: (<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>), title: "Filing Deadlines", body: 'VAT: 21st · PAYE: 10th · WHT: 21st · CIT: 6 months after year-end · PIT: 31 March · NSITF: 16th · Pension: 7 days after payday · CAC: 30 June · ITF: 1 April' },
           ].map(({ icon, title, body }) => (
             <div key={title} className="bg-slate-50 rounded-xl p-3 space-y-1">
               <p className="font-bold text-slate-800">{icon} {title}</p>

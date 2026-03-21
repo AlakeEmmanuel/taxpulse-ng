@@ -55,7 +55,7 @@ export const PITCalculator: React.FC = () => {
 
       {/* Reform notice */}
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex gap-3">
-        <span className="text-xl shrink-0">📢</span>
+        <span className="text-xl shrink-0"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg></span></span>
         <div className="text-xs text-blue-800 space-y-1">
           <p className="font-bold">Updated for Nigeria Tax Reform 2026 (NTA 2025)</p>
           <p>Key changes: <strong>CRA abolished</strong> → replaced with Rent Relief (20% of annual rent, max ₦500k). New bands: 0% on first ₦800k, then 15%-25%. Minimum tax abolished.</p>
@@ -191,7 +191,7 @@ export const PITCalculator: React.FC = () => {
 
           {!hasIncome && (
             <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 text-center">
-              <p className="text-3xl mb-2">👆</p>
+              <p className="text-3xl mb-2"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 14a8 8 0 0 1-8 8"/><path d="M18 11v-1a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V9a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v1"/><path d="M10 9.5V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v10"/><path d="M18 11a2 2 0 1 1 4 0v3a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg></span></p>
               <p className="text-sm font-bold text-slate-700">Enter your income above</p>
               <p className="text-xs text-slate-400 mt-1">Using NTA 2025 bands effective 1 Jan 2026</p>
             </div>
@@ -200,7 +200,7 @@ export const PITCalculator: React.FC = () => {
       </div>
 
       <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex gap-3">
-        <span className="text-xl shrink-0">💡</span>
+        <span className="text-xl shrink-0"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg></span></span>
         <div className="text-xs text-amber-800 space-y-1">
           <p><strong>NTA 2025 changes from PITA:</strong> CRA abolished → Rent Relief introduced. New bands start at 0% up to ₦800k taxable income (after deductions). Max rate 25% (was 24%). Minimum tax abolished. FIRS renamed to Nigeria Revenue Service (NRS).</p>
           <p>Self-employed individuals file directly with their State Internal Revenue Service by 31 March annually.</p>

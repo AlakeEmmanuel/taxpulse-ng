@@ -486,7 +486,7 @@ async function generateCITReturn(doc: any, company: Company, period: string, led
   doc.roundedRect(14, y, doc.internal.pageSize.getWidth() - 28, 22, 3, 3, 'F');
   doc.setTextColor(isSmallCompany ? 0 : 180, isSmallCompany ? 100 : 50, isSmallCompany ? 0 : 0);
   doc.setFontSize(9); doc.setFont('helvetica', 'bold');
-  doc.text(isSmallCompany ? '✓ SMALL COMPANY EXEMPTION APPLIES' : '⚠ STANDARD COMPANY -- CIT APPLIES', 20, y + 8);
+  doc.text(isSmallCompany ? '<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> SMALL COMPANY EXEMPTION APPLIES' : '<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> STANDARD COMPANY -- CIT APPLIES', 20, y + 8);
   doc.setFontSize(8); doc.setFont('helvetica', 'normal');
   doc.text(isSmallCompany
     ? `Turnover ≤₦50M: 0% CIT, 0% Dev Levy, 0% CGT under NTA 2025. Professional service firms do not qualify.`
@@ -728,12 +728,12 @@ async function generateComplianceSummary(doc: any, company: Company, period: str
 
 // ─── Report type definitions ──────────────────────────────────────────────────
 const REPORT_TYPES = [
-  { id: 'compliance', label: "Tax Compliance Summary", desc: 'Full overview -- all obligations, financial summary, compliance score', icon: '📊', color: 'bg-slate-50 border-slate-200', always: true },
-  { id: 'vat', label: "VAT Return (Form 002)", desc: 'Monthly VAT return with output/input VAT computation. File with NRS by 21st.', icon: '🧾', color: 'bg-blue-50 border-blue-200', requires: 'vat' },
-  { id: 'paye', label: "PAYE Monthly Schedule", desc: 'Employee payroll PAYE schedule with NTA 2025 bands. File with State IRS by 10th.', icon: '👥', color: 'bg-purple-50 border-purple-200', requires: 'paye' },
-  { id: 'wht', label: "WHT Schedule", desc: 'Withholding tax deduction schedule with vendor breakdown. File with NRS by 21st.', icon: '🤝', color: 'bg-amber-50 border-amber-200', requires: 'wht' },
-  { id: 'cit', label: "CIT Computation Sheet", desc: 'Company Income Tax computation + small company check. File with NRS within 6 months.', icon: '🏢', color: 'bg-green-50 border-green-200', requires: 'cit' },
-  { id: 'pit', label: "PIT Self-Assessment (Form A)", desc: 'Personal Income Tax return with all deductions. File with State IRS by 31 March.', icon: '👤', color: 'bg-rose-50 border-rose-200', requires: 'pit' },
+  { id: 'compliance', label: "Tax Compliance Summary", desc: 'Full overview -- all obligations, financial summary, compliance score', icon: (<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></span>), color: 'bg-slate-50 border-slate-200', always: true },
+  { id: 'vat', label: "VAT Return (Form 002)", desc: 'Monthly VAT return with output/input VAT computation. File with NRS by 21st.', icon: (<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1z"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/></svg></span>), color: 'bg-blue-50 border-blue-200', requires: 'vat' },
+  { id: 'paye', label: "PAYE Monthly Schedule", desc: 'Employee payroll PAYE schedule with NTA 2025 bands. File with State IRS by 10th.', icon: (<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>), color: 'bg-purple-50 border-purple-200', requires: 'paye' },
+  { id: 'wht', label: "WHT Schedule", desc: 'Withholding tax deduction schedule with vendor breakdown. File with NRS by 21st.', icon: (<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z"/></svg></span>), color: 'bg-amber-50 border-amber-200', requires: 'wht' },
+  { id: 'cit', label: "CIT Computation Sheet", desc: 'Company Income Tax computation + small company check. File with NRS within 6 months.', icon: (<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>), color: 'bg-green-50 border-green-200', requires: 'cit' },
+  { id: 'pit', label: "PIT Self-Assessment (Form A)", desc: 'Personal Income Tax return with all deductions. File with State IRS by 31 March.', icon: (<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>), color: 'bg-rose-50 border-rose-200', requires: 'pit' },
 ];
 
 interface TaxExportProps { company: Company; onNavigate?: (v: string) => void; }
@@ -809,7 +809,7 @@ export const TaxExport: React.FC<TaxExportProps> = ({ company, onNavigate }) => 
   if (loading) return (
     <div className="min-h-[40vh] flex items-center justify-center">
       <div className="text-center space-y-3">
-        <div className="text-4xl animate-pulse">📄</div>
+        <div className="text-4xl animate-pulse"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg></span></div>
         <p className="text-slate-500 text-sm">Loading your data...</p>
       </div>
     </div>
@@ -829,7 +829,7 @@ export const TaxExport: React.FC<TaxExportProps> = ({ company, onNavigate }) => 
 
       {/* Filing education banner */}
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-        <p className="text-xs font-bold text-blue-800 mb-2">📋 How tax filing works in Nigeria (NTA 2025)</p>
+        <p className="text-xs font-bold text-blue-800 mb-2"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></span> How tax filing works in Nigeria (NTA 2025)</p>
         <div className="grid md:grid-cols-2 gap-2 text-xs text-blue-700">
           {isIndividual ? <>
             <p>• <strong>PIT Return (Form A):</strong> File with your State IRS by 31 March each year</p>
@@ -866,7 +866,7 @@ export const TaxExport: React.FC<TaxExportProps> = ({ company, onNavigate }) => 
                     <p className="font-bold text-slate-900 text-sm">{r.label}</p>
                     <p className="text-xs text-slate-500 mt-0.5">{r.desc}</p>
                   </div>
-                  {reportType === r.id && <span className="ml-auto text-cac-green font-black text-lg">✓</span>}
+                  {reportType === r.id && <span className="ml-auto text-cac-green font-black text-lg"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span></span>}
                 </div>
               </button>
             ))}
@@ -924,13 +924,13 @@ export const TaxExport: React.FC<TaxExportProps> = ({ company, onNavigate }) => 
 
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">
-          <p className="font-bold">⚠️ {error}</p>
+          <p className="font-bold"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> {error}</p>
         </div>
       )}
 
       {generated && (
         <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-sm text-cac-green font-bold flex items-center gap-2">
-          ✅ PDF downloaded! Upload it to the relevant tax portal or share with your accountant.
+          <span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span> PDF downloaded! Upload it to the relevant tax portal or share with your accountant.
         </div>
       )}
 
@@ -941,7 +941,7 @@ export const TaxExport: React.FC<TaxExportProps> = ({ company, onNavigate }) => 
             Generating {availableReports.find(r=>r.id===reportType)?.label}...
           </span>
         ) : (
-          `📄 Generate ${availableReports.find(r=>r.id===reportType)?.label}`
+          `<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg></span> Generate ${availableReports.find(r=>r.id===reportType)?.label}`
         )}
       </Button>
 

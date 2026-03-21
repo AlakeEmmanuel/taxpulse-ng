@@ -119,13 +119,13 @@ const WHTCalculator: React.FC = () => {
           value={monthlyTxn} onChange={e => setMonthlyTxn(e.target.value)}
           placeholder={`Auto: using ${fmt(val)} if blank`} />
         {hasTIN && monthly <= 2_000_000 && monthly > 0 && (
-          <p className="text-xs text-green-700 font-bold">✅ WHT exempt -- vendor qualifies (TIN + ≤₦2M/month)</p>
+          <p className="text-xs text-green-700 font-bold"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span> WHT exempt -- vendor qualifies (TIN + ≤₦2M/month)</p>
         )}
         {hasTIN && monthly > 2_000_000 && (
-          <p className="text-xs text-amber-700">⚠️ Exceeds ₦2M threshold -- WHT applies</p>
+          <p className="text-xs text-amber-700"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> Exceeds ₦2M threshold -- WHT applies</p>
         )}
         {!hasTIN && (
-          <p className="text-xs text-red-600">❌ No TIN -- WHT must be deducted regardless of amount</p>
+          <p className="text-xs text-red-600"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span> No TIN -- WHT must be deducted regardless of amount</p>
         )}
       </div>
 
@@ -190,7 +190,7 @@ const CITCalculator: React.FC = () => {
           className="w-4 h-4 accent-cac-green" />
         <span className="text-sm text-slate-700">Professional service company (law, accounting, consulting)</span>
       </label>
-      {isProSvc && <p className="text-xs text-amber-600">⚠️ Pro service firms cannot qualify as small companies under NTA 2025</p>}
+      {isProSvc && <p className="text-xs text-amber-600"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> Pro service firms cannot qualify as small companies under NTA 2025</p>}
 
       {t > 0 && (
         <div className={`rounded-xl p-4 space-y-3 ${result.rate === 0 ? 'bg-green-50 border border-green-200' : 'bg-slate-50'}`}>
@@ -312,7 +312,7 @@ const CGTCalculator: React.FC = () => {
         <div className={`rounded-xl p-4 space-y-2 ${result.exempt ? 'bg-green-50 border border-green-200' : 'bg-slate-50 border border-slate-100'}`}>
           {result.exempt ? (
             <div className="text-center">
-              <p className="text-2xl mb-1">🎉</p>
+              <p className="text-2xl mb-1"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span></p>
               <p className="font-bold text-cac-green text-sm">{result.exemptionReason}</p>
             </div>
           ) : (
@@ -395,7 +395,7 @@ const StateLeviesViewer: React.FC = () => {
       </div>
 
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-800">
-        <p className="font-bold mb-1">📋 Important</p>
+        <p className="font-bold mb-1"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></span> Important</p>
         <p>State levies are separate from federal taxes (NRS) and are collected by your State IRS. 
         Always verify current rates directly with your State IRS as rates change annually.</p>
       </div>
