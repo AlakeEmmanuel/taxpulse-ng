@@ -28,16 +28,9 @@ const Icon = {
 
 // ── Logo ──────────────────────────────────────────────────────────────────────
 const Logo = () => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-    <div style={{ width: '32px', height: '32px', background: '#00843D', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-      </svg>
-    </div>
-    <div>
-      <p style={{ fontWeight: 700, fontSize: '14px', color: 'white', margin: 0, lineHeight: 1 }}>TaxPulse NG</p>
-      <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', margin: 0 }}>Admin Panel</p>
-    </div>
+  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+    <img src="/logo-full.png" alt="TaxPulse NG" style={{ height: '30px', width: 'auto', objectFit: 'contain' }} />
+    <span style={{ fontSize: '11px', color: '#555', borderLeft: '1px solid #222', paddingLeft: '12px', fontWeight: 600, letterSpacing: '0.5px' }}>ADMIN</span>
   </div>
 );
 
@@ -65,12 +58,11 @@ const PasswordGate: React.FC<{ onUnlock: (s: string) => void }> = ({ onUnlock })
     <div style={{ minHeight: '100vh', background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
       <div style={{ background: '#111', border: '1px solid #222', borderRadius: '16px', padding: '36px', width: '100%', maxWidth: '380px' }}>
         <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-          <div style={{ width: '56px', height: '56px', background: '#00843D', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-            </svg>
-          </div>
-          <h1 style={{ fontSize: '20px', fontWeight: 700, color: 'white', margin: '0 0 6px' }}>TaxPulse NG</h1>
+          <img
+            src="/logo-full.png"
+            alt="TaxPulse NG"
+            style={{ height: '40px', width: 'auto', objectFit: 'contain', margin: '0 auto 16px', display: 'block' }}
+          />
           <p style={{ color: '#666', fontSize: '13px', margin: 0 }}>Admin access only</p>
         </div>
 
