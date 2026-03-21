@@ -385,7 +385,7 @@ export const TCCTracker: React.FC<{ company: Company }> = ({ company }) => {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${s.color}`}>{s.label}</span>
-                    <span className="text-xs font-bold text-slate-600 uppercase">{entry.type === 'federal" ? 'Federal (NRS)' : `State (${company.state} IRS)`}</span>
+                    <span className="text-xs font-bold text-slate-600 uppercase">{entry.type === 'federal' ? 'Federal (NRS)' : `State (${company.state} IRS)`}</span>
                   </div>
                   {entry.tccNumber && <p className="text-sm font-bold text-slate-800">{entry.tccNumber}</p>}
                   <p className="text-xs text-slate-500 mt-1">

@@ -80,7 +80,7 @@ const UploadModal: React.FC<{
                 onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files?.[0]; if (f) handleFile(f); }}
                 onDragOver={e => e.preventDefault()}
                 onClick={() => inputRef.current?.click()}
-                className={'border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors ' + (file ? 'border-cac-green bg-green-50' : 'border-slate-200 hover:border-cac-green hover:bg-slate-50')}
+                className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors ${file ? 'border-cac-green bg-green-50' : 'border-slate-200 hover:border-cac-green hover:bg-slate-50'}`}
               >
                 <input
                   ref={inputRef} type="file" className="hidden"
@@ -112,7 +112,7 @@ const UploadModal: React.FC<{
                       <button
                         key={cat}
                         onClick={() => setCategory(cat)}
-                        className={'flex flex-col items-center gap-1 p-2 rounded-xl border text-xs font-semibold transition-all ' + (category === cat ? color + ' ring-2 ring-cac-green' : 'border-slate-100 hover:bg-slate-50 text-slate-600')}
+                        className={`flex flex-col items-center gap-1 p-2 rounded-xl border text-xs font-semibold transition-all ${category === cat ? color + ' ring-2 ring-cac-green' : 'border-slate-100 hover:bg-slate-50 text-slate-600'}`}
                       >
                         <span>{icon}</span>
                         <span>{label}</span>
@@ -203,13 +203,13 @@ const FileCard: React.FC<{
   return (
     <div className="bg-white border border-slate-100 rounded-2xl p-4 hover:shadow-md transition-shadow">
       <div className="flex items-start gap-3">
-        <div className={'w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 border ' + color}>
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 border ${color}`}>
           {icon}
         </div>
         <div className="flex-1 min-w-0">
           <p className="font-bold text-slate-900 text-sm truncate">{file.name}</p>
           <div className="flex items-center gap-2 mt-1 flex-wrap">
-            <span className={'text-[10px] font-bold px-2 py-0.5 rounded-full border ' + color}>{label}</span>
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${color}`}>{label}</span>
             <span className="text-[10px] text-slate-400">{fmtSize(file.sizeBytes)}</span>
             <span className="text-[10px] text-slate-400">{file.uploadDate}</span>
           </div>
@@ -316,7 +316,7 @@ export const EvidenceVault: React.FC<EvidenceVaultProps> = ({ company }) => {
             <button
               key={cat}
               onClick={() => setFilterCat(filterCat === cat ? 'all' : cat)}
-              className={'flex items-center gap-2 p-3 rounded-xl border text-sm font-semibold transition-all ' + (filterCat === cat ? color + ' ring-2 ring-cac-green' : 'bg-white border-slate-100 text-slate-600 hover:border-slate-200')}
+              className={`flex items-center gap-2 p-3 rounded-xl border text-sm font-semibold transition-all ${filterCat === cat ? color + ' ring-2 ring-cac-green' : 'bg-white border-slate-100 text-slate-600 hover:border-slate-200'}`}
             >
               <span className="text-lg">{icon}</span>
               <div className="text-left">
@@ -366,7 +366,7 @@ export const EvidenceVault: React.FC<EvidenceVaultProps> = ({ company }) => {
       ) : (
         <>
           <div className="flex items-center justify-between">
-            <p className="text-sm text-slate-500 font-semibold">{filtered.length} document{filtered.length !== 1 ? 's" : ''}</p>
+            <p className="text-sm text-slate-500 font-semibold">{filtered.length} document{filtered.length !== 1 ? 's' : ''}</p>
             {filterCat !== 'all' && (
               <button onClick={() => setFilterCat('all')} className="text-xs text-cac-green font-bold hover:underline">Clear filter</button>
             )}

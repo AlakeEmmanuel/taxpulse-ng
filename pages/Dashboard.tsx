@@ -653,7 +653,7 @@ const Dashboard: React.FC<DashboardProps> = ({ company, onNavigate }) => {
                 <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-extrabold shrink-0 ${step.done ? 'bg-cac-green text-white' : 'bg-slate-100 text-slate-400'}`}>
                   {step.done ? '✓' : i + 1}
                 </div>
-                <p className={"flex-1 text-sm font-semibold ' + (step.done ? 'line-through text-slate-400" : 'text-slate-800')}>{step.label}</p>
+                <p className={`flex-1 text-sm font-semibold ${step.done ? 'line-through text-slate-400' : 'text-slate-800'}`}>{step.label}</p>
                 {!step.done && (
                   <button
                     onClick={step.action}

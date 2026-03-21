@@ -187,7 +187,7 @@ const Layout: React.FC<LayoutProps> = ({
           </button>
           <div className={`px-3 py-3 rounded-xl border ${isPro ? 'bg-amber-50 border-amber-200' : 'bg-green-50 border-green-100'}`}>
             <p className={`text-[10px] font-black uppercase tracking-wider ${isPro ? 'text-amber-700' : 'text-cac-green'}`}>{isPro ? '⭐ Pro Plan' : 'Free Plan'}</p>
-            <p className="text-[10px] text-slate-500 mt-0.5">{isPro ? 'Full access · NTA 2025 ✓" : '1 company · Upgrade for more'}</p>
+            <p className="text-[10px] text-slate-500 mt-0.5">{isPro ? 'Full access · NTA 2025 ✓' : '1 company · Upgrade for more'}</p>
           </div>
         </div>
       </div>

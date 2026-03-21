@@ -323,7 +323,7 @@ export const InvoiceGenerator: React.FC<InvoiceGeneratorProps> = ({ company }) =
                     onChange={e => updateLine(i, 'vatApplicable', e.target.checked)}
                     className="accent-cac-green w-4 h-4"
                   />
-                  <span className="text-xs text-slate-600">{line.vatApplicable ? '7.5%" : '0%'}</span>
+                  <span className="text-xs text-slate-600">{line.vatApplicable ? '7.5%' : '0%'}</span>
                 </label>
               </div>
               <div className="col-span-4 md:col-span-1 text-right text-sm font-bold text-slate-700 py-2">

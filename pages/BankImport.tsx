@@ -274,7 +274,7 @@ const StatementsTab: React.FC<{ company: Company; onNavigate: (v: AppView) => vo
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-slate-500 font-semibold">{statements.length} statement{statements.length !== 1 ? 's" : ''} · ordered chronologically</p>
+        <p className="text-sm text-slate-500 font-semibold">{statements.length} statement{statements.length !== 1 ? 's' : ''} · ordered chronologically</p>
         <button onClick={() => onNavigate('ledger')} className="text-xs text-cac-green font-bold hover:underline">View Ledger →</button>
       </div>
 
@@ -291,7 +291,7 @@ const StatementsTab: React.FC<{ company: Company; onNavigate: (v: AppView) => vo
                   <div className="flex items-center gap-3 mt-1">
                     <span className="text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full">{txCount} transactions</span>
                     <span className="text-[10px] text-slate-400">Uploaded {stmt.uploadDate}</span>
-                    <span className="text-[10px] text-slate-400">{stmt.sizeBytes ? (stmt.sizeBytes / 1024).toFixed(1) + ' KB" : ''}</span>
+                    <span className="text-[10px] text-slate-400">{stmt.sizeBytes ? (stmt.sizeBytes / 1024).toFixed(1) + ' KB' : ''}</span>
                   </div>
                 </div>
               </div>
@@ -460,7 +460,7 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
       <div className="flex gap-1 bg-slate-100 p-1 rounded-xl w-fit">
           {([['import', '📤 Import Statement'], ['statements', '📂 My Statements']] as [Tab, string][]).map(([t, label]) => (
           <button key={t} onClick={() => { setTab(t); if (t === 'import') reset(); }}
-            className={'px-5 py-2 rounded-lg text-sm font-bold transition-all ' + (tab === t ? 'bg-white text-cac-green shadow' : 'text-slate-500 hover:text-slate-700')}>
+            className={`px-5 py-2 rounded-lg text-sm font-bold transition-all ${tab === t ? 'bg-white text-cac-green shadow' : 'text-slate-500 hover:text-slate-700'}`}>
             {label}
           </button>
         ))}
@@ -482,7 +482,7 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
                 onDragOver={e => { e.preventDefault(); setDragOver(true); }}
                 onDragLeave={() => setDragOver(false)}
                 onClick={() => fileRef.current?.click()}
-                className={'border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all ' + (dragOver ? 'border-cac-green bg-green-50' : 'border-slate-200 hover:border-cac-green hover:bg-green-50/50')}
+                className={`border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all ${dragOver ? 'border-cac-green bg-green-50' : 'border-slate-200 hover:border-cac-green hover:bg-green-50/50'}`}
               >
                 <div className="text-5xl mb-4">📄</div>
                 <p className="font-bold text-slate-900">Drop your bank statement here</p>
@@ -600,14 +600,14 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
                 ].map(s => (
                   <div key={s.label} className={s.bg + ' rounded-2xl p-4'}>
                     <p className="text-xs text-slate-500 font-semibold">{s.label}</p>
-                    <p className={'text-lg font-extrabold mt-1 ' + s.color}>{s.value}</p>
+                    <p className={`text-lg font-extrabold mt-1 ${s.color}`}>{s.value}</p>
                   </div>
                 ))}
               </div>
 
-              <div className={'rounded-xl px-4 py-3 flex items-center justify-between ' + (netProfit >= 0 ? 'bg-green-50 border border-green-100' : 'bg-red-50 border border-red-100')}>
+              <div className={`rounded-xl px-4 py-3 flex items-center justify-between ${netProfit >= 0 ? 'bg-green-50 border border-green-100' : 'bg-red-50 border border-red-100'}`}>
                 <p className="font-bold text-slate-700 text-sm">Net Profit</p>
-                <p className={'font-extrabold text-lg ' + (netProfit >= 0 ? 'text-green-700' : 'text-red-700')}>{fmt(netProfit)}</p>
+                <p className={`font-extrabold text-lg ${netProfit >= 0 ? 'text-green-700' : 'text-red-700'}`}>{fmt(netProfit)}</p>
               </div>
 
               <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
@@ -634,14 +634,14 @@ export const BankImport: React.FC<BankImportProps> = ({ company, onNavigate }) =
                     </thead>
                     <tbody className="divide-y divide-slate-50">
                       {transactions.map(t => (
-                        <tr key={t.id} className={'transition-colors ' + (t.selected ? 'bg-white' : 'bg-slate-50 opacity-50')}>
+                        <tr key={t.id} className={`transition-colors ${t.selected ? 'bg-white' : 'bg-slate-50 opacity-50'}`}>
                           <td className="px-4 py-3"><input type="checkbox" checked={t.selected} onChange={() => toggleRow(t.id)} className="w-4 h-4 accent-cac-green cursor-pointer" /></td>
                           <td className="px-4 py-3"><input type="date" value={t.date} onChange={e => updateRow(t.id, "date", e.target.value)} className="border-0 bg-transparent text-xs focus:outline-none focus:ring-1 focus:ring-cac-green rounded" /></td>
                           <td className="px-4 py-3 max-w-[200px]"><input value={t.description} onChange={e => updateRow(t.id, 'description', e.target.value)} className="w-full border-0 bg-transparent text-xs focus:outline-none focus:ring-1 focus:ring-cac-green rounded px-1 truncate" /></td>
-                          <td className="px-4 py-3"><span className={'text-[10px] font-bold px-2 py-0.5 rounded-full " + (categoryColors[t.category] || 'bg-gray-100 text-gray-700')}>{t.category}</span></td>
+                            <td className="px-4 py-3"><span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${categoryColors[t.category] || 'bg-gray-100 text-gray-700'}`}>{t.category}</span></td>
                           <td className="px-4 py-3 text-right font-bold text-slate-900 whitespace-nowrap">{fmt(t.amount)}</td>
                           <td className="px-4 py-3 text-center">
-                            <select value={t.type} onChange={e => updateRow(t.id, 'type', e.target.value)} className={"text-[10px] font-bold px-2 py-0.5 rounded-full border-0 cursor-pointer ' + (t.type === 'sale" ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')}>
+                            <select value={t.type} onChange={e => updateRow(t.id, 'type', e.target.value)} className={`text-[10px] font-bold px-2 py-0.5 rounded-full border-0 cursor-pointer ${t.type === 'sale' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                               <option value="sale">Income</option>
                               <option value="expense">Expense</option>
                             </select>
