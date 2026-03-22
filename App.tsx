@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
+import { FreelancerDashboard } from './pages/FreelancerDashboard';
 import Onboarding from './pages/Onboarding';
 import { CalculatorsPage } from './pages/Calculators';
 import { PITCalculator } from './pages/PITCalculator';
@@ -210,7 +211,7 @@ const App: React.FC = () => {
   if (companies.length === 0) return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <header className="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between">
-        <img src="/logo-full.png" alt="TaxPulse NG" className="h-9 w-auto" />
+        <img src="/logo.png" alt="TaxPulse NG" className="h-9 w-auto" />
         <button onClick={async () => { await signOut(); }} className="text-xs text-slate-400 hover:text-slate-600">Sign out</button>
       </header>
       <div className="flex-1 p-4">
@@ -234,7 +235,11 @@ const App: React.FC = () => {
       onUpgrade={() => setShowPaywall(true)}
     >
       {view === 'onboarding'  && <Onboarding onComplete={handleCompanyAdded} />}
-      {view === 'dashboard'   && activeCompany && <Dashboard company={activeCompany} onNavigate={handleNavigate} />}
+      {view === 'dashboard'   && activeCompany && (
+        activeCompany.entityType === 'Individual (Personal Income Tax)'
+          ? <FreelancerDashboard company={activeCompany} onNavigate={handleNavigate} />
+          : <Dashboard company={activeCompany} onNavigate={handleNavigate} />
+      )}
       {view === 'calculators' && <CalculatorsPage />}
       {view === 'pit'         && <PITCalculator />}
       {view === 'ledger'      && activeCompany && <LedgerPage company={activeCompany} />}
