@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import { FreelancerDashboard } from './pages/FreelancerDashboard';
+import { CurrencyIncome } from './pages/CurrencyIncome';
 import Onboarding from './pages/Onboarding';
 import { CalculatorsPage } from './pages/Calculators';
 import { PITCalculator } from './pages/PITCalculator';
@@ -28,7 +29,7 @@ import { supabase } from './services/supabaseClient';
 export type AppView =
   | 'dashboard' | 'onboarding' | 'calculators' | 'pit'
   | 'ledger' | 'settings' | 'ai' | 'vault' | 'penalties' | 'export' | 'import' | 'payslip' | 'invoice'
-  | 'salary' | 'planner' | 'tcc' | 'payroll-csv';
+  | 'salary' | 'planner' | 'tcc' | 'payroll-csv' | 'fx';
 
 const PRO_VIEWS: AppView[] = ['ai', 'vault', 'export', 'import', 'payslip', 'invoice'];
 
@@ -255,6 +256,7 @@ const App: React.FC = () => {
       {view === 'planner'     && activeCompany && <AnnualTaxPlanner company={activeCompany} />}
       {view === 'tcc'         && activeCompany && <TCCTracker company={activeCompany} />}
       {view === 'payroll-csv' && activeCompany && <PayrollCSVExport company={activeCompany} />}
+      {view === 'fx' && activeCompany && <CurrencyIncome company={activeCompany} />}
     </Layout>
   );
 };

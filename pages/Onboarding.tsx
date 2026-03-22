@@ -59,6 +59,7 @@ const defaultForm: FormData = {
 };
 
 const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
+  const [profileType, setProfileType] = useState<'individual' | 'business' | null>(null);
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<FormData>(defaultForm);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
@@ -105,17 +106,216 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
 
   const progress = ((step - 1) / 3) * 100;
 
+  // ── Individual quick onboarding ──────────────────────────────────────────────
+  const [indForm, setIndForm] = useState({
+    name: '', state: '', employmentType: 'self-employed' as 'employed' | 'self-employed' | 'both',
+    annualIncome: '', phone: '',
+  });
+  const [indSubmitting, setIndSubmitting] = useState(false);
+
+  const handleIndividualSubmit = () => {
+    if (!indForm.name.trim() || !indForm.state) return;
+    setIndSubmitting(true);
+    const company: Company = {
+      id: Date.now().toString(),
+      name: indForm.name.trim(),
+      entityType: EntityType.INDIVIDUAL,
+      industry: 'Individual',
+      state: indForm.state,
+      address: '',
+      cacStatus: 'Not Registered',
+      yearEnd: 'December 31',
+      hasEmployees: false,
+      paysVendors: false,
+      collectsVat: false,
+      complianceScore: 50,
+      employmentType: indForm.employmentType,
+      annualIncome: parseFloat(indForm.annualIncome) || undefined,
+      phone: indForm.phone || undefined,
+    };
+    onComplete(company);
+  };
+
+  // ── Profile type selector ─────────────────────────────────────────────────────
+  if (!profileType) return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50/30 to-slate-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-lg">
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center gap-2 bg-cac-green/10 text-cac-green px-4 py-1.5 rounded-full text-sm font-bold mb-4">
+            <span>🇳🇬</span> TaxPulse NG
+          </div>
+          <h1 className="text-3xl font-bold text-slate-900">Who are you filing for?</h1>
+          <p className="text-slate-500 mt-2">Choose your account type to get started</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <button
+            onClick={() => setProfileType('individual')}
+            className="bg-white border-2 border-slate-200 rounded-2xl p-6 text-left hover:border-cac-green hover:shadow-md transition-all group"
+          >
+            <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-2xl mb-4 group-hover:bg-cac-green/10 transition-all">
+              👤
+            </div>
+            <h3 className="font-extrabold text-slate-900 text-lg">Myself</h3>
+            <p className="text-slate-500 text-sm mt-1">Freelancer, creator, remote worker, employed individual</p>
+            <ul className="mt-4 space-y-1">
+              {['Personal income tax (PIT)', 'WHT credit tracking', 'Foreign income in USD, GBP, EUR', 'Quarterly tax reminders'].map(f => (
+                <li key={f} className="text-xs text-slate-400 flex items-center gap-2">
+                  <span className="text-cac-green">✓</span> {f}
+                </li>
+              ))}
+            </ul>
+            <div className="mt-4 text-cac-green font-bold text-sm flex items-center gap-1">
+              Get started <span>→</span>
+            </div>
+          </button>
+
+          <button
+            onClick={() => setProfileType('business')}
+            className="bg-white border-2 border-slate-200 rounded-2xl p-6 text-left hover:border-cac-green hover:shadow-md transition-all group"
+          >
+            <div className="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center text-2xl mb-4 group-hover:bg-cac-green/10 transition-all">
+              🏢
+            </div>
+            <h3 className="font-extrabold text-slate-900 text-lg">My Business</h3>
+            <p className="text-slate-500 text-sm mt-1">Ltd, PLC, NGO, sole proprietorship, partnership</p>
+            <ul className="mt-4 space-y-1">
+              {['VAT, PAYE, WHT, CIT filing', 'Multi-employee payroll', 'Evidence vault & PDF export', 'CAC annual returns'].map(f => (
+                <li key={f} className="text-xs text-slate-400 flex items-center gap-2">
+                  <span className="text-cac-green">✓</span> {f}
+                </li>
+              ))}
+            </ul>
+            <div className="mt-4 text-cac-green font-bold text-sm flex items-center gap-1">
+              Get started <span>→</span>
+            </div>
+          </button>
+        </div>
+
+        <p className="text-center text-xs text-slate-400 mt-6">
+          You can add multiple profiles after setup
+        </p>
+      </div>
+    </div>
+  );
+
+  // ── Individual flow ───────────────────────────────────────────────────────────
+  if (profileType === 'individual') return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-slate-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-lg">
+        <div className="text-center mb-8">
+          <button onClick={() => setProfileType(null)} className="text-slate-400 text-sm hover:text-slate-600 mb-4 flex items-center gap-1 mx-auto">
+            ← Back
+          </button>
+          <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">👤</div>
+          <h1 className="text-2xl font-bold text-slate-900">Personal Tax Profile</h1>
+          <p className="text-slate-500 text-sm mt-1">Quick setup — takes under 2 minutes</p>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-5">
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Your Full Name *</label>
+            <input
+              value={indForm.name}
+              onChange={e => setIndForm(p => ({ ...p, name: e.target.value }))}
+              placeholder="e.g. Chukwuemeka Obi"
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-cac-green/30 focus:border-cac-green"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">State of Residence *</label>
+            <select
+              value={indForm.state}
+              onChange={e => setIndForm(p => ({ ...p, state: e.target.value }))}
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-cac-green/30 bg-white"
+            >
+              <option value="">Select your state</option>
+              {NIGERIAN_STATES.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">How do you earn?</label>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { value: 'employed', label: 'Salary / PAYE', icon: '💼' },
+                { value: 'self-employed', label: 'Freelance / Creator', icon: '💻' },
+                { value: 'both', label: 'Both', icon: '⚡' },
+              ].map(opt => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setIndForm(p => ({ ...p, employmentType: opt.value as any }))}
+                  className={`p-3 rounded-xl border text-center transition-all ${indForm.employmentType === opt.value ? 'border-cac-green bg-cac-green/5 text-cac-green' : 'border-slate-200 text-slate-600 hover:border-slate-300'}`}
+                >
+                  <div className="text-xl mb-1">{opt.icon}</div>
+                  <div className="text-xs font-semibold">{opt.label}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+              Estimated Annual Income (NGN)
+              <span className="text-slate-400 font-normal ml-2">optional</span>
+            </label>
+            <input
+              type="number"
+              value={indForm.annualIncome}
+              onChange={e => setIndForm(p => ({ ...p, annualIncome: e.target.value }))}
+              placeholder="e.g. 4800000"
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-cac-green/30"
+            />
+            <p className="text-xs text-slate-400 mt-1">Used to estimate your PIT liability. You can update this anytime.</p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+              Phone Number
+              <span className="text-slate-400 font-normal ml-2">optional — for deadline reminders</span>
+            </label>
+            <input
+              type="tel"
+              value={indForm.phone}
+              onChange={e => setIndForm(p => ({ ...p, phone: e.target.value }))}
+              placeholder="e.g. 08012345678"
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-cac-green/30"
+            />
+          </div>
+
+          <button
+            onClick={handleIndividualSubmit}
+            disabled={!indForm.name.trim() || !indForm.state || indSubmitting}
+            className="w-full py-3.5 bg-cac-green text-white rounded-xl font-bold text-sm hover:bg-cac-dark disabled:opacity-50 transition-all"
+          >
+            {indSubmitting ? 'Setting up...' : 'Launch My Tax Dashboard'}
+          </button>
+        </div>
+
+        <div className="mt-4 bg-blue-50 border border-blue-200 rounded-xl p-4 text-xs text-blue-700">
+          <p className="font-bold mb-1">What happens next?</p>
+          <p>We will generate your personal PIT obligations, quarterly remittance calendar, and set up your income tracker — all based on NTA 2025.</p>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50/30 to-slate-50 flex items-center justify-center p-4">
       <div className="w-full max-w-2xl">
 
         {/* Header */}
         <div className="text-center mb-8">
+          <button onClick={() => setProfileType(null)} className="text-slate-400 text-sm hover:text-slate-600 mb-4 flex items-center gap-1 mx-auto">
+            ← Back
+          </button>
           <div className="inline-flex items-center gap-2 bg-cac-green/10 text-cac-green px-4 py-1.5 rounded-full text-sm font-bold mb-4">
             <span>🇳🇬</span> TaxPulse NG
           </div>
-          <h1 className="text-3xl font-bold text-slate-900">Set Up Your Tax Profile</h1>
-          <p className="text-slate-500 mt-1">For businesses and individuals -- ready in minutes</p>
+          <h1 className="text-3xl font-bold text-slate-900">Set Up Your Business</h1>
+          <p className="text-slate-500 mt-1">Ready in minutes</p>
         </div>
 
         {/* Step indicators */}

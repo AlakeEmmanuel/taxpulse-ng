@@ -346,6 +346,7 @@ export const FreelancerDashboard: React.FC<Props> = ({ company, onNavigate }) =>
           { icon: '📄', label: 'Create Invoice',    view: 'invoice'  as AppView },
           { icon: '🤖', label: 'Ask AI',            view: 'ai'       as AppView },
           { icon: '📊', label: 'PIT Calculator',    view: 'pit'      as AppView },
+          { icon: '💱', label: 'Foreign Income',    view: 'fx'       as AppView },
           { icon: '📤', label: 'Export Reports',    view: 'export'   as AppView },
         ].map(({ icon, label, view }) => (
           <button key={label} onClick={() => onNavigate(view)}
