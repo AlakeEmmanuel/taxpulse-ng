@@ -212,7 +212,7 @@ const App: React.FC = () => {
   if (companies.length === 0) return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <header className="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between">
-        <img src="/logo.png" alt="TaxPulse NG" className="h-9 w-auto" />
+        <img src="/logo-full.png" alt="TaxPulse NG" className="h-9 w-auto" />
         <button onClick={async () => { await signOut(); }} className="text-xs text-slate-400 hover:text-slate-600">Sign out</button>
       </header>
       <div className="flex-1 p-4">
