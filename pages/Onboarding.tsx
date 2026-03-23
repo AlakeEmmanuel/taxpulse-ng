@@ -6,10 +6,10 @@ interface OnboardingProps {
 }
 
 const STEPS = [
-  { id: 1, title: "Your Profile", subtitle: 'Tell us about yourself or your business', icon: '🏢' },
-  { id: 2, title: "Registration", subtitle: 'CAC & Tax registration details', icon: '📋' },
-  { id: 3, title: "Tax Profile", subtitle: 'Configure your tax obligations', icon: '🧾' },
-  { id: 4, title: "Ready!", subtitle: 'Review and launch', icon: '🚀' },
+  { id: 1, title: "Your Profile", subtitle: 'Tell us about yourself or your business', icon: '1' },
+  { id: 2, title: "Registration", subtitle: 'CAC & Tax registration details', icon: '2' },
+  { id: 3, title: "Tax Profile", subtitle: 'Configure your tax obligations', icon: '3' },
+  { id: 4, title: "Ready!", subtitle: 'Review and launch', icon: '4' },
 ];
 
 const INDUSTRIES = [
@@ -57,6 +57,8 @@ const defaultForm: FormData = {
   phone: '',
   whatsappOptin: false,
 };
+
+const SVG_CHECK_INLINE = <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>;
 
 const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
   const [profileType, setProfileType] = useState<'individual' | 'business' | null>(null);
@@ -141,9 +143,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50/30 to-slate-50 flex items-center justify-center p-4">
       <div className="w-full max-w-lg">
         <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 bg-cac-green/10 text-cac-green px-4 py-1.5 rounded-full text-sm font-bold mb-4">
-            <span>🇳🇬</span> TaxPulse NG
-          </div>
+          <img src="/logo-full.png" alt="TaxPulse NG" className="h-10 w-auto mx-auto mb-6" />
           <h1 className="text-3xl font-bold text-slate-900">Who are you filing for?</h1>
           <p className="text-slate-500 mt-2">Choose your account type to get started</p>
         </div>
@@ -153,20 +153,20 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             onClick={() => setProfileType('individual')}
             className="bg-white border-2 border-slate-200 rounded-2xl p-6 text-left hover:border-cac-green hover:shadow-md transition-all group"
           >
-            <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-2xl mb-4 group-hover:bg-cac-green/10 transition-all">
-              👤
+            <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-cac-green/10 transition-all text-blue-600">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             </div>
             <h3 className="font-extrabold text-slate-900 text-lg">Myself</h3>
             <p className="text-slate-500 text-sm mt-1">Freelancer, creator, remote worker, employed individual</p>
             <ul className="mt-4 space-y-1">
               {['Personal income tax (PIT)', 'WHT credit tracking', 'Foreign income in USD, GBP, EUR', 'Quarterly tax reminders'].map(f => (
                 <li key={f} className="text-xs text-slate-400 flex items-center gap-2">
-                  <span className="text-cac-green">✓</span> {f}
+                  <span className="text-cac-green flex-shrink-0"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> {f}
                 </li>
               ))}
             </ul>
             <div className="mt-4 text-cac-green font-bold text-sm flex items-center gap-1">
-              Get started <span>→</span>
+              Get started <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </div>
           </button>
 
@@ -174,20 +174,20 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             onClick={() => setProfileType('business')}
             className="bg-white border-2 border-slate-200 rounded-2xl p-6 text-left hover:border-cac-green hover:shadow-md transition-all group"
           >
-            <div className="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center text-2xl mb-4 group-hover:bg-cac-green/10 transition-all">
-              🏢
+            <div className="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-cac-green/10 transition-all text-cac-green">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
             </div>
             <h3 className="font-extrabold text-slate-900 text-lg">My Business</h3>
             <p className="text-slate-500 text-sm mt-1">Ltd, PLC, NGO, sole proprietorship, partnership</p>
             <ul className="mt-4 space-y-1">
               {['VAT, PAYE, WHT, CIT filing', 'Multi-employee payroll', 'Evidence vault & PDF export', 'CAC annual returns'].map(f => (
                 <li key={f} className="text-xs text-slate-400 flex items-center gap-2">
-                  <span className="text-cac-green">✓</span> {f}
+                  <span className="text-cac-green flex-shrink-0"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> {f}
                 </li>
               ))}
             </ul>
             <div className="mt-4 text-cac-green font-bold text-sm flex items-center gap-1">
-              Get started <span>→</span>
+              Get started <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </div>
           </button>
         </div>
@@ -205,9 +205,9 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
       <div className="w-full max-w-lg">
         <div className="text-center mb-8">
           <button onClick={() => setProfileType(null)} className="text-slate-400 text-sm hover:text-slate-600 mb-4 flex items-center gap-1 mx-auto">
-            ← Back
+            Back
           </button>
-          <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">👤</div>
+          <img src="/logo-full.png" alt="TaxPulse NG" className="h-9 w-auto mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-slate-900">Personal Tax Profile</h1>
           <p className="text-slate-500 text-sm mt-1">Quick setup — takes under 2 minutes</p>
         </div>
@@ -239,9 +239,9 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             <label className="block text-sm font-semibold text-slate-700 mb-1.5">How do you earn?</label>
             <div className="grid grid-cols-3 gap-2">
               {[
-                { value: 'employed', label: 'Salary / PAYE', icon: '💼' },
-                { value: 'self-employed', label: 'Freelance / Creator', icon: '💻' },
-                { value: 'both', label: 'Both', icon: '⚡' },
+                { value: 'employed', label: 'Salary / PAYE', icon: 'briefcase' },
+                { value: 'self-employed', label: 'Freelance / Creator', icon: 'laptop' },
+                { value: 'both', label: 'Both', icon: 'zap' },
               ].map(opt => (
                 <button
                   key={opt.value}
@@ -249,7 +249,9 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                   onClick={() => setIndForm(p => ({ ...p, employmentType: opt.value as any }))}
                   className={`p-3 rounded-xl border text-center transition-all ${indForm.employmentType === opt.value ? 'border-cac-green bg-cac-green/5 text-cac-green' : 'border-slate-200 text-slate-600 hover:border-slate-300'}`}
                 >
-                  <div className="text-xl mb-1">{opt.icon}</div>
+                  <div className="mb-1 flex justify-center text-current">
+                    {opt.icon === 'briefcase' ? (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>) : opt.icon === 'laptop' ? (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>) : (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>)}
+                  </div>
                   <div className="text-xs font-semibold">{opt.label}</div>
                 </button>
               ))}
@@ -309,11 +311,9 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
         {/* Header */}
         <div className="text-center mb-8">
           <button onClick={() => setProfileType(null)} className="text-slate-400 text-sm hover:text-slate-600 mb-4 flex items-center gap-1 mx-auto">
-            ← Back
+            Back
           </button>
-          <div className="inline-flex items-center gap-2 bg-cac-green/10 text-cac-green px-4 py-1.5 rounded-full text-sm font-bold mb-4">
-            <span>🇳🇬</span> TaxPulse NG
-          </div>
+          <img src="/logo-full.png" alt="TaxPulse NG" className="h-10 w-auto mx-auto mb-6" />
           <h1 className="text-3xl font-bold text-slate-900">Set Up Your Business</h1>
           <p className="text-slate-500 mt-1">Ready in minutes</p>
         </div>
@@ -330,7 +330,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                     ? 'bg-cac-green text-white shadow-lg shadow-cac-green/30 ring-4 ring-cac-green/20'
                     : 'bg-slate-100 text-slate-400'
                 }`}>
-                  {step > s.id ? '✓' : s.icon}
+                  {step > s.id ? SVG_CHECK_INLINE : s.icon}
                 </div>
                 <span className={`text-xs font-semibold hidden md:block transition-colors ${step === s.id ? 'text-cac-green' : 'text-slate-400'}`}>
                   {s.title}
@@ -506,7 +506,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             {step === 3 && (
               <div className="space-y-5">
                 <p className="text-sm text-slate-500 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3">
-                  💡 {form.entityType === EntityType.INDIVIDUAL
+                   {form.entityType === EntityType.INDIVIDUAL
                     ? 'This helps us generate the right PIT obligations and reminders for you.'
                     : 'This helps us generate the right tax obligations and reminders for your business.'}
                 </p>
@@ -515,7 +515,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                 {form.entityType === EntityType.INDIVIDUAL ? (
                   <div className="space-y-5">
                     <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                      <p className="text-xs font-bold text-blue-800 mb-1">📋 Personal Income Tax Setup (NTA 2025)</p>
+                      <p className="text-xs font-bold text-blue-800 mb-1">Personal Income Tax Setup (NTA 2025)</p>
                       <p className="text-xs text-blue-600">Your annual PIT return is due <strong>31 March</strong> each year with your State Internal Revenue Service. Self-employed individuals also make quarterly advance payments.</p>
                     </div>
 
@@ -557,7 +557,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                       {(form.annualIncome || 0) > 0 && (
                         <p className="text-xs text-cac-green mt-1 font-semibold">
                           {(form.annualIncome || 0) <= 800000
-                            ? '✓ First ₦800k is tax-free under NTA 2025'
+                            ? 'First N800k is tax-free under NTA 2025'
                             : `Estimated monthly PIT: ₦${Math.round(((form.annualIncome || 0) * 0.12) / 12).toLocaleString()} (rough estimate)`}
                         </p>
                       )}
@@ -567,7 +567,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                   /* BUSINESS: existing VAT, PAYE, WHT toggles */
                   <>
                     <ToggleCard
-                      icon="🧾"
+                      icon=""
                       title="Registered for VAT?"
                       description="Your business charges VAT (7.5%) on goods or services"
                       checked={form.collectsVat}
@@ -587,7 +587,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                     )}
 
                     <ToggleCard
-                      icon="👥"
+                      icon=""
                       title="Do you have employees?"
                       description="You'll need to file PAYE returns with your state IRS"
                       checked={form.hasEmployees}
@@ -608,7 +608,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                     )}
 
                     <ToggleCard
-                      icon="🤝"
+                      icon=""
                       title="Do you pay vendors / contractors?"
                       description="You'll need to deduct and remit Withholding Tax (WHT)"
                       checked={form.paysVendors}
@@ -618,32 +618,32 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                     {/* Payroll statutory contributions -- shown when has employees */}
                     {form.hasEmployees && (
                       <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 space-y-3">
-                        <p className="text-xs font-bold text-purple-800">👥 Payroll Statutory Contributions</p>
+                        <p className="text-xs font-bold text-purple-800">Payroll Statutory Contributions</p>
                         <p className="text-xs text-purple-600">These apply to employers with staff. Tick what applies to you.</p>
 
                         <ToggleCard
-                          icon="🛡️"
+                          icon=""
                           title="NSITF (3+ employees)"
                           description="1% of gross payroll monthly → National Social Insurance Trust Fund (due 16th)"
                           checked={form.hasNSITF || false}
                           onChange={v => update('hasNSITF', v)}
                         />
                         <ToggleCard
-                          icon="🏦"
+                          icon=""
                           title="Pension (3+ employees)"
                           description="8% employee + 10% employer of gross → Pension Fund Administrators (due 7 days after payday)"
                           checked={form.hasPension || false}
                           onChange={v => update('hasPension', v)}
                         />
                         <ToggleCard
-                          icon="🎓"
+                          icon=""
                           title="ITF (5+ staff or ₦50M+ turnover)"
                           description="1% of annual payroll → Industrial Training Fund (due 1 April annually)"
                           checked={form.hasITF || false}
                           onChange={v => update('hasITF', v)}
                         />
                         <ToggleCard
-                          icon="🏠"
+                          icon=""
                           title="NHF contributions"
                           description="2.5% of employee basic salary monthly → Federal Mortgage Bank of Nigeria"
                           checked={form.hasNHF || false}
@@ -655,7 +655,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                     {/* CAC Annual Returns */}
                     {(form.cacStatus === 'Registered' || form.rcNumber) && (
                       <ToggleCard
-                        icon="🏛️"
+                        icon=""
                         title="CAC Annual Returns"
                         description="All registered companies must file annual returns with CAC by 30 June each year"
                         checked={form.cacAnnualReturns !== false}
@@ -666,7 +666,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                 )}
               {/* WhatsApp reminder opt-in */}
               <div className="bg-green-50 border border-green-200 rounded-xl p-4 space-y-3">
-                <p className="text-xs font-bold text-green-800">📱 WhatsApp Deadline Reminders</p>
+                <p className="text-xs font-bold text-green-800">WhatsApp Deadline Reminders</p>
                 <p className="text-xs text-green-600">Get tax deadline reminders directly on WhatsApp -- 7 days and 1 day before each obligation is due.</p>
                 <input
                   type="tel"
@@ -677,7 +677,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                 />
                 {form.phone && (
                   <ToggleCard
-                    icon="✅"
+                    icon=""
                     title="Enable WhatsApp reminders"
                     description="I agree to receive tax deadline reminders on WhatsApp from TaxPulse NG"
                     checked={form.whatsappOptin || false}
@@ -705,23 +705,23 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                     <div className="flex flex-wrap gap-2">
                       {form.entityType === EntityType.INDIVIDUAL ? (
                         <>
-                          <span className="bg-cac-green/10 text-cac-green text-xs font-bold px-2.5 py-1 rounded-full">PIT ✓</span>
+                          <span className="bg-cac-green/10 text-cac-green text-xs font-bold px-2.5 py-1 rounded-full">PIT </span>
                           {(form.employmentType === 'self-employed' || form.employmentType === 'both') && (
-                            <span className="bg-blue-50 text-blue-700 text-xs font-bold px-2.5 py-1 rounded-full">Quarterly Advance ✓</span>
+                            <span className="bg-blue-50 text-blue-700 text-xs font-bold px-2.5 py-1 rounded-full">Quarterly Advance </span>
                           )}
                         </>
                       ) : (
                         <>
-                          <span className="bg-cac-green/10 text-cac-green text-xs font-bold px-2.5 py-1 rounded-full">CIT ✓</span>
-                          {form.collectsVat && <span className="bg-cac-green/10 text-cac-green text-xs font-bold px-2.5 py-1 rounded-full">VAT ✓</span>}
-                          {form.hasEmployees && <span className="bg-cac-green/10 text-cac-green text-xs font-bold px-2.5 py-1 rounded-full">PAYE ✓</span>}
-                          {form.paysVendors && <span className="bg-cac-green/10 text-cac-green text-xs font-bold px-2.5 py-1 rounded-full">WHT ✓</span>}
-                          {form.hasNSITF && <span className="bg-purple-100 text-purple-700 text-xs font-bold px-2.5 py-1 rounded-full">NSITF ✓</span>}
-                          {form.hasPension && <span className="bg-blue-100 text-blue-700 text-xs font-bold px-2.5 py-1 rounded-full">Pension ✓</span>}
-                          {form.hasITF && <span className="bg-amber-100 text-amber-700 text-xs font-bold px-2.5 py-1 rounded-full">ITF ✓</span>}
-                          {form.hasNHF && <span className="bg-teal-100 text-teal-700 text-xs font-bold px-2.5 py-1 rounded-full">NHF ✓</span>}
-                          {form.cacAnnualReturns !== false && form.cacStatus === 'Registered' && <span className="bg-slate-100 text-slate-700 text-xs font-bold px-2.5 py-1 rounded-full">CAC ✓</span>}
-                          {form.whatsappOptin && <span className="bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full">WhatsApp ✓</span>}
+                          <span className="bg-cac-green/10 text-cac-green text-xs font-bold px-2.5 py-1 rounded-full">CIT </span>
+                          {form.collectsVat && <span className="bg-cac-green/10 text-cac-green text-xs font-bold px-2.5 py-1 rounded-full">VAT </span>}
+                          {form.hasEmployees && <span className="bg-cac-green/10 text-cac-green text-xs font-bold px-2.5 py-1 rounded-full">PAYE </span>}
+                          {form.paysVendors && <span className="bg-cac-green/10 text-cac-green text-xs font-bold px-2.5 py-1 rounded-full">WHT </span>}
+                          {form.hasNSITF && <span className="bg-purple-100 text-purple-700 text-xs font-bold px-2.5 py-1 rounded-full">NSITF </span>}
+                          {form.hasPension && <span className="bg-blue-100 text-blue-700 text-xs font-bold px-2.5 py-1 rounded-full">Pension </span>}
+                          {form.hasITF && <span className="bg-amber-100 text-amber-700 text-xs font-bold px-2.5 py-1 rounded-full">ITF </span>}
+                          {form.hasNHF && <span className="bg-teal-100 text-teal-700 text-xs font-bold px-2.5 py-1 rounded-full">NHF </span>}
+                          {form.cacAnnualReturns !== false && form.cacStatus === 'Registered' && <span className="bg-slate-100 text-slate-700 text-xs font-bold px-2.5 py-1 rounded-full">CAC </span>}
+                          {form.whatsappOptin && <span className="bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full">WhatsApp </span>}
                         </>
                       )}
                     </div>
@@ -738,14 +738,14 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
               onClick={back}
               className={`px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-all ${step === 1 ? 'invisible' : ''}`}
             >
-              ← Back
+              Back
             </button>
             {step < 4 ? (
               <button
                 onClick={next}
                 className="px-6 py-2.5 bg-cac-green text-white rounded-xl text-sm font-bold hover:bg-cac-dark transition-all shadow-lg shadow-cac-green/20"
               >
-                Continue →
+                Continue
               </button>
             ) : (
               <button
@@ -753,7 +753,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                 disabled={submitting}
                 className="px-8 py-2.5 bg-cac-green text-white rounded-xl text-sm font-bold hover:bg-cac-dark transition-all shadow-lg shadow-cac-green/30 flex items-center gap-2 disabled:opacity-70"
               >
-                🚀 Launch Dashboard
+                Launch Dashboard
               </button>
             )}
           </div>
