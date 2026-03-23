@@ -32,7 +32,7 @@ export const AccountantShareManager: React.FC<ShareManagerProps> = ({ company })
       const t = await db.createShareToken(company.id, 30);
       setToken(t);
     } catch (e: any) {
-      alert('Failed to create share link: ' + e.message);
+      alert('Failed to create share link:' + e.message);
     } finally {
       setCreating(false);
     }
@@ -68,7 +68,7 @@ export const AccountantShareManager: React.FC<ShareManagerProps> = ({ company })
       {token ? (
         <div className="space-y-3">
           <div className="bg-green-50 border border-green-200 rounded-xl p-3 space-y-2">
-            <p className="text-xs font-bold text-green-800"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span> Share link is active (expires in 30 days)</p>
+            <p className="text-xs font-bold text-green-800"> Share link is active (expires in 30 days)</p>
             <div className="flex gap-2">
               <input
                 readOnly
@@ -81,7 +81,7 @@ export const AccountantShareManager: React.FC<ShareManagerProps> = ({ company })
                   copied ? 'bg-cac-green text-white' : 'bg-white text-cac-green border border-cac-green hover:bg-cac-green/5'
                 }`}
               >
-                {copied ? '<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Copied!' : 'Copy'}
+                {copied ? 'Copied!' : 'Copy'}
               </button>
             </div>
           </div>
@@ -99,13 +99,13 @@ export const AccountantShareManager: React.FC<ShareManagerProps> = ({ company })
             onClick={revokeLink}
             className="w-full py-2.5 border border-red-200 text-red-500 rounded-xl text-sm font-bold hover:bg-red-50 transition-all"
           >
-            <span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span> Revoke Link -- Remove Access
+             Revoke Link -- Remove Access
           </button>
         </div>
       ) : (
         <div className="space-y-3">
           <div className="bg-slate-50 rounded-xl p-4 text-center space-y-2">
-            <p className="text-3xl"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span></p>
+            <p className="text-3xl"></p>
             <p className="text-sm font-bold text-slate-700">No share link active</p>
             <p className="text-xs text-slate-400">Create a link to give your accountant read-only access to your data without sharing your password.</p>
           </div>
@@ -114,7 +114,7 @@ export const AccountantShareManager: React.FC<ShareManagerProps> = ({ company })
             disabled={creating}
             className="w-full py-3 bg-cac-green text-white rounded-xl text-sm font-bold hover:bg-cac-dark transition-all disabled:opacity-60"
           >
-            {creating ? 'Creating...' : '<span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span> Create Accountant Share Link (30 days)'}
+            {creating ? 'Creating...' : 'Create Accountant Share Link (30 days)'}
           </button>
         </div>
       )}
@@ -156,7 +156,7 @@ export const AccountantView: React.FC<AccountantViewProps> = ({ token }) => {
   if (error) return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
       <div className="bg-white rounded-2xl p-8 max-w-sm w-full text-center border border-slate-100 shadow-lg">
-        <p className="text-5xl mb-4"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span></p>
+        <p className="text-5xl mb-4"></p>
         <h2 className="font-bold text-slate-800 mb-2">Link Expired or Invalid</h2>
         <p className="text-slate-500 text-sm">{error}</p>
       </div>
@@ -203,7 +203,7 @@ export const AccountantView: React.FC<AccountantViewProps> = ({ token }) => {
       <div className="max-w-5xl mx-auto p-6 space-y-6">
         {/* Read-only notice */}
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-700 flex items-center gap-2">
-          <span className="text-base"><span style={{display:"inline-flex",alignItems:"center",verticalAlign:"middle"}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span></span>
+          <span className="text-base"></span>
           <span>You are viewing <strong>{company.name}</strong>'s tax data in read-only mode. This link expires in 30 days from creation. Data generated by TaxPulse NG -- NTA 2025.</span>
         </div>
 
@@ -212,10 +212,10 @@ export const AccountantView: React.FC<AccountantViewProps> = ({ token }) => {
           <h2 className="font-bold text-slate-800 mb-3">Financial Summary</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { label: "Total Revenue",    value: fmt(totalRevenue),  color: 'text-cac-green' },
-              { label: "Total Expenses",   value: fmt(totalExpenses), color: 'text-slate-700' },
-              { label: "VAT Collected",    value: fmt(vatCollected),  color: 'text-amber-600' },
-              { label: "WHT Deducted",     value: fmt(whtDeducted),   color: 'text-purple-600' },
+              { label: "Total Revenue",    value: fmt(totalRevenue),  color:'text-cac-green'},
+              { label: "Total Expenses",   value: fmt(totalExpenses), color:'text-slate-700'},
+              { label: "VAT Collected",    value: fmt(vatCollected),  color:'text-amber-600'},
+              { label: "WHT Deducted",     value: fmt(whtDeducted),   color:'text-purple-600'},
             ].map(s => (
               <Card key={s.label} className="text-center">
                 <p className="text-xs text-slate-400 mb-1">{s.label}</p>
@@ -230,9 +230,9 @@ export const AccountantView: React.FC<AccountantViewProps> = ({ token }) => {
           <h2 className="font-bold text-slate-800 mb-3">Tax Obligations Overview</h2>
           <div className="grid grid-cols-3 gap-4 mb-4">
             {[
-              { label: "Filed", count: filed.length,   color: 'bg-green-50 border-green-200 text-green-700' },
-              { label: "Due / Overdue", count: due.length + overdue.length, color: 'bg-red-50 border-red-200 text-red-700' },
-              { label: "Total", count: obligations.length, color: 'bg-slate-50 border-slate-200 text-slate-700' },
+              { label: "Filed", count: filed.length,   color:'bg-green-50 border-green-200 text-green-700'},
+              { label: "Due / Overdue", count: due.length + overdue.length, color:'bg-red-50 border-red-200 text-red-700'},
+              { label: "Total", count: obligations.length, color:'bg-slate-50 border-slate-200 text-slate-700'},
             ].map(s => (
               <div key={s.label} className={`rounded-xl p-4 text-center border ${s.color}`}>
                 <p className="text-2xl font-extrabold">{s.count}</p>
@@ -245,7 +245,7 @@ export const AccountantView: React.FC<AccountantViewProps> = ({ token }) => {
             <table className="w-full text-sm">
               <thead className="bg-slate-50 border-b border-slate-100">
                 <tr>
-                  {['Tax', 'Period', 'Due Date', 'Amount', 'Status', 'Filed On'].map(h => (
+                  {['Tax','Period','Due Date','Amount','Status','Filed On'].map(h => (
                     <th key={h} className="px-4 py-3 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">{h}</th>
                   ))}
                 </tr>
@@ -260,7 +260,7 @@ export const AccountantView: React.FC<AccountantViewProps> = ({ token }) => {
                     <td className="px-4 py-3">
                       <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${statusColor(o.status)}`}>{o.status}</span>
                     </td>
-                    <td className="px-4 py-3 text-slate-400">{o.paymentDate ? fmtDate(o.paymentDate) : '--'}</td>
+                    <td className="px-4 py-3 text-slate-400">{o.paymentDate ? fmtDate(o.paymentDate) :'--'}</td>
                   </tr>
                 ))}
               </tbody>
@@ -275,7 +275,7 @@ export const AccountantView: React.FC<AccountantViewProps> = ({ token }) => {
             <table className="w-full text-sm">
               <thead className="bg-slate-50 border-b border-slate-100 sticky top-0">
                 <tr>
-                  {['Date', 'Type', 'Description', 'Amount', 'Tax Amount'].map(h => (
+                  {['Date','Type','Description','Amount','Tax Amount'].map(h => (
                     <th key={h} className="px-4 py-3 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">{h}</th>
                   ))}
                 </tr>
@@ -285,8 +285,8 @@ export const AccountantView: React.FC<AccountantViewProps> = ({ token }) => {
                   <tr key={l.id} className="hover:bg-slate-50/50">
                     <td className="px-4 py-2.5 text-slate-500 text-xs">{fmtDate(l.date)}</td>
                     <td className="px-4 py-2.5">
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${l.type === 'sale' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                        {l.type === 'sale' ? 'Income' : 'Expense'}
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${l.type ==='sale'?'bg-green-100 text-green-700':'bg-red-100 text-red-700'}`}>
+                        {l.type ==='sale'?'Income':'Expense'}
                       </span>
                     </td>
                     <td className="px-4 py-2.5 text-slate-700">{l.description}</td>
