@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
+import LandingPage from './pages/LandingPage';
 import { FreelancerDashboard } from './pages/FreelancerDashboard';
 import { CurrencyIncome } from './pages/CurrencyIncome';
+import { EInvoiceNRS } from './pages/EInvoiceNRS';
 import Onboarding from './pages/Onboarding';
 import { CalculatorsPage } from './pages/Calculators';
 import { PITCalculator } from './pages/PITCalculator';
@@ -29,7 +31,7 @@ import { supabase } from './services/supabaseClient';
 export type AppView =
   | 'dashboard' | 'onboarding' | 'calculators' | 'pit'
   | 'ledger' | 'settings' | 'ai' | 'vault' | 'penalties' | 'export' | 'import' | 'payslip' | 'invoice'
-  | 'salary' | 'planner' | 'tcc' | 'payroll-csv' | 'fx';
+  | 'salary' | 'planner' | 'tcc' | 'payroll-csv' | 'fx' | 'einvoice-nrs';
 
 const PRO_VIEWS: AppView[] = ['ai', 'vault', 'export', 'import', 'payslip', 'invoice'];
 
@@ -60,6 +62,7 @@ type AppState = 'loading' | 'unauthenticated' | 'ready';
 
 const App: React.FC = () => {
   const [appState, setAppState]           = useState<AppState>('loading');
+  const [showLanding, setShowLanding]     = useState(true);
   const [seedingSchedule, setSeedingSchedule] = useState(false);
   const [userId, setUserId]               = useState<string | null>(null);
   const [profile, setProfile]             = useState<UserProfile | null>(null);
@@ -147,11 +150,13 @@ const App: React.FC = () => {
 
   const handleCompanyAdded = async (company: Company) => {
     if (companies.length >= 1 && !isPro(profile)) { setShowPaywall(true); return; }
+    setSeedingSchedule(true);
     try {
+      // Ensure uid is always set before saving (race condition guard)
+      if (userId) (window as any).__taxpulse_uid = userId;
       // 1. Save company first -- DB returns real UUID
       const saved = await db.addCompany(company);
-      // 2. Show seeding overlay, seed obligations with real company ID
-      setSeedingSchedule(true);
+      // 2. Seed obligations with real company ID
       const obligations = generateObligations({ ...company, id: saved.id });
       for (const ob of obligations) {
         await db.addObligation({ ...ob, id: '' }).catch(() => {});
@@ -159,8 +164,14 @@ const App: React.FC = () => {
       setCompanies(prev => [...prev, saved]);
       setActiveCompany(saved);
       setView('dashboard');
-    } catch (e: any) { alert('Error saving company: ' + e.message); }
-    finally { setSeedingSchedule(false); }
+    } catch (e: any) {
+      console.error('handleCompanyAdded error:', e);
+      setSeedingSchedule(false);
+      alert('Could not save your profile: ' + (e?.message || 'Unknown error') + '\n\nPlease check your internet connection and try again.');
+      return;
+    } finally {
+      setSeedingSchedule(false);
+    }
   };
 
   const handleCompanySaved = async (updated: Company) => {
@@ -189,11 +200,14 @@ const App: React.FC = () => {
       <div className="text-center space-y-5 px-6">
         <div className="w-20 h-20 border-4 border-cac-green border-t-transparent rounded-full animate-spin mx-auto" />
         <div>
-          <h2 className="text-xl font-extrabold text-slate-900">Building your tax calendar</h2>
-          <p className="text-slate-500 text-sm mt-2">Creating 12 months of obligations based on your company profile...</p>
+          <h2 className="text-xl font-extrabold text-slate-900">Setting up your tax profile</h2>
+          <p className="text-slate-500 text-sm mt-2">Creating your personalised tax calendar...</p>
         </div>
         <div className="space-y-2 text-left max-w-xs mx-auto">
-          {['VAT deadlines (monthly, 21st)', 'PAYE schedule (monthly, 10th)', 'WHT remittance (monthly, 21st)', 'CIT filing (annual)'].map(item => (
+          {(activeCompany?.entityType === 'Individual (Personal Income Tax)'
+            ? ['PIT self-assessment calendar', 'Quarterly remittance schedule', 'WHT credit tracker', 'TCC reminder']
+            : ['VAT deadlines (monthly, 21st)', 'PAYE schedule (monthly, 10th)', 'WHT remittance (monthly, 21st)', 'CIT filing (annual)']
+          ).map(item => (
             <div key={item} className="flex items-center gap-2 text-sm text-slate-600">
               <span className="w-4 h-4 bg-cac-green rounded-full flex items-center justify-center text-white text-xs">✓</span>
               {item}
@@ -203,7 +217,10 @@ const App: React.FC = () => {
       </div>
     </div>
   );
-  if (appState === 'unauthenticated') return <AuthPage />;
+  if (appState === 'unauthenticated') {
+    if (showLanding) return <LandingPage onGetStarted={() => setShowLanding(false)} />;
+    return <AuthPage />;
+  }
   if (showPaywall) return (
     <Paywall profile={profile!} onUpgraded={handleUpgraded} onContinueFree={() => setShowPaywall(false)} />
   );
@@ -257,6 +274,7 @@ const App: React.FC = () => {
       {view === 'tcc'         && activeCompany && <TCCTracker company={activeCompany} />}
       {view === 'payroll-csv' && activeCompany && <PayrollCSVExport company={activeCompany} />}
       {view === 'fx' && activeCompany && <CurrencyIncome company={activeCompany} />}
+      {view === 'einvoice-nrs' && activeCompany && <EInvoiceNRS company={activeCompany} />}
     </Layout>
   );
 };

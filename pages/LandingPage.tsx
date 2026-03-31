@@ -236,7 +236,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
             {[
               { icon: '?', title: "Auto Tax Calendar", desc: 'Sign up once. Get 12 months of VAT, PAYE, WHT and CIT deadlines generated based on your company profile.', tag: 'Core' },
               { icon: '?', title: "Bank Statement Import", desc: 'Upload your PDF, Excel or CSV. AI reads every transaction, categorises it and fills your ledger in seconds.', tag: 'Pro' },
-              { icon: '?', title: "AI Tax Assistant", desc: 'Ask 'How much VAT do I owe this month?' Get an answer based on your actual ledger -- not generic advice.', tag: "Pro" },
+              { icon: '?', title: "AI Tax Assistant", desc: 'Ask How much VAT do I owe this month? Get an answer based on your actual ledger -- not generic advice.', tag: "Pro" },
               { icon: '??', title: "Evidence Vault", desc: 'Store receipts and invoices securely. NTA 2025 requires 6-year retention. Be audit-ready in minutes.', tag: 'Pro' },
               { icon: '?', title: "PDF Tax Reports", desc: 'Generate professional reports ready to send your accountant or submit to the Nigeria Revenue Service.', tag: 'Pro' },
               { icon: '?', title: "Deadline Reminders", desc: 'Push notifications 7 days and 1 day before every obligation. Never miss a VAT return or PAYE filing again.', tag: 'Core' },
